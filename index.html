@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Furnishing Widget BigLayoutData.com</title>
+    <meta name="description" content="Select furniture that fits your floor plan, budget and style in Dubai.">
+</head>
+<body>
+    <!-- BigLayoutData widget (widget.js) -->
+    <div id="wbld"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
+        scriptElement.type = 'text/javascript';
+        scriptElement.onload = function() {
+            wbld.init(id='wbld', widget_name='wbld_widget');
+        };
+        document.body.appendChild(scriptElement);
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N1523CTQVK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-N1523CTQVK');
+    </script>
+</body>
+</html>
