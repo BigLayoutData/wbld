@@ -13,6 +13,7 @@ var wbld = {
     products_img_trimmed: 'https://space.biglayoutdata.com/products_img_trimmed/',
     products_img_200_200: 'https://space.biglayoutdata.com/products_200_200/',
     products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
+    products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
     // widget initialization method 
     init: function(id, widget_name) {
         // check if the HTML element with the specified id exists on the page
@@ -917,21 +918,9 @@ function set_zero_click_n() {
 
 function get_bucket(product_image, product_main_image_n, product_shop) {
 
-    let bucket_name = wbld.products_img_200_200;
-
+    let bucket_name = wbld.products_OC_Home;
     if (product_shop === "Danube Home") {
-        if (parseInt(product_main_image_n) < 10) {
-            bucket_name = wbld.products_img_trimmed;
-            let [fname, ext] = product_image.split('.');
-            if (['.jpg', '.jpeg'].includes('.' + ext.toLowerCase())) {
-                ext = ".png";
-                product_image = fname + ext;
-            }
-        }
-    }
-    
-    if (product_shop === "OC Home") {
-        bucket_name = wbld.products_OC_Home;
+        bucket_name = wbld.products_Danube_Home;
     }
     
     return bucket_name + product_image;
