@@ -38,12 +38,18 @@ var wbld = {
                     this.widget_name = widget_name;
 
                     // get domain name
-                    this.widget_domain = document.domain;
+                    this.widget_domain = location.hostname;
+
+                    // get url params
+                    const urlParams = new URLSearchParams(window.location.search);
 
                     // need to check that the widget name is available
                     const data = {
                         "widget_name": widget_name,
-                        "widget_domain": document.domain
+                        "widget_domain": location.hostname,
+                        "property_size": urlParams.get('property_size'),
+                        "bedrooms": urlParams.get('bedrooms'),
+                        "search": urlParams.get('search'),
                     };
                     $.ajax({
                         url: 'https://api1.biglayoutdata.com/check_widget/',
