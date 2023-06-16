@@ -3,6 +3,8 @@
   --white: #ffffff;
   --black: #000000;
   --btn-color: var(--gold);
+  --min-width: 346px;
+  --max-width: 865px;
 }
 
 #wbld {
@@ -64,10 +66,11 @@
     float: left;
     box-sizing: border-box;
     width: 100%;
-    height: calc(100vh - 160px - 20px - 70px);
+    /*height: calc(100vh - 160px - 20px - 70px);
     max-height: 900px;
+    height: auto;
     overflow-y: scroll;
-    scrollbar-width: thin;
+    scrollbar-width: thin;*/
 }
 
 #poweredby {
@@ -114,8 +117,9 @@
     float: left;
     box-sizing: border-box;
     width: 100%;
-    height: calc(100vh - 70px - 10px - 10px - 70px);
-    max-height: 990px;
+    /*height: calc(100vh - 70px - 10px - 10px - 70px);
+    max-height: 990px;*/
+    height: 400px;
     overflow-y: scroll;
     scrollbar-width: thin;
 }

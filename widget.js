@@ -554,7 +554,24 @@ function setCoordinates(element, coords) {
     element.style.top = `${y}px`;
     element.style.width = `${width}px`;
     element.style.height = `${height}px`;
-  }
+}
+
+function updateSidebarContentHeight() {
+    // max-width: 865px from widget.css
+    var maxWidth = 865;
+    var viewportWidth = window.innerWidth;
+  
+    if (viewportWidth > maxWidth) {
+        var outputHeight = document.getElementById('output').offsetHeight;
+        var inputHeight = document.getElementById('input').offsetHeight;
+        var progressBarHeight = document.getElementById('progress-bar').offsetHeight;
+        var sidebarTitleHeight = document.getElementById('sidebar-title').offsetHeight;
+        var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight - progressBarHeight;
+        document.getElementById('sidebar-content').style.height = sidebarContentHeight + 'px';
+    } else {
+      // Reset the height if the conditions are not met
+    }
+}
 
 function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
@@ -710,6 +727,7 @@ function update_output(click_n, address_id, layout_id) {
                         // Check if all item images have finished loading
                         if ($('.item-product-image img').length === items_n) {
                             startProgressBar(5);
+                            updateSidebarContentHeight();
                         }
                     });
                     
