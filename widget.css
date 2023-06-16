@@ -472,18 +472,31 @@
 }
 
 
-.mood-board img {
+.mood-board img, .product-mood-board {
     box-sizing: border-box;
     width: 90%;
     padding-left: 5%;
     padding-right: 5%;
     max-width: 700px;
-    max-height: 350px;
+    height: 350px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: auto;
     display: block;
+    position: relative;
+}
+.product-div {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: white;
+    overflow: hidden; /* Add overflow: hidden to hide overflowing images */
+}  
+.product-div img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Add object-fit: cover to the images */
 }
 
 
@@ -542,17 +555,18 @@
     padding-left: 0px;
 }
 
-.mood-board img {
+.mood-board img, .product-mood-board {
     box-sizing: border-box;
     width: 100%;
     padding-left: 0%;
     padding-right: 0%;
     max-width: 700px;
-    max-height: 350px;
+    height: 350px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: auto;
     display: block;
+    position: relative;
 }
 }

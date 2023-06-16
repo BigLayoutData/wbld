@@ -5,15 +5,14 @@ var wbld = {
     // some const for img urls
     pics: 'https://space.biglayoutdata.com/pics/',
     mood_board_img: 'https://space.biglayoutdata.com/mood-boards/',
-    //layout_without_items_img: 'https://space.biglayoutdata.com/layout-without-items-img/',
-    //layout_with_items_img: 'https://space.biglayoutdata.com/layout-with-items-img/',
     layout_without_items_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     layout_with_items_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
-    products_img_trimmed: 'https://space.biglayoutdata.com/products_img_trimmed/',
-    products_img_200_200: 'https://space.biglayoutdata.com/products_200_200/',
     products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
     products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
+    // some const for api urls
+    api1: 'https://api1.biglayoutdata.com/',
+    api2: 'https://api.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
@@ -54,7 +53,7 @@ var wbld = {
                         "search": url_params.get('search'),
                     };
                     $.ajax({
-                        url: 'https://api1.biglayoutdata.com/check_widget/',
+                        url: this.api1 + 'check_widget/',
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',
@@ -364,7 +363,7 @@ function generate_poweredby() {
         <div class="widget-container">
             <div class="poweredby">
                 <div class="poweredby-text">Powered by</div>
-                <a href="https://biglayoutdata.com"><img src="${wbld.pics + 'poweredby.png'}" target="_blank" rel="noopener" /></a>
+                <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.png'}" target="_blank" rel="noopener" /></a>
             </div>
         </div>
     `);
@@ -377,7 +376,7 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
     $('.layout-change').css('display', 'none');
     
     $.ajax({
-        url: "https://api1.biglayoutdata.com/layouts/" + address_id + "/" + n_bedrooms + "/",
+        url: wbld.api1 + "layouts/" + address_id + "/" + n_bedrooms + "/",
         type: "GET",
         cache: true,
         dataType: "json",
@@ -542,6 +541,21 @@ function clean_output() {
     $("#sidebar-content").empty();
 }
 
+function setCoordinates(element, coords) {
+    const parentWidth = element.parentNode.offsetWidth;
+    const parentHeight = element.parentNode.offsetHeight;
+  
+    const x = coords[0] * parentWidth;
+    const y =  ( 1 - coords[1] - coords[3] ) * parentHeight;
+    const width = coords[2] * parentWidth;
+    const height = coords[3] * parentHeight;
+  
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
+  }
+
 function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
     clean_output();
@@ -570,7 +584,7 @@ function update_output(click_n, address_id, layout_id) {
         const shop = $(".shop-btn.selected").data( "shop_name" );
         
         $.ajax({
-            url: "https://api.biglayoutdata.com/generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
+            url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
             type: "GET",
             cache: false,
             dataType: "json",
@@ -589,7 +603,6 @@ function update_output(click_n, address_id, layout_id) {
                 } else {
                     
                     let items_n = 0;
-                    let mood_boords_n = 0;
                     
                     response.data.rooms_list.forEach( function(room) {
                         
@@ -622,7 +635,7 @@ function update_output(click_n, address_id, layout_id) {
                                             <div class="item-product-line-1">
                                                 <div class="item-product-image">
                                                     <a href="${product.product_url}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
-                                                        <img src="${get_bucket(product.product_image, product.product_main_image_n, product.product_shop)}"/>
+                                                        <img src="${get_bucket(product.product_image, product.product_shop)}"/>
                                                     </a>
                                                 </div>
                                                 <div class="item-product-content">
@@ -647,24 +660,39 @@ function update_output(click_n, address_id, layout_id) {
                                                         image_name: ${product.product_image}
                                                     </div>*/
                         
-                        if (room.room_mood_board) {
+                        if (room.room_has_moodboard == "Y") {
                         
                             $('#output').append(`
                                 <div class="widget-container">
                                     <div class="heading-subtitle">${room.room_name}</div>
                                 </div>
                             `);
-                            
-                            $('#output').append(`
-                                <div class="widget-container">
-                                    <div class="mood-board">
-                                        <img src="${wbld.mood_board_img}${room.room_mood_board}"/>
-                                    </div>
-                                </div>
-                            `);
-                            // <img src="${wbld.mood_board_img}${room.room_mood_board}?_${Date.now()}"/>
 
-                            mood_boords_n += 1;
+                            const wcDiv = document.createElement('div');
+                            wcDiv.className = 'widget-container';
+
+                            const pmbDiv = document.createElement('div');
+                            pmbDiv.className = 'product-mood-board';
+                            
+                            wcDiv.appendChild(pmbDiv);
+                            $('#output').append(wcDiv);
+
+                            pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
+
+                            for (let i = 0; i < room.products_list.length; i++) {
+                                const product = room.products_list[i];
+
+                                const productDiv = document.createElement('div');
+                                productDiv.className = 'product-div';
+
+                                const img = document.createElement('img');
+                                img.src = get_bucket(product.product_image, product.product_shop);
+                                productDiv.appendChild(img);
+
+                                pmbDiv.appendChild(productDiv);
+                                setCoordinates(productDiv, JSON.parse(product.item_ax));
+                            }
+
                         }
                         
                     });
@@ -676,11 +704,11 @@ function update_output(click_n, address_id, layout_id) {
                     click_n += 1;
                     $(".generate-btn").data("click_n", click_n);
                     
-                    // Attach load event listener to each mood board image
-                    const moodBoardImage = $('.mood-board img').last();
-                    moodBoardImage.on('load', function () {
-                        // Check if all mood board images have finished loading
-                        if ($('.mood-board img').length === mood_boords_n) {
+                    // Attach load event listener to each item image
+                    const itemImage = $('.item-product-image img').last();
+                    itemImage.on('load', function () {
+                        // Check if all item images have finished loading
+                        if ($('.item-product-image img').length === items_n) {
                             startProgressBar(5);
                         }
                     });
@@ -903,7 +931,7 @@ $(document).ready(function(){
         };
         
         $.ajax({
-            url: 'https://api1.biglayoutdata.com/product_click/',
+            url: wbld.api1 + 'product_click/',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
@@ -924,8 +952,8 @@ function set_zero_click_n() {
     $(".generate-btn").data("click_n", 0);
 }
 
-function get_bucket(product_image, product_main_image_n, product_shop) {
-
+function get_bucket(product_image, product_shop) {
+    
     let bucket_name = wbld.products_OC_Home;
     if (product_shop === "Danube Home") {
         bucket_name = wbld.products_Danube_Home;
