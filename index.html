@@ -17,7 +17,8 @@
         scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
         scriptElement.type = 'text/javascript';
         scriptElement.onload = function() {
-            wbld.init(id='wbld', widget_name='wbld_widget');
+            var url_params = new Map();
+            wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
         };
         document.body.appendChild(scriptElement);
     </script>

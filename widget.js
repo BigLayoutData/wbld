@@ -15,7 +15,7 @@ var wbld = {
     products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
     products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
     // widget initialization method 
-    init: function(id, widget_name) {
+    init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
         if (document.getElementById(id)) { 
             if (id == 'wbld') { 
@@ -41,15 +41,17 @@ var wbld = {
                     this.widget_domain = location.hostname;
 
                     // get url params
-                    const urlParams = new URLSearchParams(window.location.search);
+                    if (url_params.size == 0) {
+                        url_params = new URLSearchParams(window.location.search);
+                    }
 
                     // need to check that the widget name is available
                     const data = {
                         "widget_name": widget_name,
                         "widget_domain": location.hostname,
-                        "property_size": urlParams.get('property_size'),
-                        "bedrooms": urlParams.get('bedrooms'),
-                        "search": urlParams.get('search'),
+                        "property_size": url_params.get('property_size'),
+                        "bedrooms": url_params.get('bedrooms'),
+                        "search": url_params.get('search'),
                     };
                     $.ajax({
                         url: 'https://api1.biglayoutdata.com/check_widget/',
