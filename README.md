@@ -18,7 +18,8 @@ We leverage AI and a database of floor plans to curate furniture sets from local
     scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
     scriptElement.type = 'text/javascript';
     scriptElement.onload = function() {
-        wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME');
+        var url_params = new Map();
+        wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
     };
     document.body.appendChild(scriptElement);
 </script>
@@ -28,7 +29,7 @@ Replace ```YOUR_WIDGET_NAME``` with the widget name you received in step 1.
 
 The widget should now be installed and activated!
 
-## urlParams for pre-search
+## url_params for pre-search in URL
 
 To open a URL with specific parameters for pre-search, you can use the following format:
 
@@ -39,6 +40,46 @@ Replace ```[bedrooms]``` with the number of bedrooms (0 for Studio, 1 for 1 bedr
 For example, to open a URL for a 2-bedroom apartment with a property size of 140.5m² in Armada Tower 3, the URL would be:
 
 https://widget.biglayoutdata.com/?bedrooms=2&property_size=140.5&search=Armada+Tower+3
+
+## url_params for pre-search in wbld.init()
+
+To initialise widget with specific parameters for pre-search, you can set the parameters inside the onload function as follows:
+
+```
+scriptElement.onload = function() {
+    var url_params = new Map();
+    url_params.set('bedrooms', [bedrooms]);
+    url_params.set('property_size', [property_size]);
+    url_params.set('search', [search]);
+
+    wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
+};
+```
+
+Replace ```[bedrooms]``` with the number of bedrooms (0 for Studio, 1 for 1 bedroom, 2 for 2 bedrooms, 3 for 3 bedrooms), ```[property_size]``` with the property size in square meters, and ```[search]``` with the name of the building/address where spaces are replaced by '+'.
+
+For example, to init widget for a 2-bedroom apartment with a property size of 140.5m² in Armada Tower 3, the script would be:
+
+```
+<!-- BigLayoutData widget (widget.js) -->
+<div id="wbld"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+    var scriptElement = document.createElement('script');
+    scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
+    scriptElement.type = 'text/javascript';
+    scriptElement.onload = function() {
+        var url_params = new Map();
+        url_params.set('bedrooms', 2);
+        url_params.set('property_size', 140.5);
+        url_params.set('search', 'Armada+Tower+3');
+
+        wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
+    };
+    document.body.appendChild(scriptElement);
+</script>
+```
 
 ## Getting help
 
