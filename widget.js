@@ -133,6 +133,7 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     $("#input").append($('<div id="input-line-1"></div>'));
     $("#input").append($('<div id="input-line-2"></div>'));
     $("#mainbar").append($('<div id="output"></div>'));
+    $("#mainbar").append($('<div id="product-popup" style="display: none;"></div>'));
     $("#mainbar").append($('<div id="poweredby"></div>'));
 
     // first auto click is 0
@@ -170,6 +171,8 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     const shops_list = JSON.parse(widget_shops);
     
     generate_input(addresses_list, address_id, address_address, n_bedrooms_list, layout_id, shops_list, styles_list, budgets_list, click_n);
+
+    generate_product_popup();
     
     generate_poweredby();
     
@@ -349,10 +352,21 @@ function generate_sidebar() {
                 <div class="heading-title" id="sidebar-you-look">Your Look</div>
             </div>
             <div class="widget-container">
-                <div class="heading-subtitle" id="sidebar-total-budget"></div>
+                <div class="heading-subtitle" id="sidebar-total-budget" data-budget_total="0"></div>
             </div>
         </div>
         <div id="sidebar-content"></div>
+    `);
+    
+}
+
+function generate_product_popup() {
+    
+    $('#product-popup').append(`
+        <div class="widget-container">
+            <div id="product-popup-content">
+            </div>
+        </div>
     `);
     
 }
@@ -641,7 +655,7 @@ function update_output(click_n, address_id, layout_id) {
                         
                         $('#sidebar-content').append(`
                             <div class="widget-container">
-                                <div class="heading-subtitle room-budget-title">Budget: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
+                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_budget="${room.room_budget}">Budget: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
                             </div>
                         `);
                         
@@ -651,15 +665,13 @@ function update_output(click_n, address_id, layout_id) {
                                         <div class="item-product">
                                             <div class="item-product-line-1">
                                                 <div class="item-product-image">
-                                                    <a href="${product.product_url}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
-                                                        <img src="${get_bucket(product.product_image, product.product_shop)}"/>
-                                                    </a>
+                                                    <img src="${get_bucket(product.product_image, product.product_shop)}" data-room_id="${room.room_id}" data-product_id="${product.product_id}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-product='${JSON.stringify(product)}' data-products_list_total='${JSON.stringify(room.products_list_total.filter(item => item.item_id === product.item_id))}' />
                                                 </div>
                                                 <div class="item-product-content">
                                                     <div class="item-product-name">
-                                                        <a href="${product.product_url}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">${product.product_name}</a><span class="item-product-amount">x${product.item_amount}</span>
+                                                        <a href="${product.product_url}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">${product.product_name}</a><span class="item-product-amount">x${product.item_amount}</span>
                                                     </div>
-                                                    <div class="item-product-price">
+                                                    <div class="item-product-price" data-room_id="${room.room_id}" data-product_id="${product.product_id}">
                                                         ${Number(product.product_price).toLocaleString()} ${product.product_currency}
                                                     </div>
                                                 </div>
@@ -704,6 +716,19 @@ function update_output(click_n, address_id, layout_id) {
 
                                 const img = document.createElement('img');
                                 img.src = get_bucket(product.product_image, product.product_shop);
+                                
+                                img.dataset.product = JSON.stringify(product);
+                                img.dataset.product_id = product.product_id;
+                                img.dataset.room_id = room.room_id;
+                                img.dataset.product_price = product.product_price;
+                                img.dataset.product_currency = product.product_currency;
+
+                                // Filter the array based on the condition item_id == product.item_id
+                                const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
+
+                                // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
+                                img.dataset.products_list_total = JSON.stringify(filteredList);    
+
                                 productDiv.appendChild(img);
 
                                 pmbDiv.appendChild(productDiv);
@@ -716,6 +741,7 @@ function update_output(click_n, address_id, layout_id) {
                     
                     $("#sidebar-you-look").text(`Your Look (${items_n} items)`);
                     $("#sidebar-total-budget").text(`Total Budget: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
+                    $("#sidebar-total-budget").data("budget_total", response.data.budget_total);
                     
                     // next click number
                     click_n += 1;
@@ -723,11 +749,14 @@ function update_output(click_n, address_id, layout_id) {
                     
                     // Attach load event listener to each item image
                     const itemImage = $('.item-product-image img').last();
+                    // Was problem. On last image click after request this event was triggered
+                    let requestNode = true;
                     itemImage.on('load', function () {
                         // Check if all item images have finished loading
-                        if ($('.item-product-image img').length === items_n) {
+                        if ($('.item-product-image img').length === items_n & requestNode) {
                             startProgressBar(5);
                             updateSidebarContentHeight();
+                            requestNode = false;
                         }
                     });
                     
@@ -962,6 +991,98 @@ $(document).ready(function(){
             }
         });
         
+    });
+
+    //open product change popup on product image click
+    $(document).on('click', '.product-div img, .item-product-image img', function(event) {
+        const product = JSON.parse($(this).attr('data-product'));
+        const product_id = product.product_id;
+        const productsListTotal = JSON.parse($(this).attr('data-products_list_total'));
+        const room_id = $(this).attr('data-room_id');
+        
+        // Clear the previous content
+        $('#product-popup-content').empty();
+
+        $('#product-popup-content').append(`<div id="product-popup-image"><img src="${get_bucket(product.product_image, product.product_shop)}"/></div>`);
+        $('#product-popup-content').append(`<div id="product-popup-info"><div id="product-popup-info-title">${product.product_name}</div><div id="product-popup-info-price">Buy for <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div></div>`);
+        $('#product-popup-content').append(`<div id="product-popup-list"><div id="product-popup-list-title">Try these alternatives:</div><div id="product-popup-list-items"></div></div>`);
+
+        // Add each product to the list
+        productsListTotal.forEach(function(product) {
+            const dataProduct = JSON.stringify(product);
+            const encodedDataProduct = encodeURIComponent(dataProduct);
+            $('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
+        });
+
+        // Show the popup
+        $('#product-popup').fadeIn();
+
+        // Add the 'no-scroll' class to the body to prevent scrolling on the background content
+        $('body').addClass('no-scroll');
+
+    });
+
+    // Close the popup when clicking outside the content
+    $(document).on('click', '#product-popup', function(event) {
+        if (event.target.id === 'product-popup') {
+            $('#product-popup').fadeOut();
+
+            // Remove the 'no-scroll' class from the body to allow scrolling on the background content
+            $('body').removeClass('no-scroll');
+        }
+    });
+
+    //change product on product image click
+    $(document).on('click', '#product-popup-list-item img', function(event) {
+        const decodedDataProduct = decodeURIComponent($(this).attr('data-product'));
+        const product = JSON.parse(decodedDataProduct);
+        const product_id_for_change = $(this).attr('data-product_id_for_change');
+        const room_id = $(this).attr('data-room_id');
+
+        const mbProduct = $(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
+        mbProduct.attr('data-product', JSON.stringify(product));
+        mbProduct.attr('data-product_id', product.product_id);
+        mbProduct.attr('data-product_price', product.product_price);
+        mbProduct.attr('data-product_currency', product.product_currency);
+
+        const sbProductImage = $(`.item-product-image img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        const ProductPriceOld = sbProductImage.attr('data-product_price');
+        sbProductImage.attr('src', get_bucket(product.product_image, product.product_shop));
+        sbProductImage.attr('data-product', JSON.stringify(product));
+        sbProductImage.attr('data-product_id', product.product_id);
+        sbProductImage.attr('data-product_price', product.product_price);
+        sbProductImage.attr('data-product_currency', product.product_currency);
+
+        const sbProductName = $(`.item-product-name a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        sbProductName.text(product.product_name);
+        sbProductName.attr('href', product.product_url);
+        sbProductName.attr('data-product', JSON.stringify(product));
+        sbProductName.attr('data-product_id', product.product_id);
+        sbProductName.attr('data-product_price', product.product_price);
+        sbProductName.attr('data-product_currency', product.product_currency);
+        sbProductName.attr('data-product_sku', product.product_sku);
+        sbProductName.attr('data-product_name', product.product_name);
+
+        const sbProductPrice = $(`.item-product-price[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        sbProductPrice.text(`${Number(product.product_price).toLocaleString()} ${product.product_currency}`);
+        sbProductPrice.attr('data-product_id', product.product_id);
+
+        const sbTotalBudget = $("#sidebar-total-budget");
+        const sbTotalBudgetValue = sbTotalBudget.data("budget_total");
+        const sbTotalBudgetValueNew = sbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+        sbTotalBudget.text(`Total Budget: ${Number(sbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+        sbTotalBudget.data("budget_total", sbTotalBudgetValueNew);
+
+        const roomBudgetTitle = $(`.room-budget-title[data-room_id="${room_id}"]`);
+        const roomBudgetValue = roomBudgetTitle.data('room_budget');
+        const roomBudgetValueNew = roomBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+        roomBudgetTitle.text(`Budget: ${Number(roomBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+        roomBudgetTitle.data("room_budget", roomBudgetValueNew);
+
+        $('#product-popup').fadeOut();
+        // Remove the 'no-scroll' class from the body to allow scrolling on the background content
+        $('body').removeClass('no-scroll');
     });
     
 });
