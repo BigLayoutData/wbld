@@ -669,7 +669,7 @@ function update_output(click_n, address_id, layout_id) {
                                                 </div>
                                                 <div class="item-product-content">
                                                     <div class="item-product-name">
-                                                        <a href="${product.product_url}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">${product.product_name}</a><span class="item-product-amount">x${product.item_amount}</span>
+                                                        <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">${product.product_name}</a><span class="item-product-amount">x${product.item_amount}</span>
                                                     </div>
                                                     <div class="item-product-price" data-room_id="${room.room_id}" data-product_id="${product.product_id}">
                                                         ${Number(product.product_price).toLocaleString()} ${product.product_currency}
@@ -1056,7 +1056,7 @@ $(document).ready(function(){
 
         const sbProductName = $(`.item-product-name a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
         sbProductName.text(product.product_name);
-        sbProductName.attr('href', product.product_url);
+        sbProductName.attr('href', get_url(product.product_url));
         sbProductName.attr('data-product', JSON.stringify(product));
         sbProductName.attr('data-product_id', product.product_id);
         sbProductName.attr('data-product_price', product.product_price);
@@ -1083,7 +1083,7 @@ $(document).ready(function(){
         $('#product-popup').fadeOut();
         // Remove the 'no-scroll' class from the body to allow scrolling on the background content
         $('body').removeClass('no-scroll');
-    });
+    }); 
     
 });
 
@@ -1099,6 +1099,18 @@ function get_bucket(product_image, product_shop) {
     }
     
     return bucket_name + product_image;
+}
+
+function get_url(product_url) {
+    // if product_url contains ? then add & otherwise add ?
+    // add utm_widget=wbld.widget_name
+    if (product_url.includes("?")) {
+        product_url += "&utm_widget=" + wbld.widget_name;
+    } else {
+        product_url += "?utm_widget=" + wbld.widget_name;
+    }
+    
+    return product_url;
 }
 
 const speedProgressBarDefault = 200;

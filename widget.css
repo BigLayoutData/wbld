@@ -674,7 +674,7 @@ body.no-scroll {
 #sidebar-content {
     width: 100%;
     height: auto;
-    overflow-y: auto;
+    overflow-y: none;
     max-height: none;
 }
 
@@ -731,3 +731,108 @@ body.no-scroll {
     position: relative;
 }
 }
+
+@media print {
+#mainbar {
+    width: 100%;
+    border-width: 0px;
+}
+#sidebar {
+    width: 100%;
+}
+#input {
+    float: none;
+    justify-content: center;
+    height: 229px;
+    
+    grid-template-columns: repeat(2, 155px);
+}
+.input-line-2 .input-block:first-child {
+    grid-column: 1 / span 2;
+}
+.popup#bedroomsPopup {
+    left: 20px;
+    width: 330px;
+}
+.popup#stylesPopup {
+    width: 160px;
+}
+#output {
+    float: left;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+}
+#sidebar {
+    float: left;
+    box-sizing: border-box;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #FFFFFF;
+}
+#sidebar-content {
+    width: 100%;
+    height: auto;
+    overflow-y: none;
+    max-height: none;
+}
+
+#product-popup-content {
+    width: 100%;
+    margin-left: 0%;
+    margin-right: 0%;
+    max-height: 550px;
+    padding: 20px;
+}
+#product-popup-image {
+    width: 100%;
+}
+#product-popup-info {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    padding: 0px;
+}
+#product-popup-info-title {
+    font-size: 16px;
+    padding-bottom: 20px;
+}
+#product-popup-info-price {
+    padding-bottom: 0px;
+}
+#product-popup-list-item {
+    width: 170px;
+}
+#product-popup-list-item img {
+    width: 170px;
+}
+#product-popup-list-item p {
+    width: 170px;
+}
+
+.item-product-content {
+    width: calc(100% - 100px - 10px);
+    padding-left: 0px;
+}
+
+.mood-board img, .product-mood-board {
+    box-sizing: border-box;
+    width: 100%;
+    padding-left: 0%;
+    padding-right: 0%;
+    max-width: 700px;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    display: block;
+    position: relative;
+}
+}
+    
