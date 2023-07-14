@@ -3,6 +3,7 @@
   --white: #ffffff;
   --black: #000000;
   --btn-color: var(--gold);
+  --widget-font: 'Raleway', sans-serif;
   --min-width: 346px;
   --max-width: 865px;
 }
@@ -12,7 +13,7 @@
     display: table;
     width: 100%;
     max-width: 1200px;
-    font-family: 'Raleway';
+    font-family: var(--widget-font);
     line-height: 1.25;
     margin: 0 auto;
 }

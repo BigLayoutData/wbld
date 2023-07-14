@@ -106,12 +106,12 @@ var wbld = {
         } 
     }, 
     // widget style connection method
-    addStyles: function() { 
+    addStyles: function(font_style_href) { 
         const font_style = document.createElement('link'); 
         font_style.rel = 'stylesheet'; 
         font_style.type = 'text/css'; 
-        font_style.href = 'https://fonts.googleapis.com/css?family=Raleway:400,700'; 
-        document.head.appendChild(font_style); 
+        font_style.href = font_style_href; 
+        document.head.appendChild(font_style);
     }
 };
 
@@ -121,7 +121,12 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     $("#loading-bar").remove();
 
     // add widget styles
-    wbld.addStyles();
+    wbld.addStyles(font_style_href='https://fonts.googleapis.com/css?family=Raleway:400,700');
+    //wbld.addStyles(font_style_href='https://fonts.googleapis.com/css?family=Source+Sans+3:400,700');
+
+    // set widget font family
+    //const root = document.documentElement;
+    //root.style.setProperty('--widget-font', "'Source Sans 3', sans-serif");
 
     // set visitor_id
     wbld.visitor_id = visitor_id;
