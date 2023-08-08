@@ -10,6 +10,7 @@ var wbld = {
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
     products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
+    products_West_Elm: 'https://space.biglayoutdata.com/products_West_Elm/',
     // some const for api urls
     api1: 'https://api1.biglayoutdata.com/',
     api2: 'https://api.biglayoutdata.com/',
@@ -472,8 +473,9 @@ function update_price_budget_range(layout_id_selected) {
     const layout_max_budget = layout_max_budgets[shop][style];
     
     const budgets = [];
-    // First btn id=0 is All budgets
-    budgets.push([layout_max_budget, layout_min_budget]);
+    // First btn id=0 is All budgets from 0 to 999999
+    //budgets.push([layout_max_budget, layout_min_budget]);
+    budgets.push([999999, 0]);
     
     const n_parts = 3;
     let part = (layout_max_budget - layout_min_budget) / n_parts;
@@ -1101,12 +1103,20 @@ function get_bucket(product_image, product_shop) {
     let bucket_name = wbld.products_OC_Home;
     if (product_shop === "Danube Home") {
         bucket_name = wbld.products_Danube_Home;
+    } else if (product_shop === "West Elm") {
+        bucket_name = wbld.products_West_Elm;
     }
     
     return bucket_name + product_image;
 }
 
 function get_url(product_url) {
+
+    if (product_url.includes("https://www.westelm.ae")) {
+        admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
+        product_url = admitad_url + encodeURIComponent(product_url) + "&subid=" + wbld.widget_name;
+    }
+
     // if product_url contains ? then add & otherwise add ?
     // add utm_widget=wbld.widget_name
     if (product_url.includes("?")) {
