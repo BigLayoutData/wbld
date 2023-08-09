@@ -687,7 +687,7 @@ function update_output(click_n, address_id, layout_id) {
                                                         </a>
                                                     </div>
                                                     <div class="item-product-comment-btn">
-                                                        <button class="comment-btn" data-room_id="${room.room_id}" data-product_id="${product.product_id}">${product.product_comment}</button>
+                                                        <div class="comment-btn" data-room_id="${room.room_id}" data-product_id="${product.product_id}">${product.product_comment}</div>
                                                     </div>
                                                 </div>
                                             </div>
