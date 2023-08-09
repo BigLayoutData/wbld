@@ -633,7 +633,7 @@
     border-radius: 95px 95px 95px 95px;
     padding: 5px 10px 10px 10px;
     text-align: center;
-    cursor: none;
+    cursor: default;
 }
 
 .mood-board img, .product-mood-board {
