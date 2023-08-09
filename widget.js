@@ -681,6 +681,11 @@ function update_output(click_n, address_id, layout_id) {
                                                     <div class="item-product-price" data-room_id="${room.room_id}" data-product_id="${product.product_id}">
                                                         ${Number(product.product_price).toLocaleString()} ${product.product_currency}
                                                     </div>
+                                                    <div class="item-product-link-btn">
+                                                        <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">
+                                                        <button class="link-btn">To Shop</button>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -809,6 +814,8 @@ $(document).ready(function(){
         
         $(".address-btn").removeClass("selected");
         $(this).addClass("selected");
+        $('#addressPopup').scrollTop(0);
+        $('#addressPopup').toggleClass("done");
         
         const address_id = $(this).data( "address_id" );
         const address_address = decodeURIComponent($(this).data( "address_address" ));
@@ -838,6 +845,8 @@ $(document).ready(function(){
     $(document).on('click', '.layout-change img', function(event) {
         $(".layout-change img").removeClass("img-selected");
         $(this).addClass("img-selected");
+        $('#bedroomsPopup').scrollTop(0);
+        $('#bedroomsPopup').toggleClass("done");
         
         //update price range for selected layout
         const layout_id_selected = $(this).data( "layout_id" );
@@ -850,6 +859,8 @@ $(document).ready(function(){
     $(document).on('click', '.budget-btn', function(event) {
         $(".budget-btn").removeClass("selected");
         $(this).addClass("selected");
+        $('#budgetsPopup').scrollTop(0);
+        $('#budgetsPopup').toggleClass("done");
         
         const budget_name = decodeURIComponent($(this).data( "budget_name" ));
         
@@ -859,6 +870,8 @@ $(document).ready(function(){
     $(document).on('click', '.style-btn', function(event) {
         $(".style-btn").removeClass("selected");
         $(this).addClass("selected");
+        $('#stylesPopup').scrollTop(0);
+        $('#stylesPopup').toggleClass("done");
         
         const style_name = decodeURIComponent($(this).data( "style_name" ));
         
@@ -874,6 +887,8 @@ $(document).ready(function(){
     $(document).on('click', '.shop-btn', function(event) {
         $(".shop-btn").removeClass("selected");
         $(this).addClass("selected");
+        $('#shopsPopup').scrollTop(0);
+        $('#shopsPopup').toggleClass("done");
         
         const shop_name = decodeURIComponent($(this).data( "shop_name" ));
         
@@ -887,26 +902,31 @@ $(document).ready(function(){
     });
     
     $(document).on('click', '#addressPopup .done-btn', function(event) {
+        $('#addressPopup').scrollTop(0);
         $('#addressPopup').toggleClass("done");
         $(this).toggleClass("selected");
     });
     
     $(document).on('click', '#bedroomsPopup .done-btn', function(event) {
+        $('#bedroomsPopup').scrollTop(0);
         $('#bedroomsPopup').toggleClass("done");
         $(this).toggleClass("selected");
     });
     
     $(document).on('click', '#budgetsPopup .done-btn', function(event) {
+        $('#budgetsPopup').scrollTop(0);
         $('#budgetsPopup').toggleClass("done");
         $(this).toggleClass("selected");
     });
     
     $(document).on('click', '#stylesPopup .done-btn', function(event) {
+        $('#stylesPopup').scrollTop(0);
         $('#stylesPopup').toggleClass("done");
         $(this).toggleClass("selected");
     });
     
     $(document).on('click', '#shopsPopup .done-btn', function(event) {
+        $('#shopsPopup').scrollTop(0);
         $('#shopsPopup').toggleClass("done");
         $(this).toggleClass("selected");
     });
@@ -960,16 +980,16 @@ $(document).ready(function(){
         }
     });
     
-    $(document).on('click', '.product-link', function(event) {
+    $(document).on('click', 'a.product-link, a.btn-product-link', function(event) {
         
         const product_url = $(this).attr('href');
-        const product_id = $(this).data( "product_id" );
-        const product_sku = $(this).data( "product_sku" );
-        const product_name = $(this).data( "product_name" );
-        const product_price = $(this).data( "product_price" );
-        const product_currency = $(this).data( "product_currency" );
-        const item_name = $(this).data( "item_name" );
-        const item_amount = $(this).data( "item_amount" );
+        const product_id = $(this).attr('data-product_id');
+        const product_sku = $(this).attr('data-product_sku');
+        const product_name = $(this).attr('data-product_name');
+        const product_price = $(this).attr('data-product_price');
+        const product_currency = $(this).attr('data-product_currency');
+        const item_name = $(this).attr('data-item_name');
+        const item_amount = $(this).attr('data-item_amount');
         
         const data = {
           "widget_name": wbld.widget_name,
@@ -1070,6 +1090,15 @@ $(document).ready(function(){
         sbProductName.attr('data-product_currency', product.product_currency);
         sbProductName.attr('data-product_sku', product.product_sku);
         sbProductName.attr('data-product_name', product.product_name);
+
+        const sbProductLinkBtn = $(`.item-product-link-btn a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        sbProductLinkBtn.attr('href', get_url(product.product_url));
+        sbProductLinkBtn.attr('data-product', JSON.stringify(product));
+        sbProductLinkBtn.attr('data-product_id', product.product_id);
+        sbProductLinkBtn.attr('data-product_price', product.product_price);
+        sbProductLinkBtn.attr('data-product_currency', product.product_currency);
+        sbProductLinkBtn.attr('data-product_sku', product.product_sku);
+        sbProductLinkBtn.attr('data-product_name', product.product_name);
 
         const sbProductPrice = $(`.item-product-price[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
         sbProductPrice.text(`${Number(product.product_price).toLocaleString()} ${product.product_currency}`);
