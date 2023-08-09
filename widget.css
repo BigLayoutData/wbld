@@ -595,7 +595,7 @@
 .item-product-link-btn {
     float: left;
     box-sizing: border-box;
-    width: 100%;
+    width: 50%;
     padding-top: 10px;
 }
 .link-btn {
@@ -615,6 +615,24 @@
 .link-btn:hover {
     border-color: var(--btn-color);
 }
+}
+.item-product-comment-btn {
+    float: left;
+    box-sizing: border-box;
+    width: 50%;
+    padding-top: 10px;
+}
+.comment-btn {
+    font-size: 11px;
+    font-weight: bold;
+    color: #000000;
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #FFFFFF;
+    border-radius: 95px 95px 95px 95px;
+    padding: 5px 10px 10px 10px;
+    text-align: center;
 }
 
 .mood-board img, .product-mood-board {

@@ -686,6 +686,9 @@ function update_output(click_n, address_id, layout_id) {
                                                         <button class="link-btn">To Shop</button>
                                                         </a>
                                                     </div>
+                                                    <div class="item-product-comment-btn">
+                                                        <button class="comment-btn" data-room_id="${room.room_id}" data-product_id="${product.product_id}">${product.product_comment}</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1091,6 +1094,10 @@ $(document).ready(function(){
         sbProductName.attr('data-product_sku', product.product_sku);
         sbProductName.attr('data-product_name', product.product_name);
 
+        const sbProductPrice = $(`.item-product-price[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        sbProductPrice.text(`${Number(product.product_price).toLocaleString()} ${product.product_currency}`);
+        sbProductPrice.attr('data-product_id', product.product_id);
+
         const sbProductLinkBtn = $(`.item-product-link-btn a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
         sbProductLinkBtn.attr('href', get_url(product.product_url));
         sbProductLinkBtn.attr('data-product', JSON.stringify(product));
@@ -1100,9 +1107,9 @@ $(document).ready(function(){
         sbProductLinkBtn.attr('data-product_sku', product.product_sku);
         sbProductLinkBtn.attr('data-product_name', product.product_name);
 
-        const sbProductPrice = $(`.item-product-price[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        sbProductPrice.text(`${Number(product.product_price).toLocaleString()} ${product.product_currency}`);
-        sbProductPrice.attr('data-product_id', product.product_id);
+        const sbProductCommentBtn = $(`.comment-btn[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        sbProductCommentBtn.text(`${product.product_comment}`);
+        sbProductCommentBtn.attr('data-product_id', product.product_id);
 
         const sbTotalBudget = $("#sidebar-total-budget");
         const sbTotalBudgetValue = sbTotalBudget.data("budget_total");
