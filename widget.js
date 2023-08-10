@@ -382,6 +382,7 @@ function generate_poweredby() {
     $('#poweredby').append(`
         <div class="widget-container">
             <div class="poweredby">
+                <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer;">User Agreement</a></div>
                 <div class="poweredby-text">Powered by</div>
                 <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.png'}" target="_blank" rel="noopener" /></a>
             </div>
