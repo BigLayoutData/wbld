@@ -11,6 +11,7 @@ var wbld = {
     products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
     products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
     products_West_Elm: 'https://space.biglayoutdata.com/products_West_Elm/',
+    products_Pottery_Barn: 'https://space.biglayoutdata.com/products_Pottery_Barn/',
     // some const for api urls
     api1: 'https://api1.biglayoutdata.com/',
     api2: 'https://api.biglayoutdata.com/',
@@ -1142,6 +1143,8 @@ function get_bucket(product_image, product_shop) {
         bucket_name = wbld.products_Danube_Home;
     } else if (product_shop === "West Elm") {
         bucket_name = wbld.products_West_Elm;
+    } else if (product_shop === "Pottery Barn") {
+        bucket_name = wbld.products_Pottery_Barn;
     }
     
     return bucket_name + product_image;
@@ -1151,6 +1154,11 @@ function get_url(product_url) {
 
     if (product_url.includes("https://www.westelm.ae")) {
         admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
+        product_url = admitad_url + encodeURIComponent(product_url) + "&subid=" + wbld.widget_name;
+    }
+
+    if (product_url.includes("https://www.potterybarn.ae")) {
+        admitad_url = "https://ad.admitad.com/g/hak848wxff21d78ab6e73929b57187/?ulp=";
         product_url = admitad_url + encodeURIComponent(product_url) + "&subid=" + wbld.widget_name;
     }
 
