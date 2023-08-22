@@ -29,6 +29,18 @@ Replace ```YOUR_WIDGET_NAME``` with the widget name you received in step 1.
 
 The widget should now be installed and activated!
 
+## partner_id in URL
+
+To open a URL with partner_id parameter, you can use the following format:
+
+```https://widget.biglayoutdata.com/?partner_id=[partner_id]```
+
+Replace ```[partner_id]``` with your partner name.
+
+For example, to open a URL with partner name ```partner_test```:
+
+https://widget.biglayoutdata.com/?partner_id=partner_test
+
 ## url_params for pre-search in URL
 
 To open a URL with specific parameters for pre-search, you can use the following format:
