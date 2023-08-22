@@ -2,6 +2,7 @@ var wbld = {
     widget_name: 'no_data',
     widget_domain: 'no_data',
     visitor_id: 'no_data',
+    partner_id: 'no_data',
     // some const for img urls
     pics: 'https://space.biglayoutdata.com/pics/',
     mood_board_img: 'https://space.biglayoutdata.com/mood-boards/',
@@ -42,8 +43,13 @@ var wbld = {
                     this.widget_domain = location.hostname;
 
                     // get url params
+                    url_search_params = new URLSearchParams(window.location.search);
+                    if (url_search_params.get('partner_id')) {
+                        this.partner_id = url_search_params.get('partner_id');
+                    }
+
                     if (url_params.size == 0) {
-                        url_params = new URLSearchParams(window.location.search);
+                        url_params = url_search_params;
                     }
 
                     // need to check that the widget name is available
@@ -624,7 +630,7 @@ function update_output(click_n, address_id, layout_id) {
         const shop = $(".shop-btn.selected").data( "shop_name" );
         
         $.ajax({
-            url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
+            url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
             type: "GET",
             cache: false,
             dataType: "json",
@@ -999,6 +1005,7 @@ $(document).ready(function(){
         const data = {
           "widget_name": wbld.widget_name,
           "visitor_id": wbld.visitor_id,
+          "partner_id": wbld.partner_id,
           "product_id": product_id,
           "product_url": product_url,
           "product_sku": product_sku,
@@ -1154,12 +1161,16 @@ function get_url(product_url) {
 
     if (product_url.includes("https://www.westelm.ae")) {
         admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
-        product_url = admitad_url + encodeURIComponent(product_url) + "&subid=" + wbld.widget_name;
+        product_url = admitad_url + encodeURIComponent(product_url);
+        product_url += "&subid=" + wbld.widget_name;
+        product_url += "&subid1=" + wbld.partner_id;
     }
 
     if (product_url.includes("https://www.potterybarn.ae")) {
         admitad_url = "https://ad.admitad.com/g/hak848wxff21d78ab6e73929b57187/?ulp=";
-        product_url = admitad_url + encodeURIComponent(product_url) + "&subid=" + wbld.widget_name;
+        product_url = admitad_url + encodeURIComponent(product_url);
+        product_url += "&subid=" + wbld.widget_name;
+        product_url += "&subid1=" + wbld.partner_id;
     }
 
     // if product_url contains ? then add & otherwise add ?
@@ -1169,6 +1180,7 @@ function get_url(product_url) {
     } else {
         product_url += "?utm_widget=" + wbld.widget_name;
     }
+    product_url += "&utm_partner=" + wbld.partner_id;
     
     return product_url;
 }
