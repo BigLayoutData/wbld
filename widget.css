@@ -269,9 +269,10 @@
     padding: 20px;
     border: solid;
     border-radius: 5px;
+    border-width: 1px;
 }
 .p-box {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
     color: #000000;
     margin: 0px;

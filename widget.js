@@ -56,6 +56,7 @@ var wbld = {
                     const data = {
                         "widget_name": widget_name,
                         "widget_domain": location.hostname,
+                        "layout_id": url_params.get('layout_id'),
                         "property_size": url_params.get('property_size'),
                         "bedrooms": url_params.get('bedrooms'),
                         "search": url_params.get('search'),
@@ -342,7 +343,7 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         
             <div class="widget-container">
                 <div class="small-text">&nbsp;</div> 
-                <button class="generate-btn generate-btn-block" data-click_n=${click_n}>ReGenerate</button>
+                <button class="generate-btn generate-btn-block" data-click_n=${click_n}>Furnish Layout</button>
             </div>
         
         </div>
@@ -362,7 +363,7 @@ function generate_sidebar() {
     $('#sidebar').append(`
         <div id="sidebar-title">
             <div class="widget-container">
-                <div class="heading-title" id="sidebar-you-look">Your Look</div>
+                <div class="heading-title" id="sidebar-you-look">Room Plan and Buy List</div>
             </div>
             <div class="widget-container">
                 <div class="heading-subtitle" id="sidebar-total-budget" data-budget_total="0"></div>
@@ -565,7 +566,7 @@ function update_price_budget_range(layout_id_selected) {
 
 function clean_output() {
     $("#output").empty();
-    $("#sidebar-you-look").text(`Your Look`);
+    $("#sidebar-you-look").text(`Room Plan and Buy List`);
     $("#sidebar-total-budget").text(``);
     $("#sidebar-content").empty();
 }
@@ -605,6 +606,16 @@ function updateSidebarContentHeight() {
 function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
     clean_output();
+
+    $('#output').append(`
+        <div class="widget-container">
+            <div class="text-editor">
+                <p class="p-box">1. Select your layout by address.</p>
+                <p class="p-box">2. Pick your store, budget and style. Click on product to change it.</p>
+                <p class="p-box">3. Follow "To Shop" to buy directly from the store.</p>
+            </div>
+        </div>
+    `);
     
     // check layout_id not null
     if (layout_id) {
@@ -612,7 +623,7 @@ function update_output(click_n, address_id, layout_id) {
         $('#output').append(`
             <div class="widget-container" id="progress-bar">
                 <div class="text-editor">
-                    <p class="p-box">We are generating your project!</p>
+                    <p class="p-box">We are selecting furniture that fits your layout!</p>
                     <div class="progress">
                         <div class="bar"></div>
                         <div class="label">0%</div>
@@ -664,7 +675,7 @@ function update_output(click_n, address_id, layout_id) {
                         
                         $('#sidebar-content').append(`
                             <div class="widget-container">
-                                <div class="heading-subtitle">${room.room_name}</div>
+                                <div class="heading-subtitle">Buy List: ${room.room_name}</div>
                             </div>
                         `);
                         
@@ -716,7 +727,7 @@ function update_output(click_n, address_id, layout_id) {
                         
                             $('#output').append(`
                                 <div class="widget-container">
-                                    <div class="heading-subtitle">${room.room_name}</div>
+                                    <div class="heading-subtitle">Mood board: ${room.room_name}</div>
                                 </div>
                             `);
 
@@ -762,7 +773,7 @@ function update_output(click_n, address_id, layout_id) {
                         
                     });
                     
-                    $("#sidebar-you-look").text(`Your Look (${items_n} items)`);
+                    $("#sidebar-you-look").text(`Room Plan and Buy List (${items_n} items)`);
                     $("#sidebar-total-budget").text(`Total Budget: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
                     $("#sidebar-total-budget").data("budget_total", response.data.budget_total);
                     
