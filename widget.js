@@ -742,6 +742,8 @@ function update_output(click_n, address_id, layout_id) {
 
                             pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
 
+                            // Assuming room.products_list is an array of objects with the parameter item_significance
+                            room.products_list.sort((a, b) => b.item_significance - a.item_significance);
                             for (let i = 0; i < room.products_list.length; i++) {
                                 const product = room.products_list[i];
 
