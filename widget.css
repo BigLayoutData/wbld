@@ -3,6 +3,7 @@
   --white: #ffffff;
   --black: #000000;
   --btn-color: var(--gold);
+  --btn-font-color: var(--black);
   --widget-font: 'Raleway', sans-serif;
   --min-width: 346px;
   --max-width: 865px;
@@ -311,12 +312,12 @@
 }
 @media (hover: hover) {
 .filter-btn:hover {
-    color: #000000;
+    color: var(--btn-font-color);
     background-color: var(--btn-color);
 }
 }
 .filter-btn.selected {
-    color: #000000;
+    color: var(--btn-font-color);
     background-color: var(--btn-color);
 }
 .done-btn {
@@ -347,6 +348,7 @@
 }
 @media (hover: hover) {
 .select-btn:hover {
+    color: var(--btn-font-color);
     background-color: var(--btn-color);
 }
 }
@@ -375,7 +377,6 @@
     -webkit-appearance: none;
        -moz-appearance: none;
             appearance: none;
-    color: #000000;
     cursor: pointer;
 }
 
@@ -385,11 +386,11 @@
 .generate-btn {
     font-size: 11px;
     font-weight: bold;
-    color: #000000;
+    color: var(--btn-font-color);
     background-color: var(--btn-color);
     border-style: solid;
     border-width: 1px;
-    border-color: #000000;
+    border-color: var(--btn-font-color);
     border-radius: 95px 95px 95px 95px;
     padding: 10px 10px 10px 10px;
     text-align: center;
@@ -531,7 +532,7 @@
   transform: translateX(-50%);
   line-height: 20px;
   padding-top: 3px;
-  color: #000000;
+  color: var(--black);
   font-size: 11px;
   font-weight: bold;
 }
@@ -623,11 +624,11 @@
 .link-btn {
     font-size: 11px;
     font-weight: bold;
-    color: #000000;
+    color: var(--btn-font-color);
     background-color: var(--btn-color);
     border-style: solid;
     border-width: 1px;
-    border-color: #000000;
+    border-color: var(--btn-font-color);
     border-radius: 95px 95px 95px 95px;
     padding: 10px 10px 10px 10px;
     text-align: center;

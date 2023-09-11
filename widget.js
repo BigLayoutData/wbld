@@ -83,6 +83,7 @@ var wbld = {
                                             response.data.widget_budgets,
                                             response.data.widget_styles,
                                             response.data.widget_shops,
+                                            response.data.widget_parameters,
                                         );
                                     })
                             } else {
@@ -124,18 +125,22 @@ var wbld = {
     }
 };
 
-function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops) {
+function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
     // remove loading bar
     startLoadingProgressBar(1);
     $("#loading-bar").remove();
 
-    // add widget styles
-    wbld.addStyles(font_style_href='https://fonts.googleapis.com/css?family=Raleway:400,700');
-    //wbld.addStyles(font_style_href='https://fonts.googleapis.com/css?family=Source+Sans+3:400,700');
+    // widget parameters
+    widget_parameters = JSON.parse(widget_parameters);
 
-    // set widget font family
-    //const root = document.documentElement;
-    //root.style.setProperty('--widget-font', "'Source Sans 3', sans-serif");
+    // add widget styles
+    wbld.addStyles(font_style_href=widget_parameters.widget_font_link);
+
+    // set widget font family and color
+    const root = document.documentElement;
+    root.style.setProperty('--widget-font', widget_parameters.widget_font);
+    root.style.setProperty('--btn-color', widget_parameters.btn_color);
+    root.style.setProperty('--btn-font-color', widget_parameters.btn_font_color);
 
     // set visitor_id
     wbld.visitor_id = visitor_id;
