@@ -696,7 +696,7 @@ function update_output(click_n, address_id, layout_id) {
                                         <div class="item-product">
                                             <div class="item-product-line-1">
                                                 <div class="item-product-image">
-                                                    <img src="${get_bucket(product.product_image, product.product_shop)}" data-room_id="${room.room_id}" data-product_id="${product.product_id}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-product='${JSON.stringify(product)}' data-products_list_total='${JSON.stringify(room.products_list_total.filter(item => item.item_id === product.item_id))}' />
+                                                    <img src="${get_bucket(product.product_image, product.product_shop)}" data-room_id="${room.room_id}" data-product_id="${product.product_id}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-product='${JSON.stringify(product)}' data-products_list_total='${JSON.stringify(room.products_list_total.filter(item => product.item_ids.includes(item.item_id)))}' />
                                                 </div>
                                                 <div class="item-product-content">
                                                     <div class="item-product-name">
@@ -765,9 +765,9 @@ function update_output(click_n, address_id, layout_id) {
                                 img.dataset.product_currency = product.product_currency;
 
                                 // Filter the array based on the condition item_id == product.item_id
-                                const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
+                                // const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
                                 // new version product.item_ids.includes(item.item_id)
-                                // const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
+                                const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
 
                                 // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
                                 img.dataset.products_list_total = JSON.stringify(filteredList);    
