@@ -27,15 +27,9 @@ var wbld = {
                         <div class="widget-container" id="loading-bar">
                             <div class="text-editor">
                                 <p class="p-box">We are downloading your widget!</p>
-                                <div class="progress">
-                                    <div class="bar"></div>
-                                    <div class="label">0%</div>
-                                </div>
                             </div>
                         </div>
                     `);
-                    // start loading progress bar
-                    startLoadingProgressBar(speedProgressBarDefault);
                     // set widget name
                     this.widget_name = widget_name;
 
@@ -127,7 +121,6 @@ var wbld = {
 
 function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
     // remove loading bar
-    startLoadingProgressBar(1);
     $("#loading-bar").remove();
 
     // widget parameters
@@ -196,8 +189,10 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     generate_poweredby();
     
     generate_sidebar();
+
+    generate_output();
     
-    update_output(click_n, address_id, layout_id);
+    //update_output(click_n, address_id, layout_id);
 }
 
 function generate_input(addresses_list, address_id, address_address, n_bedrooms_list, layout_id, shops_list, styles_list, budgets_list, click_n) {
@@ -363,12 +358,27 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
     );
 }
 
+function generate_output() {
+    
+    $('#output').append(`
+        <div class="widget-container">
+            <div class="text-editor">
+                <p class="p-box p-box-big">&#128205; Select your address.</p>
+                <p class="p-box p-box-big">&#128719; Pick your beds and layout.</p>
+                <p class="p-box p-box-big">&#128176; Choose shop, budget and style.</p>
+                <p class="p-box p-box-big">&#128526; Click "Furnish Layout" to get design project.</p>
+            </div>
+        </div>
+    `);
+    
+}
+
 function generate_sidebar() {
     
     $('#sidebar').append(`
         <div id="sidebar-title">
             <div class="widget-container">
-                <div class="heading-title" id="sidebar-you-look">Room Plan and Buy List</div>
+                <div class="heading-title" id="sidebar-you-look"></div>
             </div>
             <div class="widget-container">
                 <div class="heading-subtitle" id="sidebar-total-budget" data-budget_total="0"></div>
@@ -602,6 +612,7 @@ function updateSidebarContentHeight() {
         var progressBarHeight = document.getElementById('progress-bar').offsetHeight;
         var sidebarTitleHeight = document.getElementById('sidebar-title').offsetHeight;
         var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight - progressBarHeight;
+        //var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight;
         document.getElementById('sidebar-content').style.height = sidebarContentHeight + 'px';
     } else {
       // Reset the height if the conditions are not met
@@ -615,9 +626,9 @@ function update_output(click_n, address_id, layout_id) {
     $('#output').append(`
         <div class="widget-container">
             <div class="text-editor">
-                <p class="p-box">1. Select your layout by address.</p>
-                <p class="p-box">2. Pick your store, budget and style. Click on product to change it.</p>
-                <p class="p-box">3. Follow "To Shop" to buy directly from the store.</p>
+                <p class="p-box">1. Tap on item image to change it.</p>
+                <p class="p-box">2. Follow the link "To Shop" to go directly to the store.</p>
+                <p class="p-box">3. Play with style, budget and shop.</p>
             </div>
         </div>
     `);

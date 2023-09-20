@@ -289,6 +289,9 @@
 .p-box:nth-child(n + 2) {
     margin-top: 10px;
 }
+.p-box-big {
+    font-size: 18px;
+}
 .small-text {
     font-size: 11px;
     font-weight: 400;
