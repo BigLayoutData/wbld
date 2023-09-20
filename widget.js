@@ -745,7 +745,11 @@ function update_output(click_n, address_id, layout_id) {
                             wcDiv.appendChild(pmbDiv);
                             $('#output').append(wcDiv);
 
-                            pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
+                            if (pmbDiv.offsetWidth > 0) {
+                                pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
+                            } else {
+                                pmbDiv.style.height = '350 px';
+                            }
 
                             // Assuming room.products_list is an array of objects with the parameter item_significance
                             room.products_list.sort((a, b) => b.item_significance - a.item_significance);
