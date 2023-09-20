@@ -577,8 +577,13 @@ function clean_output() {
 }
 
 function setCoordinates(element, coords) {
-    const parentWidth = element.parentNode.offsetWidth;
-    const parentHeight = element.parentNode.offsetHeight;
+    let parentWidth = element.parentNode.offsetWidth;
+    let parentHeight = element.parentNode.offsetHeight;
+
+    if (parentWidth === 0 || parentHeight === 0) {
+        parentWidth = 700;
+        parentHeight = 350;
+    }
   
     const x = coords[0] * parentWidth;
     const y =  ( 1 - coords[1] - coords[3] ) * parentHeight;
