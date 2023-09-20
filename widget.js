@@ -27,9 +27,17 @@ var wbld = {
                         <div class="widget-container" id="loading-bar">
                             <div class="text-editor">
                                 <p class="p-box">We are downloading your widget!</p>
+                                <div class="progress">
+                                    <div class="bar"></div>
+                                    <div class="label">0%</div>
+                                </div>
                             </div>
                         </div>
                     `);
+
+                    // start progress bar
+                    startLoadingProgressBar(speedProgressBarDefault);
+
                     // set widget name
                     this.widget_name = widget_name;
 
@@ -120,8 +128,8 @@ var wbld = {
 };
 
 function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
-    // remove loading bar
-    $("#loading-bar").remove();
+    // close loading bar
+    startLoadingProgressBar(1);
 
     // widget parameters
     widget_parameters = JSON.parse(widget_parameters);
@@ -1232,13 +1240,13 @@ function startLoadingProgressBar(speedProgressBar) {
     clearInterval(progressBarIntervalId);
     progressBarIntervalId = setInterval(() => {
         progress += 1;
-        updateProgressBar(progress);
+        updateProgressBar("#loading-bar", progress);
         //console.log("speedProgressBar: " + speedProgressBar);
         if (progress === 100) { 
             clearInterval(progressBarIntervalId);
             $("#loading-bar").css('display', 'none');
             progress = 0;
-            updateProgressBar(progress);
+            updateProgressBar("#loading-bar", progress);
             speedProgressBar = speedProgressBarDefault;
             //console.log("end speedProgressBar: " + speedProgressBar);
         }
@@ -1252,23 +1260,23 @@ function startProgressBar(speedProgressBar) {
     clearInterval(progressBarIntervalId);
     progressBarIntervalId = setInterval(() => {
         progress += 1;
-        updateProgressBar(progress);
+        updateProgressBar("#progress-bar", progress);
         //console.log("speedProgressBar: " + speedProgressBar);
         if (progress === 100) { 
             clearInterval(progressBarIntervalId);
             $("#progress-bar").css('display', 'none');
             $('#generate-btn-block').css('display', 'block');
             progress = 0;
-            updateProgressBar(progress);
+            updateProgressBar("#progress-bar", progress);
             speedProgressBar = speedProgressBarDefault;
             //console.log("end speedProgressBar: " + speedProgressBar);
         }
     }, speedProgressBar);
 }
 
-function updateProgressBar(progress) {
-    const bar = document.querySelector('.bar');
-    const label = document.querySelector('.label');
+function updateProgressBar(id, progress) {
+    const bar = document.querySelector(id + ' .bar');
+    const label = document.querySelector(id + ' .label');
     bar.style.width = `${progress}%`;
     label.innerHTML = `${progress}%`;
     if (progress === 100) {
