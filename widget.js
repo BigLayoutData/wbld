@@ -577,13 +577,8 @@ function clean_output() {
 }
 
 function setCoordinates(element, coords) {
-    let parentWidth = element.parentNode.offsetWidth;
-    let parentHeight = element.parentNode.offsetHeight;
-
-    if (parentWidth === 0 || parentHeight === 0) {
-        parentWidth = 700;
-        parentHeight = 350;
-    }
+    const parentWidth = element.parentNode.offsetWidth;
+    const parentHeight = element.parentNode.offsetHeight;
   
     const x = coords[0] * parentWidth;
     const y =  ( 1 - coords[1] - coords[3] ) * parentHeight;
@@ -750,12 +745,7 @@ function update_output(click_n, address_id, layout_id) {
                             wcDiv.appendChild(pmbDiv);
                             $('#output').append(wcDiv);
 
-                            if (pmbDiv.offsetWidth > 0) {
-                                pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
-                            } else {
-                                pmbDiv.style.width = '700 px';
-                                pmbDiv.style.height = '350 px';
-                            }
+                            pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
 
                             // Assuming room.products_list is an array of objects with the parameter item_significance
                             room.products_list.sort((a, b) => b.item_significance - a.item_significance);
