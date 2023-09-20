@@ -152,7 +152,12 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     const click_n = 0;
 
     // widget addresses
-    const addresses_list = widget_addresses;
+    let addresses_list = widget_addresses;
+
+    addresses_list.sort((a, b) => {
+        // Assuming `address_address` is a string, for alphanumeric sorting
+        return a.address_address.localeCompare(b.address_address);
+    });
 
     // widget address_address
     widget_address_address = decodeURIComponent(widget_address_address);
