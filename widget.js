@@ -748,6 +748,7 @@ function update_output(click_n, address_id, layout_id) {
                             if (pmbDiv.offsetWidth > 0) {
                                 pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
                             } else {
+                                pmbDiv.style.widht = '700 px';
                                 pmbDiv.style.height = '350 px';
                             }
 
