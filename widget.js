@@ -223,12 +223,10 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
                 
                     <div class="widget-container">
                         <div class="small-text">Pick your building name</div>
+                        <input type="text" id="address-search" placeholder="Search building name...">
                         <div id="address-buttons">
                             ${addresses_list.map(item => `<button class="filter-btn address-btn ${item.address_selected}" data-address_id=${item.address_id} data-address_address=${encodeURIComponent(item.address_address)}>${item.address_address}</button>`).join('')}
                         </div>
-                    </div>
-                    <div class="widget-container">
-                        <div class="filter-btn done-btn">Done</div>
                     </div>
                     
                 </div>
@@ -263,9 +261,6 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
                             <div class="layout-change"></div>
                         </div>
                     </div>
-                    <div class="widget-container">
-                        <div class="filter-btn done-btn">Done</div>
-                    </div>
                     
                 </div>
             </div>
@@ -288,9 +283,6 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
                         <div id="budgets-buttons">
                             ${budgets_list.map(item => `<button class="filter-btn budget-btn ${item.selected}" data-budget_id=${item.budget_id} data-max_budget=${item.max_budget} data-min_budget=${item.min_budget} data-budget_name=${encodeURIComponent(item.budget_name)}>${item.budget_name}</button>`).join('')} 
                         </div>
-                    </div>
-                    <div class="widget-container">
-                        <div class="filter-btn done-btn">Done</div>
                     </div>
                     
                 </div>
@@ -315,9 +307,6 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
                             ${styles_list.map(item => `<button class="filter-btn style-btn ${item.selected}" data-style_id=${item.style_id} data-style_name=${encodeURIComponent(item.style_name)}>${item.style_name}</button>`).join('')} 
                         </div>
                     </div>
-                    <div class="widget-container">
-                        <div class="filter-btn done-btn">Done</div>
-                    </div>
                     
                 </div>
             </div>
@@ -329,20 +318,17 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         <div class="input-block">
             
             <div class="widget-container">
-                <div class="small-text">Shop</div> 
+                <div class="small-text">Furniture store</div> 
                 <div class="select-btn">
                     <div id="shops-select" class="select">${shops_list.find(item => item.selected === 'selected').shop_name}</div>
                 </div>
                 <div id="shopsPopup" class="popup done">
                 
                     <div class="widget-container">
-                        <div class="small-text">Pick shop</div>
+                        <div class="small-text">Pick furniture store</div>
                         <div id="shops-buttons">
                             ${shops_list.map(item => `<button class="filter-btn shop-btn ${item.selected}" data-shop_id=${item.shop_id} data-shop_name=${encodeURIComponent(item.shop_name)}>${item.shop_name}</button>`).join('')}
                         </div>
-                    </div>
-                    <div class="widget-container">
-                        <div class="filter-btn done-btn">Done</div>
                     </div>
                     
                 </div>
@@ -594,7 +580,7 @@ function update_price_budget_range(layout_id_selected) {
 
 function clean_output() {
     $("#output").empty();
-    $("#sidebar-you-look").text(`Room Plan and Buy List`);
+    $("#sidebar-you-look").text(``);
     $("#sidebar-total-budget").text(``);
     $("#sidebar-content").empty();
 }
@@ -625,7 +611,6 @@ function updateSidebarContentHeight() {
         var progressBarHeight = document.getElementById('progress-bar').offsetHeight;
         var sidebarTitleHeight = document.getElementById('sidebar-title').offsetHeight;
         var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight - progressBarHeight;
-        //var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight;
         document.getElementById('sidebar-content').style.height = sidebarContentHeight + 'px';
     } else {
       // Reset the height if the conditions are not met
@@ -956,38 +941,7 @@ $(document).ready(function(){
         }
     });
     
-    $(document).on('click', '#addressPopup .done-btn', function(event) {
-        $('#addressPopup').scrollTop(0);
-        $('#addressPopup').toggleClass("done");
-        $(this).toggleClass("selected");
-    });
-    
-    $(document).on('click', '#bedroomsPopup .done-btn', function(event) {
-        $('#bedroomsPopup').scrollTop(0);
-        $('#bedroomsPopup').toggleClass("done");
-        $(this).toggleClass("selected");
-    });
-    
-    $(document).on('click', '#budgetsPopup .done-btn', function(event) {
-        $('#budgetsPopup').scrollTop(0);
-        $('#budgetsPopup').toggleClass("done");
-        $(this).toggleClass("selected");
-    });
-    
-    $(document).on('click', '#stylesPopup .done-btn', function(event) {
-        $('#stylesPopup').scrollTop(0);
-        $('#stylesPopup').toggleClass("done");
-        $(this).toggleClass("selected");
-    });
-    
-    $(document).on('click', '#shopsPopup .done-btn', function(event) {
-        $('#shopsPopup').scrollTop(0);
-        $('#shopsPopup').toggleClass("done");
-        $(this).toggleClass("selected");
-    });
-    
-    
-    $(document).on('click', '#wbld', function(event) {
+    $(document).on('click', function(event) {
         if (!$(event.target).closest('.select-btn, .popup').length) {
             $('.popup').addClass("done");
         }
@@ -1180,6 +1134,19 @@ $(document).ready(function(){
         // Remove the 'no-scroll' class from the body to allow scrolling on the background content
         $('body').removeClass('no-scroll');
     }); 
+
+    // Attach an input event listener to the search box
+    $(document).on('input', '#address-search', function(event) {
+        const searchTerm = $('#address-search').val().toLowerCase();
+        $('#address-buttons .address-btn').each(function () {
+            const address = decodeURIComponent($(this).data('address_address')).toLowerCase();
+            if (address.includes(searchTerm)) {
+                $(this).show(); // Show matching addresses
+            } else {
+                $(this).hide(); // Hide non-matching addresses
+            }
+        });
+    });
     
 });
 
@@ -1303,5 +1270,6 @@ function finishWaitBar(wait_bar_id) {
 
 // Initialize the agent at application startup.
 // You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
-const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3')
+// You can also use https://openfpcdn.io/fingerprintjs/v3
+const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
   .then(FingerprintJS => FingerprintJS.load())
