@@ -1147,6 +1147,32 @@ $(document).ready(function(){
             }
         });
     });
+
+    // Add an event listener to track user input when the input loses focus
+    $(document).on('blur', '#address-search', function(event) {
+        const userInput = $('#address-search').val();
+        if (userInput != '') {            
+            const data = {
+                "widget_name": wbld.widget_name,
+                "visitor_id": wbld.visitor_id,
+                "user_input": userInput,
+            };
+            
+            $.ajax({
+                url: wbld.api1 + 'user_search/',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    //console.log(response);
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        }
+    });
     
 });
 
