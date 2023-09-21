@@ -20,8 +20,8 @@ var wbld = {
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
         if (document.getElementById(id)) { 
-            if (id == 'wbld') { 
-                if (widget_name) { 
+            if (id == 'wbld') {
+                if (widget_name) {
                     // add loading bar
                     $('#' + id).append(`
                         <div class="widget-container" id="loading-bar">
@@ -215,14 +215,14 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         <div class="input-block">
         
             <div class="widget-container">
-                <div class="small-text">Your address</div>
+                <div class="small-text">Your building name</div>
                 <div class="select-btn">
                     <div id="address-select" class="select">${address_address}</div>
                 </div>
                 <div id="addressPopup" class="popup done">
                 
                     <div class="widget-container">
-                        <div class="small-text">Pick your address</div>
+                        <div class="small-text">Pick your building name</div>
                         <div id="address-buttons">
                             ${addresses_list.map(item => `<button class="filter-btn address-btn ${item.address_selected}" data-address_id=${item.address_id} data-address_address=${encodeURIComponent(item.address_address)}>${item.address_address}</button>`).join('')}
                         </div>
@@ -376,7 +376,7 @@ function generate_output() {
     $('#output').append(`
         <div class="widget-container">
             <div class="text-editor">
-                <p class="p-box p-box-big">&#128205; Select your address.</p>
+                <p class="p-box p-box-big">&#128205; Select your building name.</p>
                 <p class="p-box p-box-big">&#128719; Pick your beds and layout.</p>
                 <p class="p-box p-box-big">&#128176; Choose shop, budget and style.</p>
                 <p class="p-box p-box-big">&#128526; Click "Furnish Layout" to get design project.</p>
