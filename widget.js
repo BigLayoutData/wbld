@@ -13,6 +13,7 @@ var wbld = {
     products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
     products_West_Elm: 'https://space.biglayoutdata.com/products_West_Elm/',
     products_Pottery_Barn: 'https://space.biglayoutdata.com/products_Pottery_Barn/',
+    products_IKEA: 'https://space.biglayoutdata.com/products_IKEA/',
     // some const for api urls
     api1: 'https://api1.biglayoutdata.com/',
     api2: 'https://api.biglayoutdata.com/',
@@ -1189,6 +1190,12 @@ function get_bucket(product_image, product_shop) {
         bucket_name = wbld.products_West_Elm;
     } else if (product_shop === "Pottery Barn") {
         bucket_name = wbld.products_Pottery_Barn;
+    } else if (product_shop === "IKEA") {
+        bucket_name = wbld.products_IKEA;
+    } else if (product_shop === "Home Centre") {
+        bucket_name = wbld.products_Home_Centre;
+    } else if (product_shop === "Home Box") {
+        bucket_name = wbld.products_Home_Box;
     }
     
     return bucket_name + product_image;

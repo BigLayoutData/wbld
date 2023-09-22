@@ -369,7 +369,7 @@
     cursor: pointer;
 }
 .select-btn .select {
-    width: 100%;
+    width: 90%;
     border: none;
     box-shadow: none;
     background-color: transparent;
@@ -378,6 +378,9 @@
        -moz-appearance: none;
             appearance: none;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #generate-btn-block, .generate-btn-block {
