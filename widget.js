@@ -17,8 +17,8 @@ var wbld = {
     products_Home_Box: 'https://space.biglayoutdata.com/products_Home_Box/',
     products_Home_Center: 'https://space.biglayoutdata.com/products_Home_Center/',
     // some const for api urls
-    api1: 'https://api-test-server.biglayoutdata.com/',
-    api2: 'https://api-test-server.biglayoutdata.com/',
+    api1: 'https://api1.biglayoutdata.com/',
+    api2: 'https://api.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
