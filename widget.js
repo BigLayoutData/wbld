@@ -365,10 +365,10 @@ function generate_output() {
     $('#output').append(`
         <div class="widget-container">
             <div class="text-editor">
-                <p class="p-box p-box-big">&#128205; Select your building name.</p>
-                <p class="p-box p-box-big">&#128719; Pick your beds and layout.</p>
-                <p class="p-box p-box-big">&#128176; Choose shop, budget and style.</p>
-                <p class="p-box p-box-big">&#128526; Click "Furnish Layout" to get design project.</p>
+                <p class="p-box p-box-big">&#128715; This is FREE tool to select furniture that fits your apartment.</p>
+                <p class="p-box p-box-big">&#128205; Select your building name and pick layout.</p>
+                <p class="p-box p-box-big">&#128176; Choose store, budget and style.</p>
+                <p class="p-box p-box-big">&#128526; Click "Furnish Layout".</p>
             </div>
         </div>
     `);
