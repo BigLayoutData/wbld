@@ -1063,7 +1063,8 @@ $(document).ready(function(){
         const room_id = $(this).attr('data-room_id');
 
         //close onboarding
-        $('.onboarding-images').fadeOut();
+        $('.onboarding-images').addClass("done");
+        updateSidebarContentHeight();
         
         // Clear the previous content
         $('#product-popup-content').empty();
