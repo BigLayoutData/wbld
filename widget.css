@@ -274,6 +274,9 @@
     color: #000000;
 }
 .text-editor {
+    float: left;
+    width: calc(100% - 21px - 21px);
+    max-width: 415px;
     padding: 20px;
     border: solid;
     border-radius: 5px;
@@ -297,6 +300,26 @@
     font-weight: 400;
     color: #000000;
     margin: 0px 6px 6px 6px;
+}
+.onboarding-images {
+    float: left;
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: left;
+}
+.onboarding-image-left img {
+    float: left;
+    box-sizing: border-box;
+    width: calc(50% - 10px);
+    max-width: 217.5px;
+    margin-right: 10px;
+}
+.onboarding-image-right img {
+    float: left;
+    box-sizing: border-box;
+    width: calc(50% - 10px);
+    max-width: 217.5px;
+    margin-left: 10px;
 }
 .filter-btn {
     box-sizing: border-box;
@@ -712,6 +735,15 @@
 
 body.no-scroll {
     overflow: hidden;
+}
+
+@media screen and (min-width: 500px) and (max-width: 865px) {
+    .text-editor {
+        margin-left: calc(50% - 218.5px); 
+    }
+    .onboarding-images {
+        margin-left: calc(50% - 217.5px);
+    }
 }
 
 @media screen and (min-width: 346px) and (max-width: 865px) {

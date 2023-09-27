@@ -345,7 +345,7 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         
             <div class="widget-container">
                 <div class="small-text">&nbsp;</div> 
-                <button class="generate-btn generate-btn-block" data-click_n=${click_n}>Furnish Layout</button>
+                <button class="generate-btn generate-btn-block" data-click_n=${click_n}>Create Project</button>
             </div>
         
         </div>
@@ -361,14 +361,23 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
 }
 
 function generate_output() {
+
+    /*
+    <p class="p-box p-box-big">&#128715; This is FREE tool to select furniture that fits your apartment.</p>
+    <p class="p-box p-box-big">&#128205; Select your building name and pick layout.</p>
+    <p class="p-box p-box-big">&#128176; Choose store, budget and style.</p>
+    <p class="p-box p-box-big">&#128526; Click "Furnish Layout".</p>
+    */
     
     $('#output').append(`
         <div class="widget-container">
-            <div class="text-editor">
-                <p class="p-box p-box-big">&#128715; This is FREE tool to select furniture that fits your apartment.</p>
-                <p class="p-box p-box-big">&#128205; Select your building name and pick layout.</p>
-                <p class="p-box p-box-big">&#128176; Choose store, budget and style.</p>
-                <p class="p-box p-box-big">&#128526; Click "Furnish Layout".</p>
+            <div class="onboarding-images">
+                <div class="onboarding-image-left">
+                    <img src="${wbld.pics + 'onboarding-1-left.webp'}" />
+                </div>
+                <div class="onboarding-image-right">
+                    <img src="${wbld.pics + 'onboarding-1-right.webp'}" />
+                </div>
             </div>
         </div>
     `);
@@ -409,7 +418,7 @@ function generate_poweredby() {
             <div class="poweredby">
                 <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer;">User Agreement</a></div>
                 <div class="poweredby-text">Powered by</div>
-                <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.png'}" target="_blank" rel="noopener" /></a>
+                <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.webp'}" target="_blank" rel="noopener" alt="Big Layout Data Logo" /></a>
             </div>
         </div>
     `);
@@ -624,12 +633,23 @@ function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
     clean_output();
 
+    /*
+    <div class="text-editor">
+        <p class="p-box">1. Tap on item image to change it.</p>
+        <p class="p-box">2. Follow the link "To Shop" to go directly to the store.</p>
+        <p class="p-box">3. Play with style, budget and shop.</p>
+    </div>
+    */
+
     $('#output').append(`
         <div class="widget-container">
-            <div class="text-editor">
-                <p class="p-box">1. Tap on item image to change it.</p>
-                <p class="p-box">2. Follow the link "To Shop" to go directly to the store.</p>
-                <p class="p-box">3. Play with style, budget and shop.</p>
+            <div class="onboarding-images">
+                <div class="onboarding-image-left">
+                    <img src="${wbld.pics + 'onboarding-2-left.webp'}" />
+                </div>
+                <div class="onboarding-image-right">
+                    <img src="${wbld.pics + 'onboarding-2-right.webp'}" />
+                </div>
             </div>
         </div>
     `);
@@ -682,13 +702,15 @@ function update_output(click_n, address_id, layout_id) {
                         
                         items_n += room.products_list.length;
                         
-                        $('#sidebar-content').append(`
-                            <div class="widget-container">
-                                <div class="layout-with-items">
-                                    <img src="${wbld.room_in_layout_img}${room.room_in_layout_img}"/>
+                        if (room.room_in_layout_img != "") {
+                            $('#sidebar-content').append(`
+                                <div class="widget-container">
+                                    <div class="layout-with-items">
+                                        <img src="${wbld.room_in_layout_img}${room.room_in_layout_img}"/>
+                                    </div>
                                 </div>
-                            </div>
-                        `);
+                            `);
+                        }
                         
                         $('#sidebar-content').append(`
                             <div class="widget-container">
@@ -1039,6 +1061,9 @@ $(document).ready(function(){
         const product_id = product.product_id;
         const productsListTotal = JSON.parse($(this).attr('data-products_list_total'));
         const room_id = $(this).attr('data-room_id');
+
+        //close onboarding
+        $('.onboarding-images').fadeOut();
         
         // Clear the previous content
         $('#product-popup-content').empty();
