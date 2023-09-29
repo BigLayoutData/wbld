@@ -1292,7 +1292,7 @@ function get_url(product_url) {
     return product_url;
 }
 
-const speedProgressBarDefault = 200;
+let speedProgressBarDefault = 200;
 let progress = 0;
 let progressBarIntervalId;
 let waitBarIntervalId;
