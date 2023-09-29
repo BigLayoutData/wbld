@@ -3,122 +3,117 @@ var wbld = {
     widget_domain: 'no_data',
     visitor_id: 'no_data',
     partner_id: 'no_data',
+    output_onboarding: 1,
+    sidebar_onboarding: 1,
     // some const for img urls
     pics: 'https://space.biglayoutdata.com/pics/',
     mood_board_img: 'https://space.biglayoutdata.com/mood-boards/',
     layout_without_items_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     layout_with_items_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
-    products_OC_Home: 'https://space.biglayoutdata.com/products_OC_Home/',
-    products_Danube_Home: 'https://space.biglayoutdata.com/products_Danube_Home/',
-    products_West_Elm: 'https://space.biglayoutdata.com/products_West_Elm/',
-    products_Pottery_Barn: 'https://space.biglayoutdata.com/products_Pottery_Barn/',
-    products_IKEA: 'https://space.biglayoutdata.com/products_IKEA/',
-    products_Home_Box: 'https://space.biglayoutdata.com/products_Home_Box/',
-    products_Home_Centre: 'https://space.biglayoutdata.com/products_Home_Centre/',
+    products_bucket: 'https://space.biglayoutdata.com/products_',
     // some const for api urls
     api1: 'https://api1.biglayoutdata.com/',
     api2: 'https://api.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
-        if (document.getElementById(id)) { 
-            if (id == 'wbld') {
-                if (widget_name) {
-                    // add loading bar
-                    $('#' + id).append(`
-                        <div class="widget-container" id="loading-bar">
-                            <div class="text-editor">
-                                <p class="p-box">We are downloading your widget!</p>
-                                <div class="progress">
-                                    <div class="bar"></div>
-                                    <div class="label">0%</div>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-
-                    // start progress bar
-                    startLoadingProgressBar(speedProgressBarDefault);
-
-                    // set widget name
-                    this.widget_name = widget_name;
-
-                    // get domain name
-                    this.widget_domain = location.hostname;
-
-                    // get url params
-                    url_search_params = new URLSearchParams(window.location.search);
-                    if (url_search_params.get('partner_id')) {
-                        this.partner_id = url_search_params.get('partner_id');
-                    }
-
-                    if (url_params.size == 0) {
-                        url_params = url_search_params;
-                    }
-
-                    // need to check that the widget name is available
-                    const data = {
-                        "widget_name": widget_name,
-                        "widget_domain": location.hostname,
-                        "layout_id": url_params.get('layout_id'),
-                        "property_size": url_params.get('property_size'),
-                        "bedrooms": url_params.get('bedrooms'),
-                        "search": url_params.get('search'),
-                    };
-                    $.ajax({
-                        url: this.api1 + 'check_widget/',
-                        type: 'POST',
-                        dataType: 'json',
-                        contentType: 'application/json',
-                        data: JSON.stringify(data),
-                        success: function(response) {
-                            if (response.data.widget_status == 'active') {
-                                // get visitor_id and start widget draw
-                                fpPromise
-                                    .then(fp => fp.get())
-                                    .then(result => {
-                                        start(
-                                            result.visitorId,
-                                            response.data.widget_addresses,
-                                            response.data.widget_address_address,
-                                            response.data.widget_address_id,
-                                            response.data.widget_layout_id,
-                                            response.data.widget_n_bedrooms,
-                                            response.data.widget_budgets,
-                                            response.data.widget_styles,
-                                            response.data.widget_shops,
-                                            response.data.widget_parameters,
-                                        );
-                                    })
-                            } else {
-                                console.log(`Widget widget_name="${widget_name}" status is not active`);
-                            }
-                        },
-                        error: function(error) {
-                            if (error.status === 404) {
-                                console.log(`Widget widget_name="${widget_name}" is not found or widget domain is not correct`);
-                            } else {
-                                console.error(error);
-                            }
-                        }
-                    });
-                } 
-                // if the widget name is not specified, we display a message: widget name is missing
-                else {
-                    console.log(`Widget name is missing`);
-                }
-            } 
-            // if the identifier is not equal to the default id="wbld"
-            else {
-                console.log(`The specified block id="${id}" not id="wbld"`);
-            }
-        } 
-        // if there is no HTML element on the page with the specified id 
-        // we display a message: there is no block with identifier id="id"
-        else { 
+        if (!document.getElementById(id)) {
             console.log(`The specified block id="${id}" is missing`);
-        } 
+            return;
+        }
+
+        // check if the identifier is equal to the default id="wbld"
+        if (id != 'wbld') {
+            console.log(`The specified block id="${id}" not id="wbld"`);
+            return;
+        }
+        
+        // check if the widget name is specified
+        if (!widget_name) {
+            console.log(`Widget name is missing`);
+            return;
+        }
+
+        // add loading bar
+        $('#' + id).append(`
+            <div class="widget-container" id="loading-bar">
+                <div class="loading-bar-text-editor">
+                    <p class="p-box">We are downloading your widget!</p>
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="label">0%</div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        // start progress bar
+        startLoadingProgressBar(speedProgressBarDefault);
+
+        // set widget name
+        this.widget_name = widget_name;
+
+        // get domain name
+        this.widget_domain = location.hostname;
+
+        // get url params
+        url_search_params = new URLSearchParams(window.location.search);
+        if (url_search_params.get('partner_id')) {
+            this.partner_id = url_search_params.get('partner_id');
+        }
+
+        if (url_params.size == 0) {
+            url_params = url_search_params;
+        }
+
+        // need to check that the widget name is available
+        const data = {
+            "widget_name": widget_name,
+            "widget_domain": location.hostname,
+            "layout_id": url_params.get('layout_id'),
+            "property_size": url_params.get('property_size'),
+            "bedrooms": url_params.get('bedrooms'),
+            "search": url_params.get('search'),
+        };
+        //console.log("data:", data);
+        $.ajax({
+            url: this.api1 + 'check_widget/',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.data.widget_status == 'active') {
+                    // get visitor_id and start widget draw
+                    fpPromise
+                        .then(fp => fp.get())
+                        .then(result => {
+                            start(
+                                result.visitorId,
+                                response.data.widget_addresses,
+                                response.data.widget_address_address,
+                                response.data.widget_address_id,
+                                response.data.widget_layout_id,
+                                response.data.widget_n_bedrooms,
+                                response.data.widget_budgets,
+                                response.data.widget_styles,
+                                response.data.widget_shops,
+                                response.data.widget_parameters,
+                            );
+                        })
+                } else {
+                    console.log(`Widget widget_name="${widget_name}" status is not active`);
+                }
+            },
+            error: function(error) {
+                if (error.status === 404) {
+                    console.log(`Widget widget_name="${widget_name}" is not found or widget domain is not correct`);
+                } else {
+                    console.error(error);
+                }
+            }
+        });
     }, 
     // widget style connection method
     addStyles: function(font_style_href) { 
@@ -155,6 +150,7 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     $("#mainbar").append($('<div id="input"></div>'));
     $("#input").append($('<div id="input-line-1"></div>'));
     $("#input").append($('<div id="input-line-2"></div>'));
+    $("#input").append($('<div id="input-line-3"></div>'));
     $("#mainbar").append($('<div id="output"></div>'));
     $("#mainbar").append($('<div id="product-popup" style="display: none;"></div>'));
     $("#mainbar").append($('<div id="poweredby"></div>'));
@@ -170,21 +166,20 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
         return a.address_address.localeCompare(b.address_address);
     });
 
-    // widget address_address
-    widget_address_address = decodeURIComponent(widget_address_address);
-    const address_address = widget_address_address;
-
     // widget address_id
     widget_address_id = decodeURIComponent(widget_address_id);
     const address_id = widget_address_id;
+    //console.log("address_id:", address_id);
 
     // widget layout_id
     widget_layout_id = decodeURIComponent(widget_layout_id);
     const layout_id = widget_layout_id;
+    //console.log("layout_id:", layout_id);
 
     // widget n_bedrooms
     widget_n_bedrooms = decodeURIComponent(widget_n_bedrooms);
     const n_bedrooms_list = JSON.parse(widget_n_bedrooms);
+    //console.log("n_bedrooms_list:", n_bedrooms_list);
 
     // widget budgets
     widget_budgets = decodeURIComponent(widget_budgets);
@@ -198,7 +193,7 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     widget_shops = decodeURIComponent(widget_shops);
     const shops_list = JSON.parse(widget_shops);
     
-    generate_input(addresses_list, address_id, address_address, n_bedrooms_list, layout_id, shops_list, styles_list, budgets_list, click_n);
+    generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n);
 
     generate_product_popup();
     
@@ -207,28 +202,24 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     generate_sidebar();
 
     generate_output();
-    
-    //update_output(click_n, address_id, layout_id);
 }
 
-function generate_input(addresses_list, address_id, address_address, n_bedrooms_list, layout_id, shops_list, styles_list, budgets_list, click_n) {
-    
-    // Add address selection
+function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n) {
+
     $('#input-line-1').append(`
         <div class="input-block">
-        
+            
             <div class="widget-container">
-                <div class="small-text">Your building name</div>
+                <div class="small-text">Furniture Store</div> 
                 <div class="select-btn">
-                    <div id="address-select" class="select">${address_address}</div>
+                    <div id="shops-select" class="select">${shops_list.find(item => item.selected === 'selected').shop_name}</div>
                 </div>
-                <div id="addressPopup" class="popup done">
+                <div id="shopsPopup" class="popup done">
                 
                     <div class="widget-container">
-                        <div class="small-text">Pick your building name</div>
-                        <input type="text" id="address-search" placeholder="Search building name...">
-                        <div id="address-buttons">
-                            ${addresses_list.map(item => `<button class="filter-btn address-btn ${item.address_selected}" data-address_id=${item.address_id} data-address_address=${encodeURIComponent(item.address_address)}>${item.address_address}</button>`).join('')}
+                        <div class="small-text">Pick Furniture Ftore</div>
+                        <div id="shops-buttons">
+                            ${shops_list.map(item => `<button class="filter-btn shop-btn ${item.selected}" data-shop_id=${item.shop_id} data-shop_name=${encodeURIComponent(item.shop_name)}>${item.shop_name}</button>`).join('')}
                         </div>
                     </div>
                     
@@ -238,24 +229,62 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         </div>
     `);
 
+    // create addresses_list.done like
+    // true if address_id != 99999
+    // and true if addresses_list.address_selected == selected and addresses_list.address_id == address_id
+    addresses_list.forEach(function(item) {
+        if (item.address_id != 99999) {
+            if (item.address_selected == 'selected' && item.address_id == address_id) {
+                item.address_done = '';
+            } else {
+                item.address_done = 'done';
+            }
+        } else {
+            item.address_done = 'done';
+        }   
+    });
+
     $('#input-line-1').append(`
         <div class="input-block">
             
             <div class="widget-container">
-                <div class="small-text">Your beds and layout</div> 
+                <div class="small-text">Your Layout</div> 
                 <div class="select-btn">
                     <div id="bedrooms-select" class="select">${n_bedrooms_list.find(item => item.selected === 'selected').n_bedrooms_name}</div>
                 </div>
                 <div id="bedroomsPopup" class="popup done">
                 
                     <div class="widget-container">
-                        <div class="small-text">Pick your bedrooms number</div>
+                        <div class="small-text">Pick Your Bedrooms Number</div>
                         <div id="bedrooms-buttons">
-                            ${n_bedrooms_list.map(item => `<button class="filter-btn bedroom-btn ${item.selected}" data-n_bedrooms=${item.n_bedrooms} data-n_bedrooms_name=${encodeURIComponent(item.n_bedrooms_name)}>${item.n_bedrooms_name}</button>`).join('')}
+                            ${n_bedrooms_list.map(item => `<button class="filter-btn bedroom-btn ${item.selected}" data-n_bedrooms=${item.n_bedrooms} data-n_bedrooms_name=${encodeURIComponent(item.n_bedrooms_name)} data-n_bedrooms_layout_sizes=${encodeURIComponent(JSON.stringify(item.layout_sizes))} >${item.n_bedrooms_name}</button>`).join('')}
                         </div>
                     </div>
+
                     <div class="widget-container">
-                        <div class="small-text">Pick your layout</div>
+                        <div class="small-text">Pick Your Layout Size</div>
+                        <div id="layoutsize-buttons">
+                            ${n_bedrooms_list.find(item => item.selected === 'selected').layout_sizes.map(item => `<button class="filter-btn layout_size-btn ${item.selected}" data-layout_id=${item.layout_id} data-address_id=${item.address_id} >${item.layout_size_name}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="widget-container">
+                        <button class="generate-btn " style="float: right; width: 220px;" data-click_n=${click_n}>Close and Create Project</button>
+                    </div>
+
+                    <div class="widget-container" id="building-scroll">
+                        <div class="small-text">Search Layout by Building (Optional)</div>
+                        <div class="input-container">
+                            <input type="text" id="address-search" placeholder="Search building name..." autocomplete="off">
+                            <span class="clear-button" id="clear-button">✕</span>
+                        </div>
+                        <div id="address-buttons">
+                            ${addresses_list.map(item => `<button class="filter-btn address-btn ${item.address_selected} ${item.address_done === "" ? "" : "done"}" data-address_id=${item.address_id} data-address_address=${encodeURIComponent(item.address_address)}>${item.address_address}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="widget-container ${addresses_list.filter(item => item.address_done == '').length >= 1 ? "" : "done"}" id="layout-change-container">
+                        <div class="small-text">Pick Your Layout (Optional)</div>
                         <div id="layout-change">
                             <div id="wait-bar">
                                 <div class="wait-bar-bar"></div>
@@ -271,41 +300,24 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
         </div>
     `);
     
-    $('#input-line-1').append(`
-        <div class="input-block">
-            
-            <div class="widget-container">
-                <div class="small-text">Target budget</div> 
-                <div class="select-btn">
-                    <div id="budgets-select" class="select">${budgets_list.find(item => item.selected === 'selected').budget_name}</div>
-                </div>
-                <div id="budgetsPopup" class="popup done">
-                
-                    <div class="widget-container">
-                        <div class="small-text">Pick your target budget</div>
-                        <div id="budgets-buttons">
-                            ${budgets_list.map(item => `<button class="filter-btn budget-btn ${item.selected}" data-budget_id=${item.budget_id} data-max_budget=${item.max_budget} data-min_budget=${item.min_budget} data-budget_name=${encodeURIComponent(item.budget_name)}>${item.budget_name}</button>`).join('')} 
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-            
-        </div>
-    `);
-    
     $('#input-line-2').append(`
         <div class="input-block">
             
             <div class="widget-container">
-                <div class="small-text">Style</div> 
+                <div class="small-text">More Filters</div> 
                 <div class="select-btn">
-                    <div id="styles-select" class="select">${styles_list.find(item => item.selected === 'selected').style_name}</div>
+                    <div id="advanced-select" class="select">Advanced</div>
                 </div>
-                <div id="stylesPopup" class="popup done">
+                <div id="advancedPopup" class="popup done">
                 
                     <div class="widget-container">
-                        <div class="small-text">Pick style</div>
+                        <div class="small-text">Pick Target Budget</div>
+                        <div id="budgets-buttons">
+                            ${budgets_list.map(item => `<button class="filter-btn budget-btn ${item.selected}" data-budget_id=${item.budget_id} data-max_budget=${item.max_budget} data-min_budget=${item.min_budget} data-budget_name=${encodeURIComponent(item.budget_name)}>${item.budget_name}</button>`).join('')} 
+                        </div>
+                    </div>
+                    <div class="widget-container">
+                        <div class="small-text">Choose Style</div>
                         <div id="styles-buttons">
                             ${styles_list.map(item => `<button class="filter-btn style-btn ${item.selected}" data-style_id=${item.style_id} data-style_name=${encodeURIComponent(item.style_name)}>${item.style_name}</button>`).join('')} 
                         </div>
@@ -318,36 +330,13 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
     `);
     
     $('#input-line-2').append(`
-        <div class="input-block">
-            
-            <div class="widget-container">
-                <div class="small-text">Furniture store</div> 
-                <div class="select-btn">
-                    <div id="shops-select" class="select">${shops_list.find(item => item.selected === 'selected').shop_name}</div>
-                </div>
-                <div id="shopsPopup" class="popup done">
-                
-                    <div class="widget-container">
-                        <div class="small-text">Pick furniture store</div>
-                        <div id="shops-buttons">
-                            ${shops_list.map(item => `<button class="filter-btn shop-btn ${item.selected}" data-shop_id=${item.shop_id} data-shop_name=${encodeURIComponent(item.shop_name)}>${item.shop_name}</button>`).join('')}
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-            
-        </div>
-    `);
-    
-    $('#input-line-2').append(`
         <div class="input-block" id="generate-btn-block">
-        
+
             <div class="widget-container">
                 <div class="small-text">&nbsp;</div> 
                 <button class="generate-btn generate-btn-block" data-click_n=${click_n}>Create Project</button>
             </div>
-        
+
         </div>
     `);
     
@@ -361,58 +350,41 @@ function generate_input(addresses_list, address_id, address_address, n_bedrooms_
 }
 
 function generate_output() {
-
-    /*
-    <p class="p-box p-box-big">&#128715; This is FREE tool to select furniture that fits your apartment.</p>
-    <p class="p-box p-box-big">&#128205; Select your building name and pick layout.</p>
-    <p class="p-box p-box-big">&#128176; Choose store, budget and style.</p>
-    <p class="p-box p-box-big">&#128526; Click "Furnish Layout".</p>
-    */
-    
     $('#output').append(`
         <div class="widget-container">
             <div class="onboarding-images">
                 <div class="onboarding-image-left">
-                    <img src="${wbld.pics + 'onboarding-1-left.webp'}" />
+                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" />
                 </div>
                 <div class="onboarding-image-right">
-                    <img src="${wbld.pics + 'onboarding-1-right.webp'}" />
+                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" />
                 </div>
             </div>
         </div>
     `);
-    
 }
 
 function generate_sidebar() {
-    
     $('#sidebar').append(`
         <div id="sidebar-title">
             <div class="widget-container">
-                <div class="heading-title" id="sidebar-you-look"></div>
-            </div>
-            <div class="widget-container">
-                <div class="heading-subtitle" id="sidebar-total-budget" data-budget_total="0"></div>
+                <div class="heading-title" id="sidebar-total-budget" data-budget_total="0" data-items_total="0"></div>
             </div>
         </div>
         <div id="sidebar-content"></div>
     `);
-    
 }
 
 function generate_product_popup() {
-    
     $('#product-popup').append(`
         <div class="widget-container">
             <div id="product-popup-content">
             </div>
         </div>
     `);
-    
 }
 
 function generate_poweredby() {
-    
     $('#poweredby').append(`
         <div class="widget-container">
             <div class="poweredby">
@@ -422,7 +394,6 @@ function generate_poweredby() {
             </div>
         </div>
     `);
-    
 }
 
 function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_selected) {
@@ -438,7 +409,7 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
         success: function(response) {
             if (!response.data.length) {
                 $(".layout-change").html(`
-                    <div class="text-editor">
+                    <div class="error-text-editor">
                         <p class="p-box">No layouts for <b>${n_bedrooms_name}</b>.</p>
                     </div>
                 `);
@@ -585,14 +556,10 @@ function update_price_budget_range(layout_id_selected) {
         budgetButtons.filter(`[data-budget_id='${budgetIdSelected}']`).addClass('selected');
     }
     
-    const budget_name = decodeURIComponent($('.filter-btn.budget-btn.selected').data( "budget_name" ));
-    
-    $("#budgets-select").text(budget_name);
 }
 
 function clean_output() {
     $("#output").empty();
-    $("#sidebar-you-look").text(``);
     $("#sidebar-total-budget").text(``);
     $("#sidebar-content").empty();
 }
@@ -633,6 +600,8 @@ function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
     clean_output();
 
+    //console.log("click_n:", click_n, "address_id:", address_id, "layout_id", layout_id);
+
     /*
     <div class="text-editor">
         <p class="p-box">1. Tap on item image to change it.</p>
@@ -640,19 +609,6 @@ function update_output(click_n, address_id, layout_id) {
         <p class="p-box">3. Play with style, budget and shop.</p>
     </div>
     */
-
-    $('#output').append(`
-        <div class="widget-container">
-            <div class="onboarding-images">
-                <div class="onboarding-image-left">
-                    <img src="${wbld.pics + 'onboarding-2-left.webp'}" />
-                </div>
-                <div class="onboarding-image-right">
-                    <img src="${wbld.pics + 'onboarding-2-right.webp'}" />
-                </div>
-            </div>
-        </div>
-    `);
     
     // check layout_id not null
     if (layout_id) {
@@ -712,15 +668,15 @@ function update_output(click_n, address_id, layout_id) {
                             `);
                         }
                         
-                        $('#sidebar-content').append(`
+                        /*$('#sidebar-content').append(`
                             <div class="widget-container">
                                 <div class="heading-subtitle">Buy List: ${room.room_name}</div>
                             </div>
-                        `);
+                        `);*/
                         
                         $('#sidebar-content').append(`
                             <div class="widget-container">
-                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_budget="${room.room_budget}">Budget: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
+                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
                             </div>
                         `);
                         
@@ -741,7 +697,7 @@ function update_output(click_n, address_id, layout_id) {
                                                     </div>
                                                     <div class="item-product-link-btn">
                                                         <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">
-                                                        <button class="link-btn">To Shop</button>
+                                                        <button class="link-btn">To Store</button>
                                                         </a>
                                                     </div>
                                                     <div class="item-product-comment-btn">
@@ -816,9 +772,9 @@ function update_output(click_n, address_id, layout_id) {
                         
                     });
                     
-                    $("#sidebar-you-look").text(`Room Plan and Buy List (${items_n} items)`);
-                    $("#sidebar-total-budget").text(`Total Budget: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
+                    $("#sidebar-total-budget").text(`Total Budget: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency} (${items_n} items)`);
                     $("#sidebar-total-budget").data("budget_total", response.data.budget_total);
+                    $("#sidebar-total-budget").data("items_total", items_n);
                     
                     // next click number
                     click_n += 1;
@@ -836,6 +792,44 @@ function update_output(click_n, address_id, layout_id) {
                             requestNode = false;
                         }
                     });
+
+                    if (wbld.output_onboarding === 1) {
+                        const htmlOutputOnboarding = `
+                            <div class="widget-container">
+                                <div class="onboarding-images">
+                                    <div class="onboarding-image-left">
+                                        <img src="${wbld.pics + 'onboarding-output-left.webp'}" />
+                                    </div>
+                                    <div class="onboarding-image-right">
+                                        <img src="${wbld.pics + 'onboarding-output-right.webp'}" />
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $("#output").children().eq(2).after(htmlOutputOnboarding);
+                    }
+
+                    if (wbld.sidebar_onboarding === 1) {
+                        const htmlSidebarOnboarding = `
+                            <div class="widget-container">
+                                <div class="onboarding-image-center">
+                                    <img src="${wbld.pics + 'onboarding-sidebar-left.webp'}" />
+                                </div>
+                            </div>
+                        `;
+                        $("#sidebar-content").children().eq(0).before(htmlSidebarOnboarding);
+                    }
+                    
+                    if (response.data.address_id != 99999 && response.data.rooms_list[0].room_in_layout_img == "") {
+                        const htmlSidebarLayoutImage = `
+                            <div class="widget-container">
+                                <div class="layout-with-items">
+                                    <img src="${wbld.room_in_layout_img}${response.data.layout_img_with_items}"/>
+                                </div>
+                            </div>
+                        `;
+                        $("#sidebar-content").children().eq(0).after(htmlSidebarLayoutImage);
+                    }
                     
                 }
             },
@@ -861,9 +855,17 @@ $(document).ready(function(){
     $(document).on('click', '.generate-btn', function(event) {
         const click_n = parseInt($(this).data("click_n"));
         //console.log("click_n:", click_n);
+        $('#bedroomsPopup').scrollTop(0);
+        $('#bedroomsPopup').toggleClass("done");
         
-        const address_id = $(".address-btn.selected").data( "address_id" );
-        const layout_id = $(".img-selected").data( "layout_id" );
+        let address_id = $(".address-btn.selected").data( "address_id" );
+        let layout_id = $(".img-selected").data( "layout_id" );
+
+        if (layout_id == null) {
+            clear_input_box();
+            address_id = $(".layout_size-btn.selected").data( "address_id" );
+            layout_id = $(".layout_size-btn.selected").data( "layout_id" );
+        }
 
         update_output(click_n, address_id, layout_id);
     });
@@ -876,35 +878,73 @@ $(document).ready(function(){
     });
     
     $(document).on('click', '.address-btn', function(event) {
-        
         $(".address-btn").removeClass("selected");
         $(this).addClass("selected");
-        $('#addressPopup').scrollTop(0);
-        $('#addressPopup').toggleClass("done");
+        $(".address-btn").hide();
+        $(this).show();
         
         const address_id = $(this).data( "address_id" );
-        const address_address = decodeURIComponent($(this).data( "address_address" ));
-        
         const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
         const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
         
-        $("#address-select").text(address_address);
-        
         layout_change(address_id, n_bedrooms, n_bedrooms_name, null);
+        $('#layout-change-container').removeClass("done");
+
+        // Get a reference to the bedroomsPopup and building-scroll elements
+        const bedroomsPopup = document.getElementById("bedroomsPopup");
+        const buildingScroll = document.getElementById("building-scroll");
+
+        // Scroll the bedroomsPopup element to the building-scroll element
+        bedroomsPopup.scrollTop = buildingScroll.offsetTop;
     });
     
     $(document).on('click', '.bedroom-btn', function(event) {
         $(".bedroom-btn").removeClass("selected");
         $(this).addClass("selected");
         
-        const address_id = $(".address-btn.selected").data( "address_id" );
+        //const address_id = $(".address-btn.selected").data( "address_id" );
         const n_bedrooms = $(this).data( "n_bedrooms" );
         const n_bedrooms_name = decodeURIComponent($(this).data( "n_bedrooms_name" ));
         
         $("#bedrooms-select").text(n_bedrooms_name);
+
+        let layout_sizes = decodeURIComponent($(this).data( "n_bedrooms_layout_sizes" ));
+        layout_sizes = JSON.parse(layout_sizes);
+        $("#layoutsize-buttons").html(`
+            ${layout_sizes.map(item => `<button class="filter-btn layout_size-btn ${item.selected}" data-layout_id=${item.layout_id} data-address_id=${item.address_id} >${item.layout_size_name}</button>`).join('')}
+        `);
+
+        const layout_id = $(".layout_size-btn.selected").data( "layout_id" );
+        const address_id = $(".layout_size-btn.selected").data( "address_id" );
+
+        $('#address-search').val('');
+        $('.address-btn').hide();
+        $('#layout-change-container').addClass("done");
+
+        $(".address-btn").removeClass("selected");
+        $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
         
-        layout_change(address_id, n_bedrooms, n_bedrooms_name, null);
+        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
         
+    });
+    
+    $(document).on('click', '.layout_size-btn', function(event) {
+        $(".layout_size-btn").removeClass("selected");
+        $(this).addClass("selected");
+
+        $('#address-search').val('');
+        $('.address-btn').hide();
+        $('#layout-change-container').addClass("done");
+
+        const address_id = $(this).data( "address_id" );
+        const layout_id = $(this).data( "layout_id" );
+        const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
+        const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+
+        $(".address-btn").removeClass("selected");
+        $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+
+        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
     });
     
     $(document).on('click', '.layout-change img', function(event) {
@@ -924,23 +964,15 @@ $(document).ready(function(){
     $(document).on('click', '.budget-btn', function(event) {
         $(".budget-btn").removeClass("selected");
         $(this).addClass("selected");
-        $('#budgetsPopup').scrollTop(0);
-        $('#budgetsPopup').toggleClass("done");
-        
-        const budget_name = decodeURIComponent($(this).data( "budget_name" ));
-        
-        $("#budgets-select").text(budget_name);
+        $('#advancedPopup').scrollTop(0);
+        $('#advancedPopup').toggleClass("done");
     });
     
     $(document).on('click', '.style-btn', function(event) {
         $(".style-btn").removeClass("selected");
         $(this).addClass("selected");
-        $('#stylesPopup').scrollTop(0);
-        $('#stylesPopup').toggleClass("done");
-        
-        const style_name = decodeURIComponent($(this).data( "style_name" ));
-        
-        $("#styles-select").text(style_name);
+        $('#advancedPopup').scrollTop(0);
+        $('#advancedPopup').toggleClass("done");
         
         //update price range for selected layout
         const layout_id_selected = $(".img-selected").data( "layout_id" );
@@ -972,49 +1004,32 @@ $(document).ready(function(){
         }
     });
     
-    $(document).on('click', '.select-btn', function(event) {
-        if ($(this).find('#address-select').length > 0) {
-            $('#addressPopup').toggleClass("done");
-            $('#bedroomsPopup').addClass("done");
-            $('#budgetsPopup').addClass("done");
-            $('#stylesPopup').addClass("done");
-            $('#shopsPopup').addClass("done");
-        }
-        
+    $(document).on('click', '.select-btn', function(event) { 
         if ($(this).find('#bedrooms-select').length > 0) {
-            $('#addressPopup').addClass("done");
             $('#bedroomsPopup').toggleClass("done");
-            $('#budgetsPopup').addClass("done");
-            $('#stylesPopup').addClass("done");
             $('#shopsPopup').addClass("done");
-        }
-        
-        if ($(this).find('#budgets-select').length > 0) {
-            $('#addressPopup').addClass("done");
-            $('#bedroomsPopup').addClass("done");
-            $('#budgetsPopup').toggleClass("done");
-            $('#stylesPopup').addClass("done");
-            $('#shopsPopup').addClass("done");
-        }
-        
-        if ($(this).find('#styles-select').length > 0) {
-            $('#addressPopup').addClass("done");
-            $('#bedroomsPopup').addClass("done");
-            $('#budgetsPopup').addClass("done");
-            $('#stylesPopup').toggleClass("done");
-            $('#shopsPopup').addClass("done");
+            $('#advancedPopup').addClass("done");
         }
         
         if ($(this).find('#shops-select').length > 0) {
-            $('#addressPopup').addClass("done");
             $('#bedroomsPopup').addClass("done");
-            $('#budgetsPopup').addClass("done");
-            $('#stylesPopup').addClass("done");
             $('#shopsPopup').toggleClass("done");
+            $('#advancedPopup').addClass("done");
+        }
+        
+        if ($(this).find('#advanced-select').length > 0) {
+            $('#bedroomsPopup').addClass("done");
+            $('#shopsPopup').addClass("done");
+            $('#advancedPopup').toggleClass("done");
         }
     });
     
     $(document).on('click', 'a.product-link, a.btn-product-link', function(event) {
+
+        //close sidebar onboarding
+        $('.onboarding-image-center').addClass("done");
+        wbld.sidebar_onboarding = 0;
+        updateSidebarContentHeight();
         
         const product_url = $(this).attr('href');
         const product_id = $(this).attr('data-product_id');
@@ -1062,8 +1077,9 @@ $(document).ready(function(){
         const productsListTotal = JSON.parse($(this).attr('data-products_list_total'));
         const room_id = $(this).attr('data-room_id');
 
-        //close onboarding
+        //close output onboarding
         $('.onboarding-images').addClass("done");
+        wbld.output_onboarding = 0;
         updateSidebarContentHeight();
         
         // Clear the previous content
@@ -1074,6 +1090,8 @@ $(document).ready(function(){
         $('#product-popup-content').append(`<div id="product-popup-list"><div id="product-popup-list-title">Try these alternatives:</div><div id="product-popup-list-items"></div></div>`);
 
         // Add each product to the list
+        // sort productsListTotal by price
+        productsListTotal.sort((a, b) => a.product_price - b.product_price);
         productsListTotal.forEach(function(product) {
             const dataProduct = JSON.stringify(product);
             const encodedDataProduct = encodeURIComponent(dataProduct);
@@ -1149,14 +1167,16 @@ $(document).ready(function(){
 
         const sbTotalBudget = $("#sidebar-total-budget");
         const sbTotalBudgetValue = sbTotalBudget.data("budget_total");
+        const sbTotalBudgetItems = sbTotalBudget.data("items_total");
         const sbTotalBudgetValueNew = sbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
-        sbTotalBudget.text(`Total Budget: ${Number(sbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+        sbTotalBudget.text(`Total Budget: ${Number(sbTotalBudgetValueNew).toLocaleString()} ${product.product_currency} (${sbTotalBudgetItems} items)`);
         sbTotalBudget.data("budget_total", sbTotalBudgetValueNew);
 
         const roomBudgetTitle = $(`.room-budget-title[data-room_id="${room_id}"]`);
         const roomBudgetValue = roomBudgetTitle.data('room_budget');
+        const roomBudgetRoomName = decodeURIComponent(roomBudgetTitle.data('room_name'));
         const roomBudgetValueNew = roomBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
-        roomBudgetTitle.text(`Budget: ${Number(roomBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+        roomBudgetTitle.text(`${roomBudgetRoomName}: ${Number(roomBudgetValueNew).toLocaleString()} ${product.product_currency}`);
         roomBudgetTitle.data("room_budget", roomBudgetValueNew);
 
         $('#product-popup').fadeOut();
@@ -1167,9 +1187,15 @@ $(document).ready(function(){
     // Attach an input event listener to the search box
     $(document).on('input', '#address-search', function(event) {
         const searchTerm = $('#address-search').val().toLowerCase();
+        if (searchTerm === '') {
+            clear_input_box();
+            return;
+        }
+
         $('#address-buttons .address-btn').each(function () {
             const address = decodeURIComponent($(this).data('address_address')).toLowerCase();
-            if (address.includes(searchTerm)) {
+            const address_id = $(this).data('address_id');
+            if (address.includes(searchTerm) & address_id != 0) {
                 $(this).show(); // Show matching addresses
             } else {
                 $(this).hide(); // Hide non-matching addresses
@@ -1180,52 +1206,61 @@ $(document).ready(function(){
     // Add an event listener to track user input when the input loses focus
     $(document).on('blur', '#address-search', function(event) {
         const userInput = $('#address-search').val();
-        if (userInput != '') {            
-            const data = {
-                "widget_name": wbld.widget_name,
-                "visitor_id": wbld.visitor_id,
-                "user_input": userInput,
-            };
-            
-            $.ajax({
-                url: wbld.api1 + 'user_search/',
-                type: 'POST',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function(response) {
-                    //console.log(response);
-                },
-                error: function(error) {
-                    console.error(error);
-                }
-            });
+        if (userInput == '') {
+            return;
         }
+
+        const data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "user_input": userInput,
+        };
+        
+        $.ajax({
+            url: wbld.api1 + 'user_search/',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                //console.log(response);
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    });
+
+    // Clear input address search after clear button click
+    $(document).on('click', '#clear-button', function(event) {
+        clear_input_box();
     });
     
 });
+
+function clear_input_box() {
+    $('#address-search').val('');
+    $('.address-btn').hide();
+    $('#layout-change-container').addClass("done");
+
+    // select address_id and layout_id from layout_sizes
+    const address_id = $(".layout_size-btn.selected").data( "address_id" );
+    const layout_id = $(".layout_size-btn.selected").data( "layout_id" );
+    const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
+    const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+
+    $(".address-btn").removeClass("selected");
+    $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+
+    layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
+}
 
 function set_zero_click_n() {
     $(".generate-btn").data("click_n", 0);
 }
 
-function get_bucket(product_image, product_shop) {
-    
-    let bucket_name = wbld.products_OC_Home;
-    if (product_shop === "Danube Home") {
-        bucket_name = wbld.products_Danube_Home;
-    } else if (product_shop === "West Elm") {
-        bucket_name = wbld.products_West_Elm;
-    } else if (product_shop === "Pottery Barn") {
-        bucket_name = wbld.products_Pottery_Barn;
-    } else if (product_shop === "IKEA") {
-        bucket_name = wbld.products_IKEA;
-    } else if (product_shop === "Home Centre") {
-        bucket_name = wbld.products_Home_Centre;
-    } else if (product_shop === "Home Box") {
-        bucket_name = wbld.products_Home_Box;
-    }
-    
+function get_bucket(product_image, product_shop) {    
+    let bucket_name = wbld.products_bucket + product_shop.replace(" ", "_") + "/";
     return bucket_name + product_image;
 }
 
@@ -1333,4 +1368,5 @@ function finishWaitBar(wait_bar_id) {
 // You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
 // You can also use https://openfpcdn.io/fingerprintjs/v3
 const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-  .then(FingerprintJS => FingerprintJS.load())
+  .then(FingerprintJS => FingerprintJS.load());
+
