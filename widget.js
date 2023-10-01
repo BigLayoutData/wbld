@@ -1104,6 +1104,35 @@ $(document).ready(function(){
         // Add the 'no-scroll' class to the body to prevent scrolling on the background content
         $('body').addClass('no-scroll');
 
+        // Send product change event
+        const data = {
+          "widget_name": wbld.widget_name,
+          "visitor_id": wbld.visitor_id,
+          "partner_id": wbld.partner_id,
+          "in_product_id": product.product_id,
+          "in_product_url": product.product_url,
+          "in_product_name": product.product_name,
+          "in_product_price": product.product_price,
+          "in_product_currency": product.product_currency,
+          "in_item_id": product.item_id,
+          "in_item_name": product.item_name,
+          "out_product_id": 0
+        };
+        
+        $.ajax({
+            url: wbld.api2 + 'product_change_click/',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+              //console.log(response);
+            },
+            error: function(error) {
+              console.error(error);
+            }
+        });
+
     });
 
     // Close the popup when clicking outside the content
@@ -1182,6 +1211,35 @@ $(document).ready(function(){
         $('#product-popup').fadeOut();
         // Remove the 'no-scroll' class from the body to allow scrolling on the background content
         $('body').removeClass('no-scroll');
+
+        // Send product change event
+        const data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "partner_id": wbld.partner_id,
+            "in_product_id": product.product_id,
+            "in_product_url": product.product_url,
+            "in_product_name": product.product_name,
+            "in_product_price": product.product_price,
+            "in_product_currency": product.product_currency,
+            "in_item_id": product.item_id,
+            "in_item_name": product.item_name,
+            "out_product_id": product_id_for_change
+          };
+          
+          $.ajax({
+              url: wbld.api2 + 'product_change_click/',
+              type: 'POST',
+              dataType: 'json',
+              contentType: 'application/json',
+              data: JSON.stringify(data),
+              success: function(response) {
+                //console.log(response);
+              },
+              error: function(error) {
+                console.error(error);
+              }
+          });
     }); 
 
     // Attach an input event listener to the search box
