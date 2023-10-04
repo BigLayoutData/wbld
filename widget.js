@@ -86,7 +86,10 @@ var wbld = {
             success: function(response) {
                 if (response.data.widget_status == 'active') {
                     // get visitor_id and start widget draw
-                    fpPromise
+                    //fpPromise
+                    import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                        .then(module => module.default)
+                        .then(FingerprintJS => FingerprintJS.load())
                         .then(fp => fp.get())
                         .then(result => {
                             start(
@@ -1238,25 +1241,27 @@ function startProgressBar(speedProgressBar) {
 }
 
 function updateProgressBar(id, progress) {
-    const bar = document.querySelector(id + ' .bar');
-    const label = document.querySelector(id + ' .label');
-    bar.style.width = `${progress}%`;
-    label.innerHTML = `${progress}%`;
+    const bar = $(id + ' .bar');
+    const label = $(id + ' .label');
+
+    bar.css('width', `${progress}%`);
+    label.html(`${progress}%`);
+
     if (progress === 100) {
-        bar.classList.add('complete');
-        label.innerHTML = 'Complete!';
+        bar.addClass('complete');
+        label.html('Complete!');
     }
 }
 
 function startWaitBar(wait_bar_id) {
     $('#' + wait_bar_id).css('display', 'block');
-    let bar = document.querySelector(".wait-bar-bar");
+    let bar = $(".wait-bar-bar");
     let angle = 0;
     clearInterval(wbld.waitBarIntervalId);
     wbld.waitBarIntervalId = setInterval(function() {
-      angle += 5;
-      bar.style.transform = "rotate(" + angle + "deg)";
-      if (angle >= 360) angle = 0;
+        angle += 5;
+        bar.css('transform', 'rotate(' + angle + 'deg)');
+        if (angle >= 360) angle = 0;
     }, 10);
 }
 
@@ -1267,6 +1272,6 @@ function finishWaitBar(wait_bar_id) {
 // Initialize the agent at application startup.
 // You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
 // You can also use https://openfpcdn.io/fingerprintjs/v3
-const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-  .then(FingerprintJS => FingerprintJS.load());
+//const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+//  .then(FingerprintJS => FingerprintJS.load());
 
