@@ -3,8 +3,8 @@ var wbld = {
     widget_domain: 'no_data',
     visitor_id: 'no_data',
     partner_id: 'no_data',
-    output_onboarding: 1,
-    sidebar_onboarding: 1,
+    progressBarIntervalId: 0,
+    waitBarIntervalId: 0,
     // some const for img urls
     pics: 'https://space.biglayoutdata.com/pics/',
     mood_board_img: 'https://space.biglayoutdata.com/mood-boards/',
@@ -383,10 +383,10 @@ function generate_poweredby() {
     $('#poweredby').append(`
         <div class="widget-container">
             <div class="poweredby">
-                <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer;">User Agreement</a></div>
+                <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">User Agreement</a></div>
                 <div class="poweredby-text">Powered by</div>
                 <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.webp'}" target="_blank" rel="noopener" alt="Big Layout Data Logo" /></a>
-                <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer;">How to Use Smart Funishing System BLD</a></div>
+                <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">How to Use Smart Funishing System BLD</a></div>
             </div>
         </div>
     `);
@@ -1197,46 +1197,38 @@ function get_url(product_url) {
     return product_url;
 }
 
-let progress = 0;
-let progressBarIntervalId;
-let waitBarIntervalId;
-
 function startLoadingProgressBar(speedProgressBar) {
-    //console.log("start speedProgressBar: " + speedProgressBar);
+    let progress = 0;
     $("#loading-bar").css('display', 'block');
-    clearInterval(progressBarIntervalId);
-    progressBarIntervalId = setInterval(() => {
+    clearInterval(wbld.progressBarIntervalId);
+    wbld.progressBarIntervalId = setInterval(() => {
         progress += 1;
         updateProgressBar("#loading-bar", progress);
-        //console.log("speedProgressBar: " + speedProgressBar);
         if (progress === 100) { 
-            clearInterval(progressBarIntervalId);
+            clearInterval(wbld.progressBarIntervalId);
             $("#loading-bar").css('display', 'none');
             progress = 0;
             updateProgressBar("#loading-bar", progress);
             speedProgressBar = 200;
-            //console.log("end speedProgressBar: " + speedProgressBar);
         }
     }, speedProgressBar);
 }
 
 function startProgressBar(speedProgressBar) {
-    //console.log("start speedProgressBar: " + speedProgressBar);
+    let progress = 0;
     $("#progress-bar").css('display', 'block');
     $('#generate-btn-block').css('display', 'none');
-    clearInterval(progressBarIntervalId);
-    progressBarIntervalId = setInterval(() => {
+    clearInterval(wbld.progressBarIntervalId);
+    wbld.progressBarIntervalId = setInterval(() => {
         progress += 1;
         updateProgressBar("#progress-bar", progress);
-        //console.log("speedProgressBar: " + speedProgressBar);
         if (progress === 100) { 
-            clearInterval(progressBarIntervalId);
+            clearInterval(wbld.progressBarIntervalId);
             $("#progress-bar").css('display', 'none');
             $('#generate-btn-block').css('display', 'block');
             progress = 0;
             updateProgressBar("#progress-bar", progress);
             speedProgressBar = 200;
-            //console.log("end speedProgressBar: " + speedProgressBar);
         }
     }, speedProgressBar);
 }
@@ -1256,8 +1248,8 @@ function startWaitBar(wait_bar_id) {
     $('#' + wait_bar_id).css('display', 'block');
     let bar = document.querySelector(".wait-bar-bar");
     let angle = 0;
-    clearInterval(waitBarIntervalId);
-    waitBarIntervalId = setInterval(function() {
+    clearInterval(wbld.waitBarIntervalId);
+    wbld.waitBarIntervalId = setInterval(function() {
       angle += 5;
       bar.style.transform = "rotate(" + angle + "deg)";
       if (angle >= 360) angle = 0;
