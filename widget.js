@@ -49,7 +49,7 @@ var wbld = {
         `);
 
         // start progress bar
-        startLoadingProgressBar(speedProgressBarDefault);
+        startLoadingProgressBar(200);
 
         // set widget name
         this.widget_name = widget_name;
@@ -126,8 +126,6 @@ var wbld = {
 };
 
 function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
-    // close loading bar
-    startLoadingProgressBar(1);
 
     // widget parameters
     widget_parameters = JSON.parse(widget_parameters);
@@ -145,12 +143,10 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     wbld.visitor_id = visitor_id;
     
     $("#wbld").append($('<div id="mainbar"></div>'));
-    $("#wbld").append($('<div id="sidebar"></div>'));
     
     $("#mainbar").append($('<div id="input"></div>'));
     $("#input").append($('<div id="input-line-1"></div>'));
     $("#input").append($('<div id="input-line-2"></div>'));
-    $("#input").append($('<div id="input-line-3"></div>'));
     $("#mainbar").append($('<div id="output"></div>'));
     $("#mainbar").append($('<div id="product-popup" style="display: none;"></div>'));
     $("#mainbar").append($('<div id="poweredby"></div>'));
@@ -160,11 +156,6 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
 
     // widget addresses
     let addresses_list = widget_addresses;
-
-    addresses_list.sort((a, b) => {
-        // Assuming `address_address` is a string, for alphanumeric sorting
-        return a.address_address.localeCompare(b.address_address);
-    });
 
     // widget address_id
     widget_address_id = decodeURIComponent(widget_address_id);
@@ -192,16 +183,35 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     // widget shops
     widget_shops = decodeURIComponent(widget_shops);
     const shops_list = JSON.parse(widget_shops);
+
+    // sort addresses_list by address_address ASC
+    addresses_list.sort((a, b) => {
+        // Assuming `address_address` is a string, for alphanumeric sorting
+        return a.address_address.localeCompare(b.address_address);
+    });
+
+    // create addresses_list.done like
+    // true if address_id != 99999
+    // and true if addresses_list.address_selected == selected and addresses_list.address_id == address_id
+    addresses_list.forEach(function(item) {
+        if (item.address_id != 99999) {
+            if (item.address_selected == 'selected' && item.address_id == address_id) {
+                item.address_done = '';
+            } else {
+                item.address_done = 'done';
+            }
+        } else {
+            item.address_done = 'done';
+        }   
+    });
     
     generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n);
+
+    generate_output();
 
     generate_product_popup();
     
     generate_poweredby();
-    
-    generate_sidebar();
-
-    generate_output();
 }
 
 function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n) {
@@ -228,21 +238,6 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
             
         </div>
     `);
-
-    // create addresses_list.done like
-    // true if address_id != 99999
-    // and true if addresses_list.address_selected == selected and addresses_list.address_id == address_id
-    addresses_list.forEach(function(item) {
-        if (item.address_id != 99999) {
-            if (item.address_selected == 'selected' && item.address_id == address_id) {
-                item.address_done = '';
-            } else {
-                item.address_done = 'done';
-            }
-        } else {
-            item.address_done = 'done';
-        }   
-    });
 
     $('#input-line-1').append(`
         <div class="input-block">
@@ -285,7 +280,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
 
                     <div class="widget-container ${addresses_list.filter(item => item.address_done == '').length >= 1 ? "" : "done"}" id="layout-change-container">
                         <div class="small-text">Pick Your Layout (Optional)</div>
-                        <div id="layout-change">
+                        <div id="layout-change" data-layout_id=${layout_id}>
                             <div id="wait-bar">
                                 <div class="wait-bar-bar"></div>
                                 <div class="wait-bar-spinner"></div>
@@ -350,36 +345,36 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
 }
 
 function generate_output() {
+    // Create a function to handle the image load event
+    let imagesLoaded = 0;
+    function imageLoaded() {
+        imagesLoaded++;
+        if (imagesLoaded === 2) {
+            startLoadingProgressBar(1);
+        }
+    }
+
     $('#output').append(`
         <div class="widget-container">
             <div class="onboarding-images">
                 <div class="onboarding-image-left">
-                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" />
+                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" alt="Onboarding how to pick store." />
                 </div>
                 <div class="onboarding-image-right">
-                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" />
+                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" alt="Onboarding how to pick layout." />
                 </div>
             </div>
         </div>
     `);
-}
 
-function generate_sidebar() {
-    $('#sidebar').append(`
-        <div id="sidebar-title">
-            <div class="widget-container">
-                <div class="heading-title" id="sidebar-total-budget" data-budget_total="0" data-items_total="0"></div>
-            </div>
-        </div>
-        <div id="sidebar-content"></div>
-    `);
+    // Attach load event listener to each image
+    $(".onboarding-images img").on("load", imageLoaded);
 }
 
 function generate_product_popup() {
     $('#product-popup').append(`
         <div class="widget-container">
-            <div id="product-popup-content">
-            </div>
+            <div id="product-popup-content"></div>
         </div>
     `);
 }
@@ -391,6 +386,7 @@ function generate_poweredby() {
                 <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer;">User Agreement</a></div>
                 <div class="poweredby-text">Powered by</div>
                 <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.webp'}" target="_blank" rel="noopener" alt="Big Layout Data Logo" /></a>
+                <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer;">How to Use Smart Funishing System BLD</a></div>
             </div>
         </div>
     `);
@@ -438,6 +434,7 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
 
                 if (layout_id_selected) {
                     $(`.layout-change img[data-layout_id='${layout_id_selected}']`).addClass("img-selected");
+                    $("#layout-change").data('layout_id', layout_id_selected);
                     
                     update_price_budget_range(layout_id_selected);
                 } else {
@@ -446,6 +443,7 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
                     const firstChild = $('.layout-change img');
                     if (firstChild) {
                         const layout_id = firstChild.data('layout_id');
+                        $("#layout-change").data('layout_id', layout_id);
                         $(`.layout-change img[data-layout_id='${layout_id}']`).addClass("img-selected");
                         update_price_budget_range(layout_id);
                     } else {
@@ -558,12 +556,6 @@ function update_price_budget_range(layout_id_selected) {
     
 }
 
-function clean_output() {
-    $("#output").empty();
-    $("#sidebar-total-budget").text(``);
-    $("#sidebar-content").empty();
-}
-
 function setCoordinates(element, coords) {
     const parentWidth = element.parentNode.offsetWidth;
     const parentHeight = element.parentNode.offsetHeight;
@@ -579,274 +571,178 @@ function setCoordinates(element, coords) {
     element.style.height = `${height}px`;
 }
 
-function updateSidebarContentHeight() {
-    // max-width: 865px from widget.css
-    var maxWidth = 865;
-    var viewportWidth = window.innerWidth;
-  
-    if (viewportWidth > maxWidth) {
-        var outputHeight = document.getElementById('output').offsetHeight;
-        var inputHeight = document.getElementById('input').offsetHeight;
-        var progressBarHeight = document.getElementById('progress-bar').offsetHeight;
-        var sidebarTitleHeight = document.getElementById('sidebar-title').offsetHeight;
-        var sidebarContentHeight = outputHeight + inputHeight - sidebarTitleHeight - progressBarHeight;
-        document.getElementById('sidebar-content').style.height = sidebarContentHeight + 'px';
-    } else {
-      // Reset the height if the conditions are not met
-    }
-}
-
 function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
-    clean_output();
+    $("#output").empty();
 
-    //console.log("click_n:", click_n, "address_id:", address_id, "layout_id", layout_id);
+    //console.log("click_n:", click_n,"address_id:", address_id, "layout_id:", layout_id);
 
-    /*
-    <div class="text-editor">
-        <p class="p-box">1. Tap on item image to change it.</p>
-        <p class="p-box">2. Follow the link "To Shop" to go directly to the store.</p>
-        <p class="p-box">3. Play with style, budget and shop.</p>
-    </div>
-    */
-    
     // check layout_id not null
-    if (layout_id) {
-        
-        $('#output').append(`
-            <div class="widget-container" id="progress-bar">
-                <div class="text-editor">
-                    <p class="p-box">We are selecting furniture that fits your layout!</p>
-                    <div class="progress">
-                        <div class="bar"></div>
-                        <div class="label">0%</div>
-                    </div>
-                </div>
-            </div>
-        `);
-        
-        // start progress bar
-        startProgressBar(speedProgressBarDefault);
-        
-        const min_budget = $(".budget-btn.selected").data( "min_budget" );
-        const max_budget = $(".budget-btn.selected").data( "max_budget" );
-        const style = $(".style-btn.selected").data( "style_name" );
-        const shop = $(".shop-btn.selected").data( "shop_name" );
-        
-        $.ajax({
-            url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
-            type: "GET",
-            cache: false,
-            dataType: "json",
-            success: function(response) {
-                if ( !response.data.address_id ) {
-                    $('#output').append(`
-                        <div class="widget-container">
-                            <div class="text-editor">
-                                <p class="p-box">No items for <b>address_id=${address_id}</b> and <b>layout_id=${layout_id}</b>.</p>
-                            </div>
-                        </div>
-                    `);
-                    
-                    startProgressBar(1);
-                
-                } else {
-                    
-                    let items_n = 0;
-                    
-                    response.data.rooms_list.forEach( function(room) {
-                        
-                        items_n += room.products_list.length;
-                        
-                        if (room.room_in_layout_img != "") {
-                            $('#sidebar-content').append(`
-                                <div class="widget-container">
-                                    <div class="layout-with-items">
-                                        <img src="${wbld.room_in_layout_img}${room.room_in_layout_img}"/>
-                                    </div>
-                                </div>
-                            `);
-                        }
-                        
-                        /*$('#sidebar-content').append(`
-                            <div class="widget-container">
-                                <div class="heading-subtitle">Buy List: ${room.room_name}</div>
-                            </div>
-                        `);*/
-                        
-                        $('#sidebar-content').append(`
-                            <div class="widget-container">
-                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
-                            </div>
-                        `);
-                        
-                        $('#sidebar-content').append(`
-                            <div class="widget-container">     
-                                ${room.products_list.map(product => `
-                                        <div class="item-product">
-                                            <div class="item-product-line-1">
-                                                <div class="item-product-image">
-                                                    <img src="${get_bucket(product.product_image, product.product_shop)}" data-room_id="${room.room_id}" data-product_id="${product.product_id}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-product='${JSON.stringify(product)}' data-products_list_total='${JSON.stringify(room.products_list_total.filter(item => product.item_ids.includes(item.item_id)))}' />
-                                                </div>
-                                                <div class="item-product-content">
-                                                    <div class="item-product-name">
-                                                        <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">${product.product_name}</a><span class="item-product-amount">x${product.item_amount}</span>
-                                                    </div>
-                                                    <div class="item-product-price" data-room_id="${room.room_id}" data-product_id="${product.product_id}">
-                                                        ${Number(product.product_price).toLocaleString()} ${product.product_currency}
-                                                    </div>
-                                                    <div class="item-product-link-btn">
-                                                        <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}" data-room_id="${room.room_id}">
-                                                        <button class="link-btn">To Store</button>
-                                                        </a>
-                                                    </div>
-                                                    <div class="item-product-comment-btn">
-                                                        <div class="comment-btn" data-room_id="${room.room_id}" data-product_id="${product.product_id}">${product.product_comment}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                `).join('')}
-                            </div>
-                        `);
-                        
-                        
-                                                    /*<div class="item-product-name">
-                                                        item_name: ${product.item_name}
-                                                    </div>
-                                                    <div class="item-product-name">
-                                                        image_name: ${product.product_image}
-                                                    </div>*/
-                        
-                        if (room.room_has_moodboard == "Y") {
-                        
-                            $('#output').append(`
-                                <div class="widget-container">
-                                    <div class="heading-subtitle">Mood board: ${room.room_name}</div>
-                                </div>
-                            `);
-
-                            const wcDiv = document.createElement('div');
-                            wcDiv.className = 'widget-container';
-
-                            const pmbDiv = document.createElement('div');
-                            pmbDiv.className = 'product-mood-board';
-                            
-                            wcDiv.appendChild(pmbDiv);
-                            $('#output').append(wcDiv);
-
-                            pmbDiv.style.height = pmbDiv.offsetWidth * 0.5 + 'px';
-
-                            // Assuming room.products_list is an array of objects with the parameter item_significance
-                            room.products_list.sort((a, b) => b.item_significance - a.item_significance);
-                            for (let i = 0; i < room.products_list.length; i++) {
-                                const product = room.products_list[i];
-
-                                const productDiv = document.createElement('div');
-                                productDiv.className = 'product-div';
-
-                                const img = document.createElement('img');
-                                img.src = get_bucket(product.product_image, product.product_shop);
-                                
-                                img.dataset.product = JSON.stringify(product);
-                                img.dataset.product_id = product.product_id;
-                                img.dataset.room_id = room.room_id;
-                                img.dataset.product_price = product.product_price;
-                                img.dataset.product_currency = product.product_currency;
-
-                                // Filter the array based on the condition item_id == product.item_id
-                                // const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
-                                // new version product.item_ids.includes(item.item_id)
-                                const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
-
-                                // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
-                                img.dataset.products_list_total = JSON.stringify(filteredList);    
-
-                                productDiv.appendChild(img);
-
-                                pmbDiv.appendChild(productDiv);
-                                setCoordinates(productDiv, JSON.parse(product.item_ax));
-                            }
-
-                        }
-                        
-                    });
-                    
-                    $("#sidebar-total-budget").text(`Total Budget: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency} (${items_n} items)`);
-                    $("#sidebar-total-budget").data("budget_total", response.data.budget_total);
-                    $("#sidebar-total-budget").data("items_total", items_n);
-                    
-                    // next click number
-                    click_n += 1;
-                    $(".generate-btn").data("click_n", click_n);
-                    
-                    // Attach load event listener to each item image
-                    const itemImage = $('.item-product-image img').last();
-                    // Was problem. On last image click after request this event was triggered
-                    let requestNode = true;
-                    itemImage.on('load', function () {
-                        // Check if all item images have finished loading
-                        if ($('.item-product-image img').length === items_n & requestNode) {
-                            startProgressBar(5);
-                            updateSidebarContentHeight();
-                            requestNode = false;
-                        }
-                    });
-
-                    if (wbld.output_onboarding === 1) {
-                        const htmlOutputOnboarding = `
-                            <div class="widget-container">
-                                <div class="onboarding-images">
-                                    <div class="onboarding-image-left">
-                                        <img src="${wbld.pics + 'onboarding-output-left.webp'}" />
-                                    </div>
-                                    <div class="onboarding-image-right">
-                                        <img src="${wbld.pics + 'onboarding-output-right.webp'}" />
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        $("#output").children().eq(2).after(htmlOutputOnboarding);
-                    }
-
-                    if (wbld.sidebar_onboarding === 1) {
-                        const htmlSidebarOnboarding = `
-                            <div class="widget-container">
-                                <div class="onboarding-image-center">
-                                    <img src="${wbld.pics + 'onboarding-sidebar-left.webp'}" />
-                                </div>
-                            </div>
-                        `;
-                        $("#sidebar-content").children().eq(0).before(htmlSidebarOnboarding);
-                    }
-                    
-                    if (response.data.address_id != 99999 && response.data.rooms_list[0].room_in_layout_img == "") {
-                        const htmlSidebarLayoutImage = `
-                            <div class="widget-container">
-                                <div class="layout-with-items">
-                                    <img src="${wbld.room_in_layout_img}${response.data.layout_img_with_items}"/>
-                                </div>
-                            </div>
-                        `;
-                        $("#sidebar-content").children().eq(0).after(htmlSidebarLayoutImage);
-                    }
-                    
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Error:", errorThrown);
-            }
-        });
-        
-    } else {
+    if (!layout_id) {
         $('#output').append(`
             <div class="widget-container">
                 <div class="text-editor">
-                    <p class="p-box">You need to choose layout image.</p>
+                    <p class="p-box">You need to choose layout.</p>
                 </div>
             </div>
         `);
+        return;
     }
+    
+    // add progress bar
+    $('#output').append(`
+        <div class="widget-container" id="progress-bar">
+            <div class="text-editor">
+                <p class="p-box">We are selecting furniture that fits your layout!</p>
+                <div class="progress">
+                    <div class="bar"></div>
+                    <div class="label">0%</div>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    // start progress bar
+    startProgressBar(200);
+    
+    const min_budget = $(".budget-btn.selected").data( "min_budget" );
+    const max_budget = $(".budget-btn.selected").data( "max_budget" );
+    const style = $(".style-btn.selected").data( "style_name" );
+    const shop = $(".shop-btn.selected").data( "shop_name" );
+    
+    $.ajax({
+        url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
+        type: "GET",
+        cache: false,
+        dataType: "json",
+        success: function(response) {
+            if ( !response.data.address_id ) {
+                $('#output').append(`
+                    <div class="widget-container">
+                        <div class="text-editor">
+                            <p class="p-box">No items for <b>address_id=${address_id}</b> and <b>layout_id=${layout_id}</b>.</p>
+                        </div>
+                    </div>
+                `);
+                
+                startProgressBar(1);
+            
+            } else {
+                
+                let items_n = 0;
+
+                all_possible_products_srcs = [];
+
+                //sort rooms_list by room_position_output ASC
+                response.data.rooms_list.sort((a, b) => a.room_position_output - b.room_position_output);
+                
+                response.data.rooms_list.forEach( function(room) {
+                    
+                    if (room.room_has_moodboard == "Y" && room.products_list.length > 0) {
+
+                        items_n += room.products_list.length;
+                    
+                        $('#output').append(`
+                            <div class="widget-container">
+                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
+                                <div class="heading-subtitle total-budget-title"></div>
+                            </div>
+                        `);
+
+                        const wcDiv = document.createElement('div');
+                        wcDiv.className = 'widget-container';
+
+                        const pmbDiv = document.createElement('div');
+                        pmbDiv.className = 'product-mood-board';
+                        
+                        wcDiv.appendChild(pmbDiv);
+                        $('#output').append(wcDiv);
+
+                        roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
+                        pmbDiv.style.height = pmbDiv.offsetWidth * roomMoodboardHeight + 'px';
+
+                        // Assuming room.products_list is an array of objects with the parameter item_significance
+                        room.products_list.sort((a, b) => b.item_significance - a.item_significance);
+                        for (let i = 0; i < room.products_list.length; i++) {
+                            const product = room.products_list[i];
+
+                            const productDiv = document.createElement('div');
+                            productDiv.className = 'product-div';
+
+                            const img = document.createElement('img');
+                            img.src = get_bucket(product.product_image, product.product_shop);
+                            
+                            img.dataset.product = JSON.stringify(product);
+                            img.dataset.product_id = product.product_id;
+                            img.dataset.room_id = room.room_id;
+                            img.dataset.product_price = product.product_price;
+                            img.dataset.product_currency = product.product_currency;
+
+                            // Filter the array based on the condition item_id == product.item_id
+                            // const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
+                            // new version product.item_ids.includes(item.item_id)
+                            const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
+
+                            // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
+                            img.dataset.products_list_total = JSON.stringify(filteredList);
+
+                            // Add all room.products_list_total img src to the array of all possible product images
+                            room.products_list_total.forEach( function (item) {
+                                all_possible_products_srcs.push(get_bucket(item.product_image, item.product_shop));
+                            });
+                            
+                            const grayPoint = document.createElement('div');
+                            grayPoint.className = 'gray-point';
+                            grayPoint.dataset.product = JSON.stringify(product);
+                            grayPoint.dataset.product_id = product.product_id;
+                            grayPoint.dataset.room_id = room.room_id;
+                            grayPoint.dataset.product_price = product.product_price;
+                            grayPoint.dataset.product_currency = product.product_currency;
+                            grayPoint.dataset.products_list_total = JSON.stringify(filteredList);
+
+                            productDiv.appendChild(grayPoint);
+                            productDiv.appendChild(img);
+
+                            pmbDiv.appendChild(productDiv);
+                            setCoordinates(productDiv, JSON.parse(product.item_ax));
+                        }
+
+                    }
+                    
+                });
+
+                $(".total-budget-title").text(`Total: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
+                $(".total-budget-title").data("budget_total", response.data.budget_total);
+                
+                // next click number
+                click_n += 1;
+                $(".generate-btn").data("click_n", click_n);
+                
+                // Attach load event listener to each item image
+                const itemImage = $('.product-div img').last();
+                // Was problem. On last image click after request this event was triggered
+                let requestNode = true;
+                itemImage.on('load', function () {
+                    // Check if all item images have finished loading
+                    if ($('.product-div img').length === items_n & requestNode) {
+                        startProgressBar(5);
+                        requestNode = false;
+                    }
+                });
+
+                // Attach click event listener to each item image in all_possible_products_srcs
+                // to push them in cache
+                all_possible_products_srcs.forEach( function (item) {
+                    const img = new Image();
+                    img.src = item;
+                });
+                
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Error:", errorThrown);
+        }
+    });
     
 }
 
@@ -859,7 +755,8 @@ $(document).ready(function(){
         $('#bedroomsPopup').toggleClass("done");
         
         let address_id = $(".address-btn.selected").data( "address_id" );
-        let layout_id = $(".img-selected").data( "layout_id" );
+        //let layout_id = $(".img-selected").data( "layout_id" );
+        let layout_id = $("#layout-change").data( "layout_id" );
 
         if (layout_id == null) {
             clear_input_box();
@@ -923,6 +820,7 @@ $(document).ready(function(){
 
         $(".address-btn").removeClass("selected");
         $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+        $("#layout-change").data('layout_id', layout_id);
         
         layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
         
@@ -943,6 +841,7 @@ $(document).ready(function(){
 
         $(".address-btn").removeClass("selected");
         $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+        $("#layout-change").data('layout_id', layout_id);
 
         layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
     });
@@ -955,6 +854,7 @@ $(document).ready(function(){
         
         //update price range for selected layout
         const layout_id_selected = $(this).data( "layout_id" );
+        $("#layout-change").data('layout_id', layout_id_selected);
         update_price_budget_range(layout_id_selected);
         
         // change click_n to 0 after each change of layout
@@ -975,7 +875,8 @@ $(document).ready(function(){
         $('#advancedPopup').toggleClass("done");
         
         //update price range for selected layout
-        const layout_id_selected = $(".img-selected").data( "layout_id" );
+        //const layout_id_selected = $(".img-selected").data( "layout_id" );
+        const layout_id_selected = $("#layout-change").data( "layout_id" );
         if (layout_id_selected) {
             update_price_budget_range(layout_id_selected);
         }
@@ -992,7 +893,8 @@ $(document).ready(function(){
         $("#shops-select").text(shop_name);
         
         //update price range for selected layout
-        const layout_id_selected = $(".img-selected").data( "layout_id" );
+        //const layout_id_selected = $(".img-selected").data( "layout_id" );
+        const layout_id_selected = $("#layout-change").data( "layout_id" );
         if (layout_id_selected) {
             update_price_budget_range(layout_id_selected);
         }
@@ -1024,12 +926,7 @@ $(document).ready(function(){
         }
     });
     
-    $(document).on('click', 'a.product-link, a.btn-product-link', function(event) {
-
-        //close sidebar onboarding
-        $('.onboarding-image-center').addClass("done");
-        wbld.sidebar_onboarding = 0;
-        updateSidebarContentHeight();
+    $(document).on('click', 'a.btn-product-link', function(event) {
         
         const product_url = $(this).attr('href');
         const product_id = $(this).attr('data-product_id');
@@ -1054,39 +951,36 @@ $(document).ready(function(){
           "item_amount": item_amount
         };
         
-        $.ajax({
-            url: wbld.api1 + 'product_click/',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(response) {
-              //console.log(response);
-            },
-            error: function(error) {
-              console.error(error);
-            }
-        });
+        send_POST_to_API(wbld.api1, 'product_click/', data);
         
     });
 
     //open product change popup on product image click
-    $(document).on('click', '.product-div img, .item-product-image img', function(event) {
+    $(document).on('click', '.product-div img, .gray-point', function(event) {
         const product = JSON.parse($(this).attr('data-product'));
         const product_id = product.product_id;
         const productsListTotal = JSON.parse($(this).attr('data-products_list_total'));
         const room_id = $(this).attr('data-room_id');
-
-        //close output onboarding
-        $('.onboarding-images').addClass("done");
-        wbld.output_onboarding = 0;
-        updateSidebarContentHeight();
         
         // Clear the previous content
         $('#product-popup-content').empty();
 
         $('#product-popup-content').append(`<div id="product-popup-image"><img src="${get_bucket(product.product_image, product.product_shop)}"/></div>`);
-        $('#product-popup-content').append(`<div id="product-popup-info"><div id="product-popup-info-title">${product.product_name}</div><div id="product-popup-info-price">Buy for <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div></div>`);
+
+        $('#product-popup-content').append(`
+        <div id="product-popup-info">
+            <div id="product-popup-info-title">${product.product_name}</div>
+            <div id="product-popup-info-amount">Quantity: <span style="font-weight: 700;">${product.item_amount}</span></div>
+            <div id="product-popup-info-price">Price: <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div>
+            <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
+            <div class="product-popup-info-product-link-btn">
+                <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
+                    <button class="link-btn">Product Details</button>
+                </a>
+            </div>
+        </div>
+        `);
+
         $('#product-popup-content').append(`<div id="product-popup-list"><div id="product-popup-list-title">Try these alternatives:</div><div id="product-popup-list-items"></div></div>`);
 
         // Add each product to the list
@@ -1119,19 +1013,7 @@ $(document).ready(function(){
           "out_product_id": 0
         };
         
-        $.ajax({
-            url: wbld.api2 + 'product_change_click/',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(response) {
-              //console.log(response);
-            },
-            error: function(error) {
-              console.error(error);
-            }
-        });
+        send_POST_to_API(wbld.api2, 'product_change_click/', data);
 
     });
 
@@ -1153,53 +1035,26 @@ $(document).ready(function(){
         const room_id = $(this).attr('data-room_id');
 
         const mbProduct = $(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        const ProductPriceOld = mbProduct.attr('data-product_price');
         mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
         mbProduct.attr('data-product', JSON.stringify(product));
         mbProduct.attr('data-product_id', product.product_id);
         mbProduct.attr('data-product_price', product.product_price);
         mbProduct.attr('data-product_currency', product.product_currency);
 
-        const sbProductImage = $(`.item-product-image img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        const ProductPriceOld = sbProductImage.attr('data-product_price');
-        sbProductImage.attr('src', get_bucket(product.product_image, product.product_shop));
-        sbProductImage.attr('data-product', JSON.stringify(product));
-        sbProductImage.attr('data-product_id', product.product_id);
-        sbProductImage.attr('data-product_price', product.product_price);
-        sbProductImage.attr('data-product_currency', product.product_currency);
+        const mbGrayPoint = $(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        mbGrayPoint.attr('data-product', JSON.stringify(product));
+        mbGrayPoint.attr('data-product_id', product.product_id);
+        mbGrayPoint.attr('data-product_price', product.product_price);
+        mbGrayPoint.attr('data-product_currency', product.product_currency);
 
-        const sbProductName = $(`.item-product-name a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        sbProductName.text(product.product_name);
-        sbProductName.attr('href', get_url(product.product_url));
-        sbProductName.attr('data-product', JSON.stringify(product));
-        sbProductName.attr('data-product_id', product.product_id);
-        sbProductName.attr('data-product_price', product.product_price);
-        sbProductName.attr('data-product_currency', product.product_currency);
-        sbProductName.attr('data-product_sku', product.product_sku);
-        sbProductName.attr('data-product_name', product.product_name);
-
-        const sbProductPrice = $(`.item-product-price[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        sbProductPrice.text(`${Number(product.product_price).toLocaleString()} ${product.product_currency}`);
-        sbProductPrice.attr('data-product_id', product.product_id);
-
-        const sbProductLinkBtn = $(`.item-product-link-btn a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        sbProductLinkBtn.attr('href', get_url(product.product_url));
-        sbProductLinkBtn.attr('data-product', JSON.stringify(product));
-        sbProductLinkBtn.attr('data-product_id', product.product_id);
-        sbProductLinkBtn.attr('data-product_price', product.product_price);
-        sbProductLinkBtn.attr('data-product_currency', product.product_currency);
-        sbProductLinkBtn.attr('data-product_sku', product.product_sku);
-        sbProductLinkBtn.attr('data-product_name', product.product_name);
-
-        const sbProductCommentBtn = $(`.comment-btn[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        sbProductCommentBtn.text(`${product.product_comment}`);
-        sbProductCommentBtn.attr('data-product_id', product.product_id);
-
-        const sbTotalBudget = $("#sidebar-total-budget");
-        const sbTotalBudgetValue = sbTotalBudget.data("budget_total");
-        const sbTotalBudgetItems = sbTotalBudget.data("items_total");
-        const sbTotalBudgetValueNew = sbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
-        sbTotalBudget.text(`Total Budget: ${Number(sbTotalBudgetValueNew).toLocaleString()} ${product.product_currency} (${sbTotalBudgetItems} items)`);
-        sbTotalBudget.data("budget_total", sbTotalBudgetValueNew);
+        $(".total-budget-title").each(function(index, element) {
+            const mbTotalBudget = $(element);
+            const mbTotalBudgetValue = mbTotalBudget.data("budget_total");
+            const mbTotalBudgetValueNew = mbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+            mbTotalBudget.text(`Total: ${Number(mbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+            mbTotalBudget.data("budget_total", mbTotalBudgetValueNew);
+        });
 
         const roomBudgetTitle = $(`.room-budget-title[data-room_id="${room_id}"]`);
         const roomBudgetValue = roomBudgetTitle.data('room_budget');
@@ -1227,19 +1082,7 @@ $(document).ready(function(){
             "out_product_id": product_id_for_change
           };
           
-          $.ajax({
-              url: wbld.api2 + 'product_change_click/',
-              type: 'POST',
-              dataType: 'json',
-              contentType: 'application/json',
-              data: JSON.stringify(data),
-              success: function(response) {
-                //console.log(response);
-              },
-              error: function(error) {
-                console.error(error);
-              }
-          });
+          send_POST_to_API(wbld.api2, 'product_change_click/', data);
     }); 
 
     // Attach an input event listener to the search box
@@ -1254,9 +1097,9 @@ $(document).ready(function(){
             const address = decodeURIComponent($(this).data('address_address')).toLowerCase();
             const address_id = $(this).data('address_id');
             if (address.includes(searchTerm) & address_id != 0) {
-                $(this).show(); // Show matching addresses
+                $(this).show();
             } else {
-                $(this).hide(); // Hide non-matching addresses
+                $(this).hide();
             }
         });
     });
@@ -1274,19 +1117,7 @@ $(document).ready(function(){
             "user_input": userInput,
         };
         
-        $.ajax({
-            url: wbld.api1 + 'user_search/',
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function(response) {
-                //console.log(response);
-            },
-            error: function(error) {
-                console.error(error);
-            }
-        });
+        send_POST_to_API(wbld.api1, 'user_search/', data);
     });
 
     // Clear input address search after clear button click
@@ -1295,6 +1126,22 @@ $(document).ready(function(){
     });
     
 });
+
+function send_POST_to_API(api, method, data) {
+    $.ajax({
+        url: api + method,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            //console.log(response);
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    });
+}
 
 function clear_input_box() {
     $('#address-search').val('');
@@ -1350,7 +1197,6 @@ function get_url(product_url) {
     return product_url;
 }
 
-let speedProgressBarDefault = 200;
 let progress = 0;
 let progressBarIntervalId;
 let waitBarIntervalId;
@@ -1368,7 +1214,7 @@ function startLoadingProgressBar(speedProgressBar) {
             $("#loading-bar").css('display', 'none');
             progress = 0;
             updateProgressBar("#loading-bar", progress);
-            speedProgressBar = speedProgressBarDefault;
+            speedProgressBar = 200;
             //console.log("end speedProgressBar: " + speedProgressBar);
         }
     }, speedProgressBar);
@@ -1389,7 +1235,7 @@ function startProgressBar(speedProgressBar) {
             $('#generate-btn-block').css('display', 'block');
             progress = 0;
             updateProgressBar("#progress-bar", progress);
-            speedProgressBar = speedProgressBarDefault;
+            speedProgressBar = 200;
             //console.log("end speedProgressBar: " + speedProgressBar);
         }
     }, speedProgressBar);
