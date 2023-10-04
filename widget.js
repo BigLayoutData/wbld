@@ -86,10 +86,9 @@ var wbld = {
             success: function(response) {
                 if (response.data.widget_status == 'active') {
                     // get visitor_id and start widget draw
-                    //fpPromise
-                    import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-                        .then(module => module.default)
-                        .then(FingerprintJS => FingerprintJS.load())
+                    //import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                    //    .then(module => module.default)
+                    fpPromise
                         .then(fp => fp.get())
                         .then(result => {
                             start(
@@ -1272,6 +1271,5 @@ function finishWaitBar(wait_bar_id) {
 // Initialize the agent at application startup.
 // You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
 // You can also use https://openfpcdn.io/fingerprintjs/v3
-//const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-//  .then(FingerprintJS => FingerprintJS.load());
-
+const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+  .then(FingerprintJS => FingerprintJS.load());
