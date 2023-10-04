@@ -387,7 +387,7 @@ function generate_poweredby() {
                 <div class="poweredby-text">Powered by</div>
                 <div class="poweredby-img">
                     <a href="https://biglayoutdata.com/" target="_blank" rel="noopener">
-                        <img src="${wbld.pics + 'bld.webp'}" alt="Big Layout Data Logo" width="640" height="163" />
+                        <img src="${wbld.pics + 'poweredby.webp'}" alt="Big Layout Data Logo" width="298" height="76" />
                     </a>
                 </div>
                 <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">How to Use Smart Funishing System BLD</a></div>
