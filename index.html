@@ -4,33 +4,47 @@
     <meta charset="UTF-8">
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Furnishing Widget BigLayoutData.com</title>
-    <meta name="description" content="Select furniture that fits your floor plan, budget and style in Dubai.">
+    <title>Furnish Rooms BigLayoutData.com</title>
+    <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn.">
+    <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn">
+
+    <link rel="preload" as="script" href="widget.js" />
+    <link rel="preload" as="style" href="widget.css" />
+    <link rel="preload" fetchpriority="high" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-left.webp" type="image/webp">
+    <link rel="preload" fetchpriority="high" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-right.webp" type="image/webp">
 </head>
 <body>
+    <div id="logo" style="max-width: 346px; margin: 0 auto;">
+        <a href="https://biglayoutdata.com/">
+            <img src="bld.webp" alt="Big Layout Data Logo" width="640" height="163" style="width: 100%; height: auto;" />
+        </a>
+    </div>
     <!-- BigLayoutData widget (widget.js) -->
     <div id="wbld"></div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script async src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
         var scriptElement = document.createElement('script');
-        scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
+        scriptElement.src = 'widget.js';
         scriptElement.type = 'text/javascript';
+        scriptElement.async = true;
         scriptElement.onload = function() {
             var url_params = new Map();
             wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
         };
         document.body.appendChild(scriptElement);
     </script>
+    <!-- BigLayoutData widget (widget.js) -->
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N1523CTQVK"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VHFE18GNY6"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', 'G-N1523CTQVK');
+        gtag('config', 'G-VHFE18GNY6');
     </script>
+    <!-- Google tag (gtag.js) -->
 </body>
 </html>

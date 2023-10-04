@@ -217,7 +217,7 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
 function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n) {
 
     $('#input-line-1').append(`
-        <div class="input-block">
+        <div class="input-block-left">
             
             <div class="widget-container">
                 <div class="small-text">Furniture Store</div> 
@@ -240,7 +240,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
     `);
 
     $('#input-line-1').append(`
-        <div class="input-block">
+        <div class="input-block-right">
             
             <div class="widget-container">
                 <div class="small-text">Your Layout</div> 
@@ -296,7 +296,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
     `);
     
     $('#input-line-2').append(`
-        <div class="input-block">
+        <div class="input-block-left">
             
             <div class="widget-container">
                 <div class="small-text">More Filters</div> 
@@ -325,7 +325,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
     `);
     
     $('#input-line-2').append(`
-        <div class="input-block" id="generate-btn-block">
+        <div class="input-block-right" id="generate-btn-block">
 
             <div class="widget-container">
                 <div class="small-text">&nbsp;</div> 
@@ -358,10 +358,10 @@ function generate_output() {
         <div class="widget-container">
             <div class="onboarding-images">
                 <div class="onboarding-image-left">
-                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" alt="Onboarding how to pick store." />
+                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" width="328" height="700" alt="Onboarding how to pick store." />
                 </div>
                 <div class="onboarding-image-right">
-                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" alt="Onboarding how to pick layout." />
+                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" width="328" height="700" alt="Onboarding how to pick layout." />
                 </div>
             </div>
         </div>
@@ -385,7 +385,11 @@ function generate_poweredby() {
             <div class="poweredby">
                 <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">User Agreement</a></div>
                 <div class="poweredby-text">Powered by</div>
-                <a href="https://biglayoutdata.com/"><img src="${wbld.pics + 'poweredby.webp'}" target="_blank" rel="noopener" alt="Big Layout Data Logo" /></a>
+                <div class="poweredby-img">
+                    <a href="https://biglayoutdata.com/" target="_blank" rel="noopener">
+                        <img src="${wbld.pics + 'bld.webp'}" alt="Big Layout Data Logo" width="640" height="163" />
+                    </a>
+                </div>
                 <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">How to Use Smart Funishing System BLD</a></div>
             </div>
         </div>
