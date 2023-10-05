@@ -772,7 +772,7 @@ $(document).ready(function(){
                 .then(fp => fp.get())
                 .then(result => {
                     wbld.visitor_id = result.visitorId;
-                    console.log("visitor_id:", wbld.visitor_id);
+                    //console.log("visitor_id:", wbld.visitor_id);
                     update_output(click_n, address_id, layout_id);
                 });
         }
@@ -1138,7 +1138,7 @@ $(document).ready(function(){
                 .then(fp => fp.get())
                 .then(result => {
                     wbld.visitor_id = result.visitorId;
-                    console.log("visitor_id:", wbld.visitor_id);
+                    //console.log("visitor_id:", wbld.visitor_id);
 
                     const data = {
                         "widget_name": wbld.widget_name,
