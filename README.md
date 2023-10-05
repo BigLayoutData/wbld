@@ -14,14 +14,16 @@ We leverage AI and a database of floor plans to curate furniture sets from local
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-    var scriptElement = document.createElement('script');
-    scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
-    scriptElement.type = 'text/javascript';
-    scriptElement.onload = function() {
-        var url_params = new Map();
-        wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
-    };
-    document.body.appendChild(scriptElement);
+    jQuery(document).ready(function($) {
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
+        scriptElement.type = 'text/javascript';
+        scriptElement.onload = function() {
+            var url_params = new Map();
+            wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
+        };
+        document.body.appendChild(scriptElement);
+    });
 </script>
 ```
 
@@ -78,18 +80,20 @@ For example, to init widget for a 2-bedroom apartment with a property size of 14
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-    var scriptElement = document.createElement('script');
-    scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
-    scriptElement.type = 'text/javascript';
-    scriptElement.onload = function() {
-        var url_params = new Map();
-        url_params.set('bedrooms', 2);
-        url_params.set('property_size', 140.5);
-        url_params.set('search', 'Armada+Tower+3');
-
-        wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
-    };
-    document.body.appendChild(scriptElement);
+    jQuery(document).ready(function($) {
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
+        scriptElement.type = 'text/javascript';
+        scriptElement.onload = function() {
+            var url_params = new Map();
+            url_params.set('bedrooms', 2);
+            url_params.set('property_size', 140.5);
+            url_params.set('search', 'Armada+Tower+3');
+    
+            wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
+        };
+        document.body.appendChild(scriptElement);
+    });
 </script>
 ```
 
