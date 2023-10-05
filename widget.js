@@ -85,25 +85,18 @@ var wbld = {
             data: JSON.stringify(data),
             success: function(response) {
                 if (response.data.widget_status == 'active') {
-                    // get visitor_id and start widget draw
-                    //import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-                    //    .then(module => module.default)
-                    fpPromise
-                        .then(fp => fp.get())
-                        .then(result => {
-                            start(
-                                result.visitorId,
-                                response.data.widget_addresses,
-                                response.data.widget_address_address,
-                                response.data.widget_address_id,
-                                response.data.widget_layout_id,
-                                response.data.widget_n_bedrooms,
-                                response.data.widget_budgets,
-                                response.data.widget_styles,
-                                response.data.widget_shops,
-                                response.data.widget_parameters,
-                            );
-                        })
+                    // start widget draw
+                    start(
+                        response.data.widget_addresses,
+                        response.data.widget_address_address,
+                        response.data.widget_address_id,
+                        response.data.widget_layout_id,
+                        response.data.widget_n_bedrooms,
+                        response.data.widget_budgets,
+                        response.data.widget_styles,
+                        response.data.widget_shops,
+                        response.data.widget_parameters,
+                    );
                 } else {
                     console.log(`Widget widget_name="${widget_name}" status is not active`);
                 }
@@ -127,7 +120,7 @@ var wbld = {
     }
 };
 
-function start(visitor_id, widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
+function start(widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
 
     // widget parameters
     widget_parameters = JSON.parse(widget_parameters);
@@ -142,7 +135,7 @@ function start(visitor_id, widget_addresses, widget_address_address, widget_addr
     root.style.setProperty('--btn-font-color', widget_parameters.btn_font_color);
 
     // set visitor_id
-    wbld.visitor_id = visitor_id;
+    //wbld.visitor_id = visitor_id;
     
     $("#wbld").append($('<div id="mainbar"></div>'));
     
@@ -770,7 +763,20 @@ $(document).ready(function(){
             layout_id = $(".layout_size-btn.selected").data( "layout_id" );
         }
 
-        update_output(click_n, address_id, layout_id);
+        if (wbld.visitor_id != "no_data") {
+            update_output(click_n, address_id, layout_id);
+        } else {
+            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                .then(FingerprintJS => FingerprintJS.load());
+            fpPromise
+                .then(fp => fp.get())
+                .then(result => {
+                    wbld.visitor_id = result.visitorId;
+                    console.log("visitor_id:", wbld.visitor_id);
+                    update_output(click_n, address_id, layout_id);
+                });
+        }
+        
     });
     
     $(document).on('click', '.filter-btn', function(event) {
@@ -1116,20 +1122,39 @@ $(document).ready(function(){
         if (userInput == '') {
             return;
         }
-
-        const data = {
-            "widget_name": wbld.widget_name,
-            "visitor_id": wbld.visitor_id,
-            "user_input": userInput,
-        };
         
-        send_POST_to_API(wbld.api1, 'user_search/', data);
+        if (wbld.visitor_id != "no_data") {
+            const data = {
+                "widget_name": wbld.widget_name,
+                "visitor_id": wbld.visitor_id,
+                "user_input": userInput,
+            };
+
+            send_POST_to_API(wbld.api1, 'user_search/', data);
+        } else {
+            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                .then(FingerprintJS => FingerprintJS.load());
+            fpPromise
+                .then(fp => fp.get())
+                .then(result => {
+                    wbld.visitor_id = result.visitorId;
+                    console.log("visitor_id:", wbld.visitor_id);
+
+                    const data = {
+                        "widget_name": wbld.widget_name,
+                        "visitor_id": wbld.visitor_id,
+                        "user_input": userInput,
+                    };
+                    send_POST_to_API(wbld.api1, 'user_search/', data);
+                });
+        }
+    
     });
 
     // Clear input address search after clear button click
     $(document).on('click', '#clear-button', function(event) {
         clear_input_box();
-    });
+    });  
     
 });
 
@@ -1271,5 +1296,5 @@ function finishWaitBar(wait_bar_id) {
 // Initialize the agent at application startup.
 // You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
 // You can also use https://openfpcdn.io/fingerprintjs/v3
-const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-  .then(FingerprintJS => FingerprintJS.load());
+//const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+//  .then(FingerprintJS => FingerprintJS.load());
