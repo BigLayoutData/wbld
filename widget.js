@@ -120,7 +120,7 @@ var wbld = {
     }
 };
 
-$(document).ready(function(){
+jQuery(document).ready(function(){
     
     $(document).on('click', '.generate-btn', function(event) {
         const click_n = parseInt($(this).data("click_n"));

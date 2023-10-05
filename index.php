@@ -19,7 +19,7 @@
     <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn.">
     <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn">
 
-    <link rel="preload" fetchpriority="high" as="script" href="https://code.jquery.com/jquery-3.6.0.min.js" />
+    <link rel="preload" fetchpriority="high" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" />
     <link rel="preload" as="script" href="widget.js" />
     <link rel="preload" as="style" href="widget.css" />
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-left.webp" type="image/webp">
@@ -33,20 +33,17 @@
     </div>
     <!-- BigLayoutData widget (widget.js) -->
     <div id="wbld"></div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type="text/javascript">
-        jQuery.noConflict();
-        (function($) {
-            var scriptElement = document.createElement('script');
-            scriptElement.src = 'widget.js';
-            scriptElement.type = 'text/javascript';
-            scriptElement.async = true;
-            scriptElement.onload = function() {
-                var url_params = new Map();
-                wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
-            };
-            document.body.appendChild(scriptElement);
-        })(jQuery);
+        var scriptElement = document.createElement('script');
+        scriptElement.src = 'widget.js';
+        scriptElement.type = 'text/javascript';
+        scriptElement.async = true;
+        scriptElement.onload = function() {
+            var url_params = new Map();
+            wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
+        };
+        document.body.appendChild(scriptElement);
     </script>
     <link href="widget.css" rel="stylesheet" type="text/css" />
     <!-- BigLayoutData widget (widget.js) -->
