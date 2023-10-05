@@ -19,11 +19,11 @@
     <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn.">
     <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn">
 
-    <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" />
+    <link rel="preload" fetchpriority="high" as="script" href="https://code.jquery.com/jquery-3.6.0.min.js" />
     <link rel="preload" as="script" href="widget.js" />
     <link rel="preload" as="style" href="widget.css" />
-    <link rel="preload" fetchpriority="high" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-left.webp" type="image/webp">
-    <link rel="preload" fetchpriority="high" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-right.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-left.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-right.webp" type="image/webp">
 </head>
 <body>
     <div id="logo" style="max-width: 165px; margin-left: calc(50% - 173px);">
@@ -33,7 +33,7 @@
     </div>
     <!-- BigLayoutData widget (widget.js) -->
     <div id="wbld"></div>
-    <script async src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         var scriptElement = document.createElement('script');
         scriptElement.src = 'widget.js';

@@ -1,3 +1,5 @@
+jQuery.noConflict();
+
 var wbld = { 
     widget_name: 'no_data',
     widget_domain: 'no_data',
