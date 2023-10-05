@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VHFE18GNY6"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-VHFE18GNY6');
-    </script>
-    <!-- Google tag (gtag.js) -->
-
     <meta charset="UTF-8">
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,6 +13,17 @@
     <link rel="preload" as="style" href="widget.css" />
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-left.webp" type="image/webp">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/onboarding-main-right.webp" type="image/webp">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VHFE18GNY6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-VHFE18GNY6');
+    </script>
+    <!-- Google tag (gtag.js) -->
 </head>
 <body>
     <div id="logo" style="max-width: 165px; margin-left: calc(50% - 173px);">
