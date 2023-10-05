@@ -35,15 +35,18 @@
     <div id="wbld"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
-        var scriptElement = document.createElement('script');
-        scriptElement.src = 'widget.js';
-        scriptElement.type = 'text/javascript';
-        scriptElement.async = true;
-        scriptElement.onload = function() {
-            var url_params = new Map();
-            wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
-        };
-        document.body.appendChild(scriptElement);
+        jQuery.noConflict();
+        (function($) {
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'widget.js';
+            scriptElement.type = 'text/javascript';
+            scriptElement.async = true;
+            scriptElement.onload = function() {
+                var url_params = new Map();
+                wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
+            };
+            document.body.appendChild(scriptElement);
+        })(jQuery);
     </script>
     <link href="widget.css" rel="stylesheet" type="text/css" />
     <!-- BigLayoutData widget (widget.js) -->
