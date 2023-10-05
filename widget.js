@@ -349,14 +349,35 @@ function generate_output() {
         }
     }
 
-    jQuery('#output').append(`
-        <div class="widget-container">
+        /*<div class="widget-container">
             <div class="onboarding-images">
                 <div class="onboarding-image-left">
                     <img src="${wbld.pics + 'onboarding-main-left.webp'}" width="328" height="700" alt="Onboarding how to pick store." />
                 </div>
                 <div class="onboarding-image-right">
                     <img src="${wbld.pics + 'onboarding-main-right.webp'}" width="328" height="700" alt="Onboarding how to pick layout." />
+                </div>
+            </div>
+        </div>*/
+
+    jQuery('#output').append(`
+        <div class="widget-container">
+            <div class="onboarding-title">
+                Furnish your <span class='word-room'>room</span> in seconds
+            </div>
+            <div class="onboarding-description">
+                Get started by selecting style, specifying your layout, selecting store, then creating project.
+            </div>
+        </div>
+        <div class="widget-container">
+            <div class="onboarding-images">
+                <div class="onboarding-image-left" >
+                    <img src="${wbld.pics + 'contemporary.webp'}" width="500" height="500" alt="Contemporary style" id="contemporary-style" data-style_id="1" />
+                    <div class="onboarding-image-desc" >Contemporary</div>
+                </div>
+                <div class="onboarding-image-right" >
+                    <img src="${wbld.pics + 'neoclassic.webp'}" width="500" height="500" alt="Neoclassic style" id="neoclassic-style" data-style_id="2" />
+                    <div class="onboarding-image-desc" >Neoclassic</div>
                 </div>
             </div>
         </div>
@@ -1289,6 +1310,32 @@ jQuery(document).ready(function(){
     // Clear input address search after clear button click
     jQuery(document).on('click', '#clear-button', function(event) {
         clear_input_box();
-    });  
+    }); 
+
+    // Select style on onboarding. Click on style image. Change styles buttons
+    jQuery(document).on('click', '#contemporary-style, #neoclassic-style', function(event) {
+        // if one or another
+        if (jQuery(this).attr('id') == 'contemporary-style') {
+            jQuery('#contemporary-style').addClass('img-selected');
+            jQuery('#neoclassic-style').removeClass('img-selected');
+        }
+
+        if (jQuery(this).attr('id') == 'neoclassic-style') {
+            jQuery('#neoclassic-style').addClass('img-selected');
+            jQuery('#contemporary-style').removeClass('img-selected');
+        }
+
+        // get style_id
+        const style_id = jQuery(this).data('style_id');
+
+        jQuery(".style-btn").removeClass("selected");
+        jQuery(`.style-btn[data-style_id='${style_id}']`).addClass("selected");
+        
+        //update price range for selected layout
+        const layout_id_selected = jQuery("#layout-change").data( "layout_id" );
+        if (layout_id_selected) {
+            update_price_budget_range(layout_id_selected);
+        }
+    });
     
 });
