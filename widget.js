@@ -36,7 +36,7 @@ var wbld = {
         }
 
         // add loading bar
-        $('#' + id).append(`
+        jQuery('#' + id).append(`
             <div class="widget-container" id="loading-bar">
                 <div class="loading-bar-text-editor">
                     <p class="p-box">We are downloading your widget!</p>
@@ -77,7 +77,7 @@ var wbld = {
             "search": url_params.get('search'),
         };
         //console.log("data:", data);
-        $.ajax({
+        jQuery.ajax({
             url: this.api1 + 'check_widget/',
             type: 'POST',
             dataType: 'json',
@@ -120,419 +120,6 @@ var wbld = {
     }
 };
 
-jQuery(document).ready(function(){
-    
-    $(document).on('click', '.generate-btn', function(event) {
-        const click_n = parseInt($(this).data("click_n"));
-        //console.log("click_n:", click_n);
-        $('#bedroomsPopup').scrollTop(0);
-        $('#bedroomsPopup').toggleClass("done");
-        
-        let address_id = $(".address-btn.selected").data( "address_id" );
-        //let layout_id = $(".img-selected").data( "layout_id" );
-        let layout_id = $("#layout-change").data( "layout_id" );
-
-        if (layout_id == null) {
-            clear_input_box();
-            address_id = $(".layout_size-btn.selected").data( "address_id" );
-            layout_id = $(".layout_size-btn.selected").data( "layout_id" );
-        }
-
-        if (wbld.visitor_id != "no_data") {
-            update_output(click_n, address_id, layout_id);
-        } else {
-            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-                .then(FingerprintJS => FingerprintJS.load());
-            fpPromise
-                .then(fp => fp.get())
-                .then(result => {
-                    wbld.visitor_id = result.visitorId;
-                    //console.log("visitor_id:", wbld.visitor_id);
-                    update_output(click_n, address_id, layout_id);
-                });
-        }
-        
-    });
-    
-    $(document).on('click', '.filter-btn', function(event) {
-        $(this).toggleClass("selected");
-        
-        // change click_n to 0 after each change of filter
-        set_zero_click_n();
-    });
-    
-    $(document).on('click', '.address-btn', function(event) {
-        $(".address-btn").removeClass("selected");
-        $(this).addClass("selected");
-        $(".address-btn").hide();
-        $(this).show();
-        
-        const address_id = $(this).data( "address_id" );
-        const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
-        const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
-        
-        layout_change(address_id, n_bedrooms, n_bedrooms_name, null);
-        $('#layout-change-container').removeClass("done");
-
-        // Get a reference to the bedroomsPopup and building-scroll elements
-        const bedroomsPopup = document.getElementById("bedroomsPopup");
-        const buildingScroll = document.getElementById("building-scroll");
-
-        // Scroll the bedroomsPopup element to the building-scroll element
-        bedroomsPopup.scrollTop = buildingScroll.offsetTop;
-    });
-    
-    $(document).on('click', '.bedroom-btn', function(event) {
-        $(".bedroom-btn").removeClass("selected");
-        $(this).addClass("selected");
-        
-        //const address_id = $(".address-btn.selected").data( "address_id" );
-        const n_bedrooms = $(this).data( "n_bedrooms" );
-        const n_bedrooms_name = decodeURIComponent($(this).data( "n_bedrooms_name" ));
-        
-        $("#bedrooms-select").text(n_bedrooms_name);
-
-        let layout_sizes = decodeURIComponent($(this).data( "n_bedrooms_layout_sizes" ));
-        layout_sizes = JSON.parse(layout_sizes);
-        $("#layoutsize-buttons").html(`
-            ${layout_sizes.map(item => `<button class="filter-btn layout_size-btn ${item.selected}" data-layout_id=${item.layout_id} data-address_id=${item.address_id} >${item.layout_size_name}</button>`).join('')}
-        `);
-
-        const layout_id = $(".layout_size-btn.selected").data( "layout_id" );
-        const address_id = $(".layout_size-btn.selected").data( "address_id" );
-
-        $('#address-search').val('');
-        $('.address-btn').hide();
-        $('#layout-change-container').addClass("done");
-
-        $(".address-btn").removeClass("selected");
-        $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
-        $("#layout-change").data('layout_id', layout_id);
-        
-        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
-        
-    });
-    
-    $(document).on('click', '.layout_size-btn', function(event) {
-        $(".layout_size-btn").removeClass("selected");
-        $(this).addClass("selected");
-
-        $('#address-search').val('');
-        $('.address-btn').hide();
-        $('#layout-change-container').addClass("done");
-
-        const address_id = $(this).data( "address_id" );
-        const layout_id = $(this).data( "layout_id" );
-        const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
-        const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
-
-        $(".address-btn").removeClass("selected");
-        $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
-        $("#layout-change").data('layout_id', layout_id);
-
-        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
-    });
-    
-    $(document).on('click', '.layout-change img', function(event) {
-        $(".layout-change img").removeClass("img-selected");
-        $(this).addClass("img-selected");
-        $('#bedroomsPopup').scrollTop(0);
-        $('#bedroomsPopup').toggleClass("done");
-        
-        //update price range for selected layout
-        const layout_id_selected = $(this).data( "layout_id" );
-        $("#layout-change").data('layout_id', layout_id_selected);
-        update_price_budget_range(layout_id_selected);
-        
-        // change click_n to 0 after each change of layout
-        set_zero_click_n();
-    });
-    
-    $(document).on('click', '.budget-btn', function(event) {
-        $(".budget-btn").removeClass("selected");
-        $(this).addClass("selected");
-        $('#advancedPopup').scrollTop(0);
-        $('#advancedPopup').toggleClass("done");
-    });
-    
-    $(document).on('click', '.style-btn', function(event) {
-        $(".style-btn").removeClass("selected");
-        $(this).addClass("selected");
-        $('#advancedPopup').scrollTop(0);
-        $('#advancedPopup').toggleClass("done");
-        
-        //update price range for selected layout
-        //const layout_id_selected = $(".img-selected").data( "layout_id" );
-        const layout_id_selected = $("#layout-change").data( "layout_id" );
-        if (layout_id_selected) {
-            update_price_budget_range(layout_id_selected);
-        }
-    });
-    
-    $(document).on('click', '.shop-btn', function(event) {
-        $(".shop-btn").removeClass("selected");
-        $(this).addClass("selected");
-        $('#shopsPopup').scrollTop(0);
-        $('#shopsPopup').toggleClass("done");
-        
-        const shop_name = decodeURIComponent($(this).data( "shop_name" ));
-        
-        $("#shops-select").text(shop_name);
-        
-        //update price range for selected layout
-        //const layout_id_selected = $(".img-selected").data( "layout_id" );
-        const layout_id_selected = $("#layout-change").data( "layout_id" );
-        if (layout_id_selected) {
-            update_price_budget_range(layout_id_selected);
-        }
-    });
-    
-    $(document).on('click', function(event) {
-        if (!$(event.target).closest('.select-btn, .popup').length) {
-            $('.popup').addClass("done");
-        }
-    });
-    
-    $(document).on('click', '.select-btn', function(event) { 
-        if ($(this).find('#bedrooms-select').length > 0) {
-            $('#bedroomsPopup').toggleClass("done");
-            $('#shopsPopup').addClass("done");
-            $('#advancedPopup').addClass("done");
-        }
-        
-        if ($(this).find('#shops-select').length > 0) {
-            $('#bedroomsPopup').addClass("done");
-            $('#shopsPopup').toggleClass("done");
-            $('#advancedPopup').addClass("done");
-        }
-        
-        if ($(this).find('#advanced-select').length > 0) {
-            $('#bedroomsPopup').addClass("done");
-            $('#shopsPopup').addClass("done");
-            $('#advancedPopup').toggleClass("done");
-        }
-    });
-    
-    $(document).on('click', 'a.btn-product-link', function(event) {
-        
-        const product_url = $(this).attr('href');
-        const product_id = $(this).attr('data-product_id');
-        const product_sku = $(this).attr('data-product_sku');
-        const product_name = $(this).attr('data-product_name');
-        const product_price = $(this).attr('data-product_price');
-        const product_currency = $(this).attr('data-product_currency');
-        const item_name = $(this).attr('data-item_name');
-        const item_amount = $(this).attr('data-item_amount');
-        
-        const data = {
-        "widget_name": wbld.widget_name,
-        "visitor_id": wbld.visitor_id,
-        "partner_id": wbld.partner_id,
-        "product_id": product_id,
-        "product_url": product_url,
-        "product_sku": product_sku,
-        "product_name": product_name,
-        "product_price": product_price,
-        "product_currency": product_currency,
-        "item_name": item_name,
-        "item_amount": item_amount
-        };
-        
-        send_POST_to_API(wbld.api1, 'product_click/', data);
-        
-    });
-
-    //open product change popup on product image click
-    $(document).on('click', '.product-div img, .gray-point', function(event) {
-        const product = JSON.parse($(this).attr('data-product'));
-        const product_id = product.product_id;
-        const productsListTotal = JSON.parse($(this).attr('data-products_list_total'));
-        const room_id = $(this).attr('data-room_id');
-        
-        // Clear the previous content
-        $('#product-popup-content').empty();
-
-        $('#product-popup-content').append(`<div id="product-popup-image"><img src="${get_bucket(product.product_image, product.product_shop)}"/></div>`);
-
-        $('#product-popup-content').append(`
-        <div id="product-popup-info">
-            <div id="product-popup-info-title">${product.product_name}</div>
-            <div id="product-popup-info-amount">Quantity: <span style="font-weight: 700;">${product.item_amount}</span></div>
-            <div id="product-popup-info-price">Price: <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div>
-            <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
-            <div class="product-popup-info-product-link-btn">
-                <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
-                    <button class="link-btn">Product Details</button>
-                </a>
-            </div>
-        </div>
-        `);
-
-        $('#product-popup-content').append(`<div id="product-popup-list"><div id="product-popup-list-title">Try these alternatives:</div><div id="product-popup-list-items"></div></div>`);
-
-        // Add each product to the list
-        // sort productsListTotal by price
-        productsListTotal.sort((a, b) => a.product_price - b.product_price);
-        productsListTotal.forEach(function(product) {
-            const dataProduct = JSON.stringify(product);
-            const encodedDataProduct = encodeURIComponent(dataProduct);
-            $('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
-        });
-
-        // Show the popup
-        $('#product-popup').fadeIn();
-
-        // Add the 'no-scroll' class to the body to prevent scrolling on the background content
-        $('body').addClass('no-scroll');
-
-        // Send product change event
-        const data = {
-        "widget_name": wbld.widget_name,
-        "visitor_id": wbld.visitor_id,
-        "partner_id": wbld.partner_id,
-        "in_product_id": product.product_id,
-        "in_product_url": product.product_url,
-        "in_product_name": product.product_name,
-        "in_product_price": product.product_price,
-        "in_product_currency": product.product_currency,
-        "in_item_id": product.item_id,
-        "in_item_name": product.item_name,
-        "out_product_id": 0
-        };
-        
-        send_POST_to_API(wbld.api2, 'product_change_click/', data);
-
-    });
-
-    // Close the popup when clicking outside the content
-    $(document).on('click', '#product-popup', function(event) {
-        if (event.target.id === 'product-popup') {
-            $('#product-popup').fadeOut();
-
-            // Remove the 'no-scroll' class from the body to allow scrolling on the background content
-            $('body').removeClass('no-scroll');
-        }
-    });
-
-    //change product on product image click
-    $(document).on('click', '#product-popup-list-item img', function(event) {
-        const decodedDataProduct = decodeURIComponent($(this).attr('data-product'));
-        const product = JSON.parse(decodedDataProduct);
-        const product_id_for_change = $(this).attr('data-product_id_for_change');
-        const room_id = $(this).attr('data-room_id');
-
-        const mbProduct = $(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        const ProductPriceOld = mbProduct.attr('data-product_price');
-        mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
-        mbProduct.attr('data-product', JSON.stringify(product));
-        mbProduct.attr('data-product_id', product.product_id);
-        mbProduct.attr('data-product_price', product.product_price);
-        mbProduct.attr('data-product_currency', product.product_currency);
-
-        const mbGrayPoint = $(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
-        mbGrayPoint.attr('data-product', JSON.stringify(product));
-        mbGrayPoint.attr('data-product_id', product.product_id);
-        mbGrayPoint.attr('data-product_price', product.product_price);
-        mbGrayPoint.attr('data-product_currency', product.product_currency);
-
-        $(".total-budget-title").each(function(index, element) {
-            const mbTotalBudget = $(element);
-            const mbTotalBudgetValue = mbTotalBudget.data("budget_total");
-            const mbTotalBudgetValueNew = mbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
-            mbTotalBudget.text(`Total: ${Number(mbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
-            mbTotalBudget.data("budget_total", mbTotalBudgetValueNew);
-        });
-
-        const roomBudgetTitle = $(`.room-budget-title[data-room_id="${room_id}"]`);
-        const roomBudgetValue = roomBudgetTitle.data('room_budget');
-        const roomBudgetRoomName = decodeURIComponent(roomBudgetTitle.data('room_name'));
-        const roomBudgetValueNew = roomBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
-        roomBudgetTitle.text(`${roomBudgetRoomName}: ${Number(roomBudgetValueNew).toLocaleString()} ${product.product_currency}`);
-        roomBudgetTitle.data("room_budget", roomBudgetValueNew);
-
-        $('#product-popup').fadeOut();
-        // Remove the 'no-scroll' class from the body to allow scrolling on the background content
-        $('body').removeClass('no-scroll');
-
-        // Send product change event
-        const data = {
-            "widget_name": wbld.widget_name,
-            "visitor_id": wbld.visitor_id,
-            "partner_id": wbld.partner_id,
-            "in_product_id": product.product_id,
-            "in_product_url": product.product_url,
-            "in_product_name": product.product_name,
-            "in_product_price": product.product_price,
-            "in_product_currency": product.product_currency,
-            "in_item_id": product.item_id,
-            "in_item_name": product.item_name,
-            "out_product_id": product_id_for_change
-        };
-        
-        send_POST_to_API(wbld.api2, 'product_change_click/', data);
-    }); 
-
-    // Attach an input event listener to the search box
-    $(document).on('input', '#address-search', function(event) {
-        const searchTerm = $('#address-search').val().toLowerCase();
-        if (searchTerm === '') {
-            clear_input_box();
-            return;
-        }
-
-        $('#address-buttons .address-btn').each(function () {
-            const address = decodeURIComponent($(this).data('address_address')).toLowerCase();
-            const address_id = $(this).data('address_id');
-            if (address.includes(searchTerm) & address_id != 0) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-    });
-
-    // Add an event listener to track user input when the input loses focus
-    $(document).on('blur', '#address-search', function(event) {
-        const userInput = $('#address-search').val();
-        if (userInput == '') {
-            return;
-        }
-        
-        if (wbld.visitor_id != "no_data") {
-            const data = {
-                "widget_name": wbld.widget_name,
-                "visitor_id": wbld.visitor_id,
-                "user_input": userInput,
-            };
-
-            send_POST_to_API(wbld.api1, 'user_search/', data);
-        } else {
-            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-                .then(FingerprintJS => FingerprintJS.load());
-            fpPromise
-                .then(fp => fp.get())
-                .then(result => {
-                    wbld.visitor_id = result.visitorId;
-                    //console.log("visitor_id:", wbld.visitor_id);
-
-                    const data = {
-                        "widget_name": wbld.widget_name,
-                        "visitor_id": wbld.visitor_id,
-                        "user_input": userInput,
-                    };
-                    send_POST_to_API(wbld.api1, 'user_search/', data);
-                });
-        }
-    
-    });
-
-    // Clear input address search after clear button click
-    $(document).on('click', '#clear-button', function(event) {
-        clear_input_box();
-    });  
-    
-});
-
 function start(widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
 
     // widget parameters
@@ -550,14 +137,14 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     // set visitor_id
     //wbld.visitor_id = visitor_id;
     
-    $("#wbld").append($('<div id="mainbar"></div>'));
+    jQuery("#wbld").append(jQuery('<div id="mainbar"></div>'));
     
-    $("#mainbar").append($('<div id="input"></div>'));
-    $("#input").append($('<div id="input-line-1"></div>'));
-    $("#input").append($('<div id="input-line-2"></div>'));
-    $("#mainbar").append($('<div id="output"></div>'));
-    $("#mainbar").append($('<div id="product-popup" style="display: none;"></div>'));
-    $("#mainbar").append($('<div id="poweredby"></div>'));
+    jQuery("#mainbar").append(jQuery('<div id="input"></div>'));
+    jQuery("#input").append(jQuery('<div id="input-line-1"></div>'));
+    jQuery("#input").append(jQuery('<div id="input-line-2"></div>'));
+    jQuery("#mainbar").append(jQuery('<div id="output"></div>'));
+    jQuery("#mainbar").append(jQuery('<div id="product-popup" style="display: none;"></div>'));
+    jQuery("#mainbar").append(jQuery('<div id="poweredby"></div>'));
 
     // first auto click is 0
     const click_n = 0;
@@ -624,7 +211,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
 
 function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n) {
 
-    $('#input-line-1').append(`
+    jQuery('#input-line-1').append(`
         <div class="input-block-left">
             
             <div class="widget-container">
@@ -647,7 +234,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
         </div>
     `);
 
-    $('#input-line-1').append(`
+    jQuery('#input-line-1').append(`
         <div class="input-block-right">
             
             <div class="widget-container">
@@ -703,7 +290,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
         </div>
     `);
     
-    $('#input-line-2').append(`
+    jQuery('#input-line-2').append(`
         <div class="input-block-left">
             
             <div class="widget-container">
@@ -732,7 +319,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
         </div>
     `);
     
-    $('#input-line-2').append(`
+    jQuery('#input-line-2').append(`
         <div class="input-block-right" id="generate-btn-block">
 
             <div class="widget-container">
@@ -762,7 +349,7 @@ function generate_output() {
         }
     }
 
-    $('#output').append(`
+    jQuery('#output').append(`
         <div class="widget-container">
             <div class="onboarding-images">
                 <div class="onboarding-image-left">
@@ -776,11 +363,11 @@ function generate_output() {
     `);
 
     // Attach load event listener to each image
-    $(".onboarding-images img").on("load", imageLoaded);
+    jQuery(".onboarding-images img").on("load", imageLoaded);
 }
 
 function generate_product_popup() {
-    $('#product-popup').append(`
+    jQuery('#product-popup').append(`
         <div class="widget-container">
             <div id="product-popup-content"></div>
         </div>
@@ -788,7 +375,7 @@ function generate_product_popup() {
 }
 
 function generate_poweredby() {
-    $('#poweredby').append(`
+    jQuery('#poweredby').append(`
         <div class="widget-container">
             <div class="poweredby">
                 <div class="poweredby-links"><a href="https://biglayoutdata.com/useragreement/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">User Agreement</a></div>
@@ -807,22 +394,22 @@ function generate_poweredby() {
 function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_selected) {
 
     startWaitBar("wait-bar");
-    $('.layout-change').css('display', 'none');
+    jQuery('.layout-change').css('display', 'none');
     
-    $.ajax({
+    jQuery.ajax({
         url: wbld.api1 + "layouts/" + address_id + "/" + n_bedrooms + "/",
         type: "GET",
         cache: true,
         dataType: "json",
         success: function(response) {
             if (!response.data.length) {
-                $(".layout-change").html(`
+                jQuery(".layout-change").html(`
                     <div class="error-text-editor">
                         <p class="p-box">No layouts for <b>${n_bedrooms_name}</b>.</p>
                     </div>
                 `);
                 
-                $('.layout-change').css('display', 'block');
+                jQuery('.layout-change').css('display', 'block');
                 finishWaitBar("wait-bar");
             } else {
                 let imagesLoaded = 0;
@@ -832,31 +419,31 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
                 function imageLoaded() {
                     imagesLoaded++;
                     if (imagesLoaded === totalImages) {
-                        $('.layout-change').css('display', 'block');
+                        jQuery('.layout-change').css('display', 'block');
                         finishWaitBar("wait-bar");
                     }
                 }
 
-                $(".layout-change").html(`
+                jQuery(".layout-change").html(`
                     ${response.data.map(layout => `<div class="layout-change-block"><img src="${wbld.layout_without_items_img}${layout.layout_img_without_items}" data-layout_id=${layout.layout_id} data-layout_min_budgets=${layout.layout_min_budgets} data-layout_max_budgets=${layout.layout_max_budgets} /><div class="layout-change-description">Floors: ${layout.layout_floors}</div><div class="layout-change-description">Area: ${(layout.layout_area_from < layout.layout_area_to) ? Math.round(layout.layout_area_from) + ' - ' + Math.round(layout.layout_area_to) : Math.round(layout.layout_area_from)} m2</div></div>`).join('')}
                 `);
 
                 // Attach load event listener to each image
-                $(".layout-change img").on("load", imageLoaded);
+                jQuery(".layout-change img").on("load", imageLoaded);
 
                 if (layout_id_selected) {
-                    $(`.layout-change img[data-layout_id='${layout_id_selected}']`).addClass("img-selected");
-                    $("#layout-change").data('layout_id', layout_id_selected);
+                    jQuery(`.layout-change img[data-layout_id='${layout_id_selected}']`).addClass("img-selected");
+                    jQuery("#layout-change").data('layout_id', layout_id_selected);
                     
                     update_price_budget_range(layout_id_selected);
                 } else {
                 
                     // select first of child 
-                    const firstChild = $('.layout-change img');
+                    const firstChild = jQuery('.layout-change img');
                     if (firstChild) {
                         const layout_id = firstChild.data('layout_id');
-                        $("#layout-change").data('layout_id', layout_id);
-                        $(`.layout-change img[data-layout_id='${layout_id}']`).addClass("img-selected");
+                        jQuery("#layout-change").data('layout_id', layout_id);
+                        jQuery(`.layout-change img[data-layout_id='${layout_id}']`).addClass("img-selected");
                         update_price_budget_range(layout_id);
                     } else {
                         console.log('No layout img!');
@@ -872,8 +459,8 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
 }
 
 function update_price_budget_range(layout_id_selected) {
-    let layout_min_budgets = $(`.layout-change img[data-layout_id='${layout_id_selected}']`).data( "layout_min_budgets" );
-    let layout_max_budgets = $(`.layout-change img[data-layout_id='${layout_id_selected}']`).data( "layout_max_budgets" );
+    let layout_min_budgets = jQuery(`.layout-change img[data-layout_id='${layout_id_selected}']`).data( "layout_min_budgets" );
+    let layout_max_budgets = jQuery(`.layout-change img[data-layout_id='${layout_id_selected}']`).data( "layout_max_budgets" );
     
     layout_min_budgets = decodeURIComponent(layout_min_budgets);
     layout_max_budgets = decodeURIComponent(layout_max_budgets);
@@ -881,8 +468,8 @@ function update_price_budget_range(layout_id_selected) {
     layout_min_budgets = JSON.parse(layout_min_budgets);
     layout_max_budgets = JSON.parse(layout_max_budgets);
     
-    const style = decodeURIComponent($(".style-btn.selected").data( "style_name" ));
-    const shop = decodeURIComponent($(".shop-btn.selected").data( "shop_name" ));
+    const style = decodeURIComponent(jQuery(".style-btn.selected").data( "style_name" ));
+    const shop = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
     
     // Retrieve the budget based on the shop and style values
     const layout_min_budget = layout_min_budgets[shop][style];
@@ -906,9 +493,9 @@ function update_price_budget_range(layout_id_selected) {
         nextNumber -= part;
     }
     
-    const budgetButtonSelected = $('.filter-btn.budget-btn.selected');
+    const budgetButtonSelected = jQuery('.filter-btn.budget-btn.selected');
     
-    let budgetButtons = $('.filter-btn.budget-btn');
+    let budgetButtons = jQuery('.filter-btn.budget-btn');
     let budgetButtonCount = budgetButtons.length;
     
     // Add more budgetButtons if budgets.length is greater than budgetButtonCount
@@ -922,7 +509,7 @@ function update_price_budget_range(layout_id_selected) {
                 budgetName = `All`;
             }
             
-            const newButton = $('<button class="filter-btn budget-btn"></button>');
+            const newButton = jQuery('<button class="filter-btn budget-btn"></button>');
             newButton.data('max_budget', max_budget);
             newButton.data('min_budget', min_budget);
             newButton.data('budget_name', encodeURIComponent(budgetName));
@@ -939,12 +526,12 @@ function update_price_budget_range(layout_id_selected) {
         }
     }
     
-    budgetButtons = $('.filter-btn.budget-btn');
+    budgetButtons = jQuery('.filter-btn.budget-btn');
     budgetButtonCount = budgetButtons.length;
     
     budgetButtons.each(function () {
-        //console.log("budgetButton:", $(this));
-        const budgetId = $(this).data('budget_id');
+        //console.log("budgetButton:", jQuery(this));
+        const budgetId = jQuery(this).data('budget_id');
         //console.log("budgets:", budgets);
         const max_budget = budgets[budgetId][0];
         const min_budget = budgets[budgetId][1];
@@ -953,10 +540,10 @@ function update_price_budget_range(layout_id_selected) {
             budgetName = `All`;
         }
     
-        $(this).data('max_budget', max_budget);
-        $(this).data('min_budget', min_budget);
-        $(this).data('budget_name', budgetName);
-        $(this).text(budgetName);
+        jQuery(this).data('max_budget', max_budget);
+        jQuery(this).data('min_budget', min_budget);
+        jQuery(this).data('budget_name', budgetName);
+        jQuery(this).text(budgetName);
     });
     
     let budgetIdSelected = budgetButtonSelected.data('budget_id');
@@ -985,13 +572,13 @@ function setCoordinates(element, coords) {
 
 function update_output(click_n, address_id, layout_id) {
     // clean output from previous info
-    $("#output").empty();
+    jQuery("#output").empty();
 
     //console.log("click_n:", click_n,"address_id:", address_id, "layout_id:", layout_id);
 
     // check layout_id not null
     if (!layout_id) {
-        $('#output').append(`
+        jQuery('#output').append(`
             <div class="widget-container">
                 <div class="text-editor">
                     <p class="p-box">You need to choose layout.</p>
@@ -1002,7 +589,7 @@ function update_output(click_n, address_id, layout_id) {
     }
     
     // add progress bar
-    $('#output').append(`
+    jQuery('#output').append(`
         <div class="widget-container" id="progress-bar">
             <div class="text-editor">
                 <p class="p-box">We are selecting furniture that fits your layout!</p>
@@ -1017,19 +604,19 @@ function update_output(click_n, address_id, layout_id) {
     // start progress bar
     startProgressBar(200);
     
-    const min_budget = $(".budget-btn.selected").data( "min_budget" );
-    const max_budget = $(".budget-btn.selected").data( "max_budget" );
-    const style = $(".style-btn.selected").data( "style_name" );
-    const shop = $(".shop-btn.selected").data( "shop_name" );
+    const min_budget = jQuery(".budget-btn.selected").data( "min_budget" );
+    const max_budget = jQuery(".budget-btn.selected").data( "max_budget" );
+    const style = jQuery(".style-btn.selected").data( "style_name" );
+    const shop = jQuery(".shop-btn.selected").data( "shop_name" );
     
-    $.ajax({
+    jQuery.ajax({
         url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
         type: "GET",
         cache: false,
         dataType: "json",
         success: function(response) {
             if ( !response.data.address_id ) {
-                $('#output').append(`
+                jQuery('#output').append(`
                     <div class="widget-container">
                         <div class="text-editor">
                             <p class="p-box">No items for <b>address_id=${address_id}</b> and <b>layout_id=${layout_id}</b>.</p>
@@ -1054,7 +641,7 @@ function update_output(click_n, address_id, layout_id) {
 
                         items_n += room.products_list.length;
                     
-                        $('#output').append(`
+                        jQuery('#output').append(`
                             <div class="widget-container">
                                 <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
                                 <div class="heading-subtitle total-budget-title"></div>
@@ -1068,7 +655,7 @@ function update_output(click_n, address_id, layout_id) {
                         pmbDiv.className = 'product-mood-board';
                         
                         wcDiv.appendChild(pmbDiv);
-                        $('#output').append(wcDiv);
+                        jQuery('#output').append(wcDiv);
 
                         roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
                         pmbDiv.style.height = pmbDiv.offsetWidth * roomMoodboardHeight + 'px';
@@ -1123,20 +710,20 @@ function update_output(click_n, address_id, layout_id) {
                     
                 });
 
-                $(".total-budget-title").text(`Total: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
-                $(".total-budget-title").data("budget_total", response.data.budget_total);
+                jQuery(".total-budget-title").text(`Total: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
+                jQuery(".total-budget-title").data("budget_total", response.data.budget_total);
                 
                 // next click number
                 click_n += 1;
-                $(".generate-btn").data("click_n", click_n);
+                jQuery(".generate-btn").data("click_n", click_n);
                 
                 // Attach load event listener to each item image
-                const itemImage = $('.product-div img').last();
+                const itemImage = jQuery('.product-div img').last();
                 // Was problem. On last image click after request this event was triggered
                 let requestNode = true;
                 itemImage.on('load', function () {
                     // Check if all item images have finished loading
-                    if ($('.product-div img').length === items_n & requestNode) {
+                    if (jQuery('.product-div img').length === items_n & requestNode) {
                         startProgressBar(5);
                         requestNode = false;
                     }
@@ -1159,7 +746,7 @@ function update_output(click_n, address_id, layout_id) {
 }
 
 function send_POST_to_API(api, method, data) {
-    $.ajax({
+    jQuery.ajax({
         url: api + method,
         type: 'POST',
         dataType: 'json',
@@ -1175,24 +762,24 @@ function send_POST_to_API(api, method, data) {
 }
 
 function clear_input_box() {
-    $('#address-search').val('');
-    $('.address-btn').hide();
-    $('#layout-change-container').addClass("done");
+    jQuery('#address-search').val('');
+    jQuery('.address-btn').hide();
+    jQuery('#layout-change-container').addClass("done");
 
     // select address_id and layout_id from layout_sizes
-    const address_id = $(".layout_size-btn.selected").data( "address_id" );
-    const layout_id = $(".layout_size-btn.selected").data( "layout_id" );
-    const n_bedrooms = $(".bedroom-btn.selected").data( "n_bedrooms" );
-    const n_bedrooms_name = decodeURIComponent($(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+    const address_id = jQuery(".layout_size-btn.selected").data( "address_id" );
+    const layout_id = jQuery(".layout_size-btn.selected").data( "layout_id" );
+    const n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
+    const n_bedrooms_name = decodeURIComponent(jQuery(".bedroom-btn.selected").data( "n_bedrooms_name" ));
 
-    $(".address-btn").removeClass("selected");
-    $(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+    jQuery(".address-btn").removeClass("selected");
+    jQuery(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
 
     layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
 }
 
 function set_zero_click_n() {
-    $(".generate-btn").data("click_n", 0);
+    jQuery(".generate-btn").data("click_n", 0);
 }
 
 function get_bucket(product_image, product_shop) {    
@@ -1230,14 +817,14 @@ function get_url(product_url) {
 
 function startLoadingProgressBar(speedProgressBar) {
     let progress = 0;
-    $("#loading-bar").css('display', 'block');
+    jQuery("#loading-bar").css('display', 'block');
     clearInterval(wbld.progressBarIntervalId);
     wbld.progressBarIntervalId = setInterval(() => {
         progress += 1;
         updateProgressBar("#loading-bar", progress);
         if (progress === 100) { 
             clearInterval(wbld.progressBarIntervalId);
-            $("#loading-bar").css('display', 'none');
+            jQuery("#loading-bar").css('display', 'none');
             progress = 0;
             updateProgressBar("#loading-bar", progress);
             speedProgressBar = 200;
@@ -1247,16 +834,16 @@ function startLoadingProgressBar(speedProgressBar) {
 
 function startProgressBar(speedProgressBar) {
     let progress = 0;
-    $("#progress-bar").css('display', 'block');
-    $('#generate-btn-block').css('display', 'none');
+    jQuery("#progress-bar").css('display', 'block');
+    jQuery('#generate-btn-block').css('display', 'none');
     clearInterval(wbld.progressBarIntervalId);
     wbld.progressBarIntervalId = setInterval(() => {
         progress += 1;
         updateProgressBar("#progress-bar", progress);
         if (progress === 100) { 
             clearInterval(wbld.progressBarIntervalId);
-            $("#progress-bar").css('display', 'none');
-            $('#generate-btn-block').css('display', 'block');
+            jQuery("#progress-bar").css('display', 'none');
+            jQuery('#generate-btn-block').css('display', 'block');
             progress = 0;
             updateProgressBar("#progress-bar", progress);
             speedProgressBar = 200;
@@ -1265,8 +852,8 @@ function startProgressBar(speedProgressBar) {
 }
 
 function updateProgressBar(id, progress) {
-    const bar = $(id + ' .bar');
-    const label = $(id + ' .label');
+    const bar = jQuery(id + ' .bar');
+    const label = jQuery(id + ' .label');
 
     bar.css('width', `${progress}%`);
     label.html(`${progress}%`);
@@ -1278,8 +865,8 @@ function updateProgressBar(id, progress) {
 }
 
 function startWaitBar(wait_bar_id) {
-    $('#' + wait_bar_id).css('display', 'block');
-    let bar = $(".wait-bar-bar");
+    jQuery('#' + wait_bar_id).css('display', 'block');
+    let bar = jQuery(".wait-bar-bar");
     let angle = 0;
     clearInterval(wbld.waitBarIntervalId);
     wbld.waitBarIntervalId = setInterval(function() {
@@ -1290,11 +877,418 @@ function startWaitBar(wait_bar_id) {
 }
 
 function finishWaitBar(wait_bar_id) {
-    $('#' + wait_bar_id).css('display', 'none');
+    jQuery('#' + wait_bar_id).css('display', 'none');
 }
 
-// Initialize the agent at application startup.
-// You can also use https://openfpcdn.io/fingerprintjs/v3/esm.min.js
-// You can also use https://openfpcdn.io/fingerprintjs/v3
-//const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-//  .then(FingerprintJS => FingerprintJS.load());
+jQuery(document).ready(function(){
+    
+    jQuery(document).on('click', '.generate-btn', function(event) {
+        const click_n = parseInt(jQuery(this).data("click_n"));
+        //console.log("click_n:", click_n);
+        jQuery('#bedroomsPopup').scrollTop(0);
+        jQuery('#bedroomsPopup').toggleClass("done");
+        
+        let address_id = jQuery(".address-btn.selected").data( "address_id" );
+        //let layout_id = jQuery(".img-selected").data( "layout_id" );
+        let layout_id = jQuery("#layout-change").data( "layout_id" );
+
+        if (layout_id == null) {
+            clear_input_box();
+            address_id = jQuery(".layout_size-btn.selected").data( "address_id" );
+            layout_id = jQuery(".layout_size-btn.selected").data( "layout_id" );
+        }
+
+        if (wbld.visitor_id != "no_data") {
+            update_output(click_n, address_id, layout_id);
+        } else {
+            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                .then(FingerprintJS => FingerprintJS.load());
+            fpPromise
+                .then(fp => fp.get())
+                .then(result => {
+                    wbld.visitor_id = result.visitorId;
+                    //console.log("visitor_id:", wbld.visitor_id);
+                    update_output(click_n, address_id, layout_id);
+                });
+        }
+        
+    });
+    
+    jQuery(document).on('click', '.filter-btn', function(event) {
+        jQuery(this).toggleClass("selected");
+        
+        // change click_n to 0 after each change of filter
+        set_zero_click_n();
+    });
+    
+    jQuery(document).on('click', '.address-btn', function(event) {
+        jQuery(".address-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        jQuery(".address-btn").hide();
+        jQuery(this).show();
+        
+        const address_id = jQuery(this).data( "address_id" );
+        const n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
+        const n_bedrooms_name = decodeURIComponent(jQuery(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+        
+        layout_change(address_id, n_bedrooms, n_bedrooms_name, null);
+        jQuery('#layout-change-container').removeClass("done");
+
+        // Get a reference to the bedroomsPopup and building-scroll elements
+        const bedroomsPopup = document.getElementById("bedroomsPopup");
+        const buildingScroll = document.getElementById("building-scroll");
+
+        // Scroll the bedroomsPopup element to the building-scroll element
+        bedroomsPopup.scrollTop = buildingScroll.offsetTop;
+    });
+    
+    jQuery(document).on('click', '.bedroom-btn', function(event) {
+        jQuery(".bedroom-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        
+        //const address_id = jQuery(".address-btn.selected").data( "address_id" );
+        const n_bedrooms = jQuery(this).data( "n_bedrooms" );
+        const n_bedrooms_name = decodeURIComponent(jQuery(this).data( "n_bedrooms_name" ));
+        
+        jQuery("#bedrooms-select").text(n_bedrooms_name);
+
+        let layout_sizes = decodeURIComponent(jQuery(this).data( "n_bedrooms_layout_sizes" ));
+        layout_sizes = JSON.parse(layout_sizes);
+        jQuery("#layoutsize-buttons").html(`
+            ${layout_sizes.map(item => `<button class="filter-btn layout_size-btn ${item.selected}" data-layout_id=${item.layout_id} data-address_id=${item.address_id} >${item.layout_size_name}</button>`).join('')}
+        `);
+
+        const layout_id = jQuery(".layout_size-btn.selected").data( "layout_id" );
+        const address_id = jQuery(".layout_size-btn.selected").data( "address_id" );
+
+        jQuery('#address-search').val('');
+        jQuery('.address-btn').hide();
+        jQuery('#layout-change-container').addClass("done");
+
+        jQuery(".address-btn").removeClass("selected");
+        jQuery(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+        jQuery("#layout-change").data('layout_id', layout_id);
+        
+        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
+        
+    });
+    
+    jQuery(document).on('click', '.layout_size-btn', function(event) {
+        jQuery(".layout_size-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+
+        jQuery('#address-search').val('');
+        jQuery('.address-btn').hide();
+        jQuery('#layout-change-container').addClass("done");
+
+        const address_id = jQuery(this).data( "address_id" );
+        const layout_id = jQuery(this).data( "layout_id" );
+        const n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
+        const n_bedrooms_name = decodeURIComponent(jQuery(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+
+        jQuery(".address-btn").removeClass("selected");
+        jQuery(`.address-btn[data-address_id='${address_id}']`).addClass("selected");
+        jQuery("#layout-change").data('layout_id', layout_id);
+
+        layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
+    });
+    
+    jQuery(document).on('click', '.layout-change img', function(event) {
+        jQuery(".layout-change img").removeClass("img-selected");
+        jQuery(this).addClass("img-selected");
+        jQuery('#bedroomsPopup').scrollTop(0);
+        jQuery('#bedroomsPopup').toggleClass("done");
+        
+        //update price range for selected layout
+        const layout_id_selected = jQuery(this).data( "layout_id" );
+        jQuery("#layout-change").data('layout_id', layout_id_selected);
+        update_price_budget_range(layout_id_selected);
+        
+        // change click_n to 0 after each change of layout
+        set_zero_click_n();
+    });
+    
+    jQuery(document).on('click', '.budget-btn', function(event) {
+        jQuery(".budget-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        jQuery('#advancedPopup').scrollTop(0);
+        jQuery('#advancedPopup').toggleClass("done");
+    });
+    
+    jQuery(document).on('click', '.style-btn', function(event) {
+        jQuery(".style-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        jQuery('#advancedPopup').scrollTop(0);
+        jQuery('#advancedPopup').toggleClass("done");
+        
+        //update price range for selected layout
+        //const layout_id_selected = jQuery(".img-selected").data( "layout_id" );
+        const layout_id_selected = jQuery("#layout-change").data( "layout_id" );
+        if (layout_id_selected) {
+            update_price_budget_range(layout_id_selected);
+        }
+    });
+    
+    jQuery(document).on('click', '.shop-btn', function(event) {
+        jQuery(".shop-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        jQuery('#shopsPopup').scrollTop(0);
+        jQuery('#shopsPopup').toggleClass("done");
+        
+        const shop_name = decodeURIComponent(jQuery(this).data( "shop_name" ));
+        
+        jQuery("#shops-select").text(shop_name);
+        
+        //update price range for selected layout
+        //const layout_id_selected = jQuery(".img-selected").data( "layout_id" );
+        const layout_id_selected = jQuery("#layout-change").data( "layout_id" );
+        if (layout_id_selected) {
+            update_price_budget_range(layout_id_selected);
+        }
+    });
+    
+    jQuery(document).on('click', function(event) {
+        if (!jQuery(event.target).closest('.select-btn, .popup').length) {
+            jQuery('.popup').addClass("done");
+        }
+    });
+    
+    jQuery(document).on('click', '.select-btn', function(event) { 
+        if (jQuery(this).find('#bedrooms-select').length > 0) {
+            jQuery('#bedroomsPopup').toggleClass("done");
+            jQuery('#shopsPopup').addClass("done");
+            jQuery('#advancedPopup').addClass("done");
+        }
+        
+        if (jQuery(this).find('#shops-select').length > 0) {
+            jQuery('#bedroomsPopup').addClass("done");
+            jQuery('#shopsPopup').toggleClass("done");
+            jQuery('#advancedPopup').addClass("done");
+        }
+        
+        if (jQuery(this).find('#advanced-select').length > 0) {
+            jQuery('#bedroomsPopup').addClass("done");
+            jQuery('#shopsPopup').addClass("done");
+            jQuery('#advancedPopup').toggleClass("done");
+        }
+    });
+    
+    jQuery(document).on('click', 'a.btn-product-link', function(event) {
+        
+        const product_url = jQuery(this).attr('href');
+        const product_id = jQuery(this).attr('data-product_id');
+        const product_sku = jQuery(this).attr('data-product_sku');
+        const product_name = jQuery(this).attr('data-product_name');
+        const product_price = jQuery(this).attr('data-product_price');
+        const product_currency = jQuery(this).attr('data-product_currency');
+        const item_name = jQuery(this).attr('data-item_name');
+        const item_amount = jQuery(this).attr('data-item_amount');
+        
+        const data = {
+        "widget_name": wbld.widget_name,
+        "visitor_id": wbld.visitor_id,
+        "partner_id": wbld.partner_id,
+        "product_id": product_id,
+        "product_url": product_url,
+        "product_sku": product_sku,
+        "product_name": product_name,
+        "product_price": product_price,
+        "product_currency": product_currency,
+        "item_name": item_name,
+        "item_amount": item_amount
+        };
+        
+        send_POST_to_API(wbld.api1, 'product_click/', data);
+        
+    });
+
+    //open product change popup on product image click
+    jQuery(document).on('click', '.product-div img, .gray-point', function(event) {
+        const product = JSON.parse(jQuery(this).attr('data-product'));
+        const product_id = product.product_id;
+        const productsListTotal = JSON.parse(jQuery(this).attr('data-products_list_total'));
+        const room_id = jQuery(this).attr('data-room_id');
+        
+        // Clear the previous content
+        jQuery('#product-popup-content').empty();
+
+        jQuery('#product-popup-content').append(`<div id="product-popup-image"><img src="${get_bucket(product.product_image, product.product_shop)}"/></div>`);
+
+        jQuery('#product-popup-content').append(`
+        <div id="product-popup-info">
+            <div id="product-popup-info-title">${product.product_name}</div>
+            <div id="product-popup-info-amount">Quantity: <span style="font-weight: 700;">${product.item_amount}</span></div>
+            <div id="product-popup-info-price">Price: <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div>
+            <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
+            <div class="product-popup-info-product-link-btn">
+                <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
+                    <button class="link-btn">Product Details</button>
+                </a>
+            </div>
+        </div>
+        `);
+
+        jQuery('#product-popup-content').append(`<div id="product-popup-list"><div id="product-popup-list-title">Try these alternatives:</div><div id="product-popup-list-items"></div></div>`);
+
+        // Add each product to the list
+        // sort productsListTotal by price
+        productsListTotal.sort((a, b) => a.product_price - b.product_price);
+        productsListTotal.forEach(function(product) {
+            const dataProduct = JSON.stringify(product);
+            const encodedDataProduct = encodeURIComponent(dataProduct);
+            jQuery('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
+        });
+
+        // Show the popup
+        jQuery('#product-popup').fadeIn();
+
+        // Add the 'no-scroll' class to the body to prevent scrolling on the background content
+        jQuery('body').addClass('no-scroll');
+
+        // Send product change event
+        const data = {
+        "widget_name": wbld.widget_name,
+        "visitor_id": wbld.visitor_id,
+        "partner_id": wbld.partner_id,
+        "in_product_id": product.product_id,
+        "in_product_url": product.product_url,
+        "in_product_name": product.product_name,
+        "in_product_price": product.product_price,
+        "in_product_currency": product.product_currency,
+        "in_item_id": product.item_id,
+        "in_item_name": product.item_name,
+        "out_product_id": 0
+        };
+        
+        send_POST_to_API(wbld.api2, 'product_change_click/', data);
+
+    });
+
+    // Close the popup when clicking outside the content
+    jQuery(document).on('click', '#product-popup', function(event) {
+        if (event.target.id === 'product-popup') {
+            jQuery('#product-popup').fadeOut();
+
+            // Remove the 'no-scroll' class from the body to allow scrolling on the background content
+            jQuery('body').removeClass('no-scroll');
+        }
+    });
+
+    //change product on product image click
+    jQuery(document).on('click', '#product-popup-list-item img', function(event) {
+        const decodedDataProduct = decodeURIComponent(jQuery(this).attr('data-product'));
+        const product = JSON.parse(decodedDataProduct);
+        const product_id_for_change = jQuery(this).attr('data-product_id_for_change');
+        const room_id = jQuery(this).attr('data-room_id');
+
+        const mbProduct = jQuery(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        const ProductPriceOld = mbProduct.attr('data-product_price');
+        mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
+        mbProduct.attr('data-product', JSON.stringify(product));
+        mbProduct.attr('data-product_id', product.product_id);
+        mbProduct.attr('data-product_price', product.product_price);
+        mbProduct.attr('data-product_currency', product.product_currency);
+
+        const mbGrayPoint = jQuery(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        mbGrayPoint.attr('data-product', JSON.stringify(product));
+        mbGrayPoint.attr('data-product_id', product.product_id);
+        mbGrayPoint.attr('data-product_price', product.product_price);
+        mbGrayPoint.attr('data-product_currency', product.product_currency);
+
+        jQuery(".total-budget-title").each(function(index, element) {
+            const mbTotalBudget = jQuery(element);
+            const mbTotalBudgetValue = mbTotalBudget.data("budget_total");
+            const mbTotalBudgetValueNew = mbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+            mbTotalBudget.text(`Total: ${Number(mbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+            mbTotalBudget.data("budget_total", mbTotalBudgetValueNew);
+        });
+
+        const roomBudgetTitle = jQuery(`.room-budget-title[data-room_id="${room_id}"]`);
+        const roomBudgetValue = roomBudgetTitle.data('room_budget');
+        const roomBudgetRoomName = decodeURIComponent(roomBudgetTitle.data('room_name'));
+        const roomBudgetValueNew = roomBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+        roomBudgetTitle.text(`${roomBudgetRoomName}: ${Number(roomBudgetValueNew).toLocaleString()} ${product.product_currency}`);
+        roomBudgetTitle.data("room_budget", roomBudgetValueNew);
+
+        jQuery('#product-popup').fadeOut();
+        // Remove the 'no-scroll' class from the body to allow scrolling on the background content
+        jQuery('body').removeClass('no-scroll');
+
+        // Send product change event
+        const data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "partner_id": wbld.partner_id,
+            "in_product_id": product.product_id,
+            "in_product_url": product.product_url,
+            "in_product_name": product.product_name,
+            "in_product_price": product.product_price,
+            "in_product_currency": product.product_currency,
+            "in_item_id": product.item_id,
+            "in_item_name": product.item_name,
+            "out_product_id": product_id_for_change
+        };
+        
+        send_POST_to_API(wbld.api2, 'product_change_click/', data);
+    }); 
+
+    // Attach an input event listener to the search box
+    jQuery(document).on('input', '#address-search', function(event) {
+        const searchTerm = jQuery('#address-search').val().toLowerCase();
+        if (searchTerm === '') {
+            clear_input_box();
+            return;
+        }
+
+        jQuery('#address-buttons .address-btn').each(function () {
+            const address = decodeURIComponent(jQuery(this).data('address_address')).toLowerCase();
+            const address_id = jQuery(this).data('address_id');
+            if (address.includes(searchTerm) & address_id != 0) {
+                jQuery(this).show();
+            } else {
+                jQuery(this).hide();
+            }
+        });
+    });
+
+    // Add an event listener to track user input when the input loses focus
+    jQuery(document).on('blur', '#address-search', function(event) {
+        const userInput = jQuery('#address-search').val();
+        if (userInput == '') {
+            return;
+        }
+        
+        if (wbld.visitor_id != "no_data") {
+            const data = {
+                "widget_name": wbld.widget_name,
+                "visitor_id": wbld.visitor_id,
+                "user_input": userInput,
+            };
+
+            send_POST_to_API(wbld.api1, 'user_search/', data);
+        } else {
+            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+                .then(FingerprintJS => FingerprintJS.load());
+            fpPromise
+                .then(fp => fp.get())
+                .then(result => {
+                    wbld.visitor_id = result.visitorId;
+                    //console.log("visitor_id:", wbld.visitor_id);
+
+                    const data = {
+                        "widget_name": wbld.widget_name,
+                        "visitor_id": wbld.visitor_id,
+                        "user_input": userInput,
+                    };
+                    send_POST_to_API(wbld.api1, 'user_search/', data);
+                });
+        }
+    
+    });
+
+    // Clear input address search after clear button click
+    jQuery(document).on('click', '#clear-button', function(event) {
+        clear_input_box();
+    });  
+    
+});
