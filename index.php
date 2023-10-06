@@ -7,6 +7,7 @@
     <title>Furnish Your Rooms in Seconds by BigLayoutData.com</title>
     <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn.">
     <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn">
+    <link rel="canonical" href="https://widget.biglayoutdata.com" />
 
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/neoclassic.webp" type="image/webp">
