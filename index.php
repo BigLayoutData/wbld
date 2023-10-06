@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Furnish Your Rooms in Seconds by BigLayoutData.com</title>
-    <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn.">
-    <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, Oc Home, West Elm, Pottery Barn">
+    <title>Furnish Your Rooms from Store Next Door by BigLayoutData.com</title>
+    <meta name="description" content="Furnish Rooms from Home Centre, IKEA, Home Box, Danube Home, OC Home, West Elm, Pottery Barn.">
+    <meta name="keywords" content="furniture, select furniture, Home Centre, IKEA, Home Box, Danube Home, OC Home, West Elm, Pottery Barn">
     <link rel="canonical" href="https://widget.biglayoutdata.com" />
 
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">

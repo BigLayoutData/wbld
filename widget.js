@@ -363,10 +363,10 @@ function generate_output() {
     jQuery('#output').append(`
         <div class="widget-container">
             <div class="onboarding-title">
-                Furnish your <span class='word-room'>room</span> in seconds
+                Furnish Your <span class='word-room'>Rooms</span> from Store Next Door
             </div>
             <div class="onboarding-description">
-                Get started by selecting style, specifying your layout, selecting store, then creating project.
+                Get started by selecting store, picking your layout, choosing style, then creating project.
             </div>
         </div>
         <div class="widget-container">
