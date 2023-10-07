@@ -49,7 +49,6 @@
         gtag('js', new Date());
 
         gtag('config', 'G-VHFE18GNY6');
-        gtag('config', 'AW-11334053187');
     </script>
     <!-- Google tag (gtag.js) -->
 </body>
