@@ -407,6 +407,10 @@ function generate_poweredby() {
                     </a>
                 </div>
                 <div class="poweredby-links-big"><a href="https://biglayoutdata.com/how-to-use-our-free-tool-to-furnish-apartment/" target="_blank" style="color: #000000; cursor: pointer; text-decoration: none;">How to Use Smart Funishing System BLD</a></div>
+                <div class="poweredby-whatsapp">
+                    <a aria-label="Chat on WhatsApp" href="https://wa.me/37129109173" target="_blank" rel="noopener noreferrer">
+                        <img alt="Chat on WhatsApp" src="${wbld.pics + 'WhatsAppButtonGreenLarge.webp'}" width="378" height="80" />
+                    </a></div>
             </div>
         </div>
     `);
