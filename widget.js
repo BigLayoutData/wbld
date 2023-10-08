@@ -349,21 +349,10 @@ function generate_output() {
         }
     }
 
-        /*<div class="widget-container">
-            <div class="onboarding-images">
-                <div class="onboarding-image-left">
-                    <img src="${wbld.pics + 'onboarding-main-left.webp'}" width="328" height="700" alt="Onboarding how to pick store." />
-                </div>
-                <div class="onboarding-image-right">
-                    <img src="${wbld.pics + 'onboarding-main-right.webp'}" width="328" height="700" alt="Onboarding how to pick layout." />
-                </div>
-            </div>
-        </div>*/
-
     jQuery('#output').append(`
         <div class="widget-container">
             <div class="onboarding-title">
-                Furnish Your <span class='word-room'>Rooms</span> from Store Next Door
+                Furnish Your <span class='word-room'>Rooms</span> from Store Next Door Using <span class='word-room'>AI</span>
             </div>
             <div class="onboarding-description">
                 Get started by selecting store, picking your layout, choosing style, then creating project.
