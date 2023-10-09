@@ -181,7 +181,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
 
     // get country_name from wbld.widget_domain
     // change countries_list.selected if needed
-    if (wbld.widget_domain.split('-')[0] in ["uae", "ksa"]) {
+    if (["uae", "ksa"].includes(wbld.widget_domain.split('-')[0])) {
         countries_list.forEach(function(item) {
             if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
                 item.selected = 'selected';
