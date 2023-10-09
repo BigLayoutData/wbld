@@ -189,7 +189,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
                 item.selected = '';
             }
         });
-    } else {
+    } else if (wbld.widget_domain.split('.')[1] === 'biglayoutdata.com') {
         fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
             .then((response) => response.json())
             .then(

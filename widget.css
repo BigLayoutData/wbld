@@ -360,7 +360,7 @@ body.no-scroll {
     text-align: left;
     font-size: var(--small-text-size);
     font-weight: var(--small-text-weight-bold);
-    padding-top: 10px;
+    padding-top: 16px;
     padding-bottom: 0px;
     color: #000000;
 }
@@ -385,7 +385,7 @@ body.no-scroll {
     float: left;
     width: 189px;
     display: block;
-    padding-top: 10px;
+    padding-top: 16px;
     padding-bottom: 0px;
 }
 .poweredby-img img, .poweredby-whatsapp img {
