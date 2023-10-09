@@ -25,6 +25,7 @@
     font-family: var(--widget-font);
     line-height: 1.25;
     margin: 0 auto;
+    position: relative;
 }
 #mainbar {
     float: left;
@@ -448,6 +449,9 @@ body.no-scroll {
     color: var(--btn-font-color);
     background-color: var(--btn-color);
 }
+.filter-btn.country-btn {
+    width: 104px;
+}
 .filter-btn.bedroom-btn {
     width: 158px;
 }
@@ -673,6 +677,13 @@ body.no-scroll {
     margin-left: 2%;
     margin-right: 2%;
     width: 96%;
+    display: none;
+
+    position: absolute;
+    top: 170px;
+    left: 0;
+    z-index: 999;
+    background-color: #FFFFFF;
 }
 .progress {
   position: relative;
@@ -689,7 +700,8 @@ body.no-scroll {
   height: 100%;
   background-color: var(--btn-color);
   border-radius: 5px;
-  width: 0%;
+  width: 100%;
+  max-width: 0%;
   transition: width 0.5s;
 }
 .label {

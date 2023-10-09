@@ -12,6 +12,7 @@
     <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript">
     <link rel="preload" as="script" href="widget.js" type="text/javascript">
     <link rel="preload" as="style" href="widget.css" type="text/css">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/neoclassic.webp" type="image/webp">
 </head>

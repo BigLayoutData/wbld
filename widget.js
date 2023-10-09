@@ -175,9 +175,37 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     widget_styles = decodeURIComponent(widget_styles);
     const styles_list = JSON.parse(widget_styles);
 
-    // widget shops
+    // widget countries
     widget_shops = decodeURIComponent(widget_shops);
-    const shops_list = JSON.parse(widget_shops);
+    const countries_list = JSON.parse(widget_shops);
+
+    // get country_name from wbld.widget_domain
+    // change countries_list.selected if needed
+    if (wbld.widget_domain.split('-')[0] in ["UAE", "KSA"]) {
+        countries_list.forEach(function(item) {
+            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
+                item.selected = 'selected';
+            } else {
+                item.selected = '';
+            }
+        });
+    } else {
+        fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
+            .then((response) => response.json())
+            .then(
+                (jsonResponse) => //console.log(jsonResponse.ip, jsonResponse.country)
+                countries_list.forEach(function(item) {
+                    if (item.country_code === jsonResponse.country) {
+                        item.selected = 'selected';
+                    } else {
+                        item.selected = '';
+                    }
+                })
+            )
+    }
+
+    // widget shops
+    const shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
 
     // sort addresses_list by address_address ASC
     addresses_list.sort((a, b) => {
@@ -200,7 +228,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
         }   
     });
     
-    generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n);
+    generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
 
     generate_output();
 
@@ -209,7 +237,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     generate_poweredby();
 }
 
-function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, shops_list, styles_list, budgets_list, click_n) {
+function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n) {
 
     jQuery('#input-line-1').append(`
         <div class="input-block-left">
@@ -217,12 +245,18 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
             <div class="widget-container">
                 <div class="small-text">Furniture Store</div> 
                 <div class="select-btn">
-                    <div id="shops-select" class="select">${shops_list.find(item => item.selected === 'selected').shop_name}</div>
+                    <div id="shops-select" class="select">${shops_list.find(item => item.selected === 'selected').shop_name} ${countries_list.find(item => item.selected === 'selected').country_flag}</div>
                 </div>
                 <div id="shopsPopup" class="popup done">
-                
                     <div class="widget-container">
-                        <div class="small-text">Pick Furniture Ftore</div>
+                        <div class="small-text">Your Country</div>
+                        <div id="countries-buttons">
+                            ${countries_list.map(item => `<button class="filter-btn country-btn ${item.selected}" data-country_id=${item.country_id} data-country_name=${encodeURIComponent(item.country_name)} data-country_flag=${encodeURIComponent(item.country_flag)} data-country_currency=${item.country_currency} data-country_shops_list=${encodeURIComponent(JSON.stringify(item.shops_list))} >${item.country_name} ${item.country_flag}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="widget-container">
+                        <div class="small-text">Pick Furniture Store</div>
                         <div id="shops-buttons">
                             ${shops_list.map(item => `<button class="filter-btn shop-btn ${item.selected}" data-shop_id=${item.shop_id} data-shop_name=${encodeURIComponent(item.shop_name)}>${item.shop_name}</button>`).join('')}
                         </div>
@@ -262,7 +296,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
                         <button class="generate-btn " style="float: right; width: 220px;" data-click_n=${click_n}>Close and Create Project</button>
                     </div>
 
-                    <div class="widget-container" id="building-scroll">
+                    <div class="widget-container" id="building-scroll" ${countries_list.find(item => item.selected === 'selected').country_name === "UAE" ? "" : "done"}>
                         <div class="small-text">Search Layout by Building (Optional)</div>
                         <div class="input-container">
                             <input type="text" id="address-search" placeholder="Search building name..." autocomplete="off">
@@ -483,11 +517,15 @@ function update_price_budget_range(layout_id_selected) {
     layout_max_budgets = JSON.parse(layout_max_budgets);
     
     const style = decodeURIComponent(jQuery(".style-btn.selected").data( "style_name" ));
+    const country = decodeURIComponent(jQuery(".country-btn.selected").data( "country_name" ));
+    const country_currency = decodeURIComponent(jQuery(".country-btn.selected").data( "country_currency" ));
     const shop = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
     
     // Retrieve the budget based on the shop and style values
-    const layout_min_budget = layout_min_budgets[shop][style];
-    const layout_max_budget = layout_max_budgets[shop][style];
+    //const layout_min_budget = layout_min_budgets[shop][style];
+    //const layout_max_budget = layout_max_budgets[shop][style];
+    const layout_min_budget = layout_min_budgets[country][shop][style];
+    const layout_max_budget = layout_max_budgets[country][shop][style];
     
     const budgets = [];
     // First btn id=0 is All budgets from 0 to 999999
@@ -518,7 +556,7 @@ function update_price_budget_range(layout_id_selected) {
             const max_budget = budgets[i][0];
             const min_budget = budgets[i][1];
             const budgetId = i;
-            let budgetName = `${max_budget.toLocaleString()} AED`;
+            let budgetName = `${max_budget.toLocaleString()} ${country_currency}`;
             if (budgetId == 0) {
                 budgetName = `All`;
             }
@@ -549,7 +587,7 @@ function update_price_budget_range(layout_id_selected) {
         //console.log("budgets:", budgets);
         const max_budget = budgets[budgetId][0];
         const min_budget = budgets[budgetId][1];
-        let budgetName = `${max_budget.toLocaleString()} AED`;
+        let budgetName = `${max_budget.toLocaleString()} ${country_currency}`;
         if (budgetId == 0) {
             budgetName = `All`;
         }
@@ -621,10 +659,11 @@ function update_output(click_n, address_id, layout_id) {
     const min_budget = jQuery(".budget-btn.selected").data( "min_budget" );
     const max_budget = jQuery(".budget-btn.selected").data( "max_budget" );
     const style = jQuery(".style-btn.selected").data( "style_name" );
+    const country = jQuery(".country-btn.selected").data( "country_name" );
     const shop = jQuery(".shop-btn.selected").data( "shop_name" );
     
     jQuery.ajax({
-        url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
+        url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + country + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
         type: "GET",
         cache: false,
         dataType: "json",
@@ -759,7 +798,7 @@ function update_output(click_n, address_id, layout_id) {
     
 }
 
-function send_POST_to_API(api, method, data) {
+function send_ajax_request(api, method, data) {
     jQuery.ajax({
         url: api + method,
         type: 'POST',
@@ -773,6 +812,26 @@ function send_POST_to_API(api, method, data) {
             console.error(error);
         }
     });
+}
+
+function send_POST_to_API(api, method, data) {
+    if (wbld.visitor_id != "no_data") {
+        send_ajax_request(api, method, data);
+        return;
+    }
+
+    const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
+            .then(FingerprintJS => FingerprintJS.load());
+    fpPromise
+        .then(fp => fp.get())
+        .then(result => {
+            wbld.visitor_id = result.visitorId;
+            //console.log("visitor_id:", wbld.visitor_id);
+            // change visitor_id in data
+            data.visitor_id = wbld.visitor_id;
+            send_ajax_request(api, method, data);
+        });
+    
 }
 
 function clear_input_box() {
@@ -869,7 +928,9 @@ function updateProgressBar(id, progress) {
     const bar = jQuery(id + ' .bar');
     const label = jQuery(id + ' .label');
 
-    bar.css('width', `${progress}%`);
+    //bar.css('width', `${progress}%`);
+    //bar.css('width', '');
+    bar.css('max-width', `${progress}%`);
     label.html(`${progress}%`);
 
     if (progress === 100) {
@@ -925,7 +986,6 @@ jQuery(document).ready(function(){
                     update_output(click_n, address_id, layout_id);
                 });
         }
-        
     });
     
     jQuery(document).on('click', '.filter-btn', function(event) {
@@ -954,6 +1014,15 @@ jQuery(document).ready(function(){
 
         // Scroll the bedroomsPopup element to the building-scroll element
         bedroomsPopup.scrollTop = buildingScroll.offsetTop;
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "address-btn",
+            "filter_value": `address_id: ${address_id}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.bedroom-btn', function(event) {
@@ -985,6 +1054,14 @@ jQuery(document).ready(function(){
         
         layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
         
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "bedroom-btn",
+            "filter_value": `n_bedrooms_name: ${n_bedrooms_name}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.layout_size-btn', function(event) {
@@ -1005,6 +1082,15 @@ jQuery(document).ready(function(){
         jQuery("#layout-change").data('layout_id', layout_id);
 
         layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id);
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "layout_size-btn",
+            "filter_value": `layout_id: ${layout_id}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.layout-change img', function(event) {
@@ -1020,6 +1106,15 @@ jQuery(document).ready(function(){
         
         // change click_n to 0 after each change of layout
         set_zero_click_n();
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "layout-change img",
+            "filter_value": `layout_id_selected: ${layout_id_selected}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.budget-btn', function(event) {
@@ -1027,6 +1122,17 @@ jQuery(document).ready(function(){
         jQuery(this).addClass("selected");
         jQuery('#advancedPopup').scrollTop(0);
         jQuery('#advancedPopup').toggleClass("done");
+
+        const budget_name = decodeURIComponent(jQuery(this).data( "budget_name" ));
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "budget-btn",
+            "filter_value": `budget_name: ${budget_name}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.style-btn', function(event) {
@@ -1041,6 +1147,60 @@ jQuery(document).ready(function(){
         if (layout_id_selected) {
             update_price_budget_range(layout_id_selected);
         }
+
+        const style_name = decodeURIComponent(jQuery(this).data( "style_name" ));
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "style-btn",
+            "filter_value": `style_name: ${style_name}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+    });
+
+    jQuery(document).on('click', '.country-btn', function(event) {
+        jQuery(".country-btn").removeClass("selected");
+        jQuery(this).addClass("selected");
+        //jQuery('#shopsPopup').scrollTop(0);
+        //jQuery('#shopsPopup').toggleClass("done");
+        
+        const country_name = decodeURIComponent(jQuery(this).data( "country_name" ));
+        const country_flag = decodeURIComponent(jQuery(this).data( "country_flag" ));
+        let country_shops_list = decodeURIComponent(jQuery(this).data( "country_shops_list" ));
+        country_shops_list = JSON.parse(country_shops_list);
+        const shop_name_selected = country_shops_list.find(item => item.selected == "selected").shop_name;
+        
+        jQuery("#shops-select").html(`${shop_name_selected} ${country_flag}`);
+
+        //update shops for selected country
+        jQuery("#shops-buttons").html(`
+            ${country_shops_list.map(item => `<button class="filter-btn shop-btn ${item.selected}" data-shop_id=${item.shop_id} data-shop_name=${encodeURIComponent(item.shop_name)} >${item.shop_name}</button>`).join('')}
+        `);
+        
+        //update price range for selected layout
+        //const layout_id_selected = jQuery(".img-selected").data( "layout_id" );
+        const layout_id_selected = jQuery("#layout-change").data( "layout_id" );
+        if (layout_id_selected) {
+            update_price_budget_range(layout_id_selected);
+        }
+
+        // add class done to #building-scroll if counrty_name not UAE
+        if (country_name != "UAE") {
+            jQuery('#building-scroll').addClass("done");
+        } else {
+            jQuery('#building-scroll').removeClass("done");
+        }
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "country-btn",
+            "filter_value": `country_name: ${country_name}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.shop-btn', function(event) {
@@ -1050,8 +1210,9 @@ jQuery(document).ready(function(){
         jQuery('#shopsPopup').toggleClass("done");
         
         const shop_name = decodeURIComponent(jQuery(this).data( "shop_name" ));
+        const country_flag = decodeURIComponent(jQuery(".country-btn.selected").data( "country_flag" ));
         
-        jQuery("#shops-select").text(shop_name);
+        jQuery("#shops-select").html(`${shop_name} ${country_flag}`);
         
         //update price range for selected layout
         //const layout_id_selected = jQuery(".img-selected").data( "layout_id" );
@@ -1059,6 +1220,15 @@ jQuery(document).ready(function(){
         if (layout_id_selected) {
             update_price_budget_range(layout_id_selected);
         }
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "shop-btn",
+            "filter_value": `shop_name: ${shop_name}`
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', function(event) {
@@ -1068,23 +1238,36 @@ jQuery(document).ready(function(){
     });
     
     jQuery(document).on('click', '.select-btn', function(event) { 
+        let popup_id = "no_data";
         if (jQuery(this).find('#bedrooms-select').length > 0) {
             jQuery('#bedroomsPopup').toggleClass("done");
             jQuery('#shopsPopup').addClass("done");
             jQuery('#advancedPopup').addClass("done");
+            popup_id = "bedroomsPopup";
         }
         
         if (jQuery(this).find('#shops-select').length > 0) {
             jQuery('#bedroomsPopup').addClass("done");
             jQuery('#shopsPopup').toggleClass("done");
             jQuery('#advancedPopup').addClass("done");
+            popup_id = "shopsPopup";
         }
         
         if (jQuery(this).find('#advanced-select').length > 0) {
             jQuery('#bedroomsPopup').addClass("done");
             jQuery('#shopsPopup').addClass("done");
             jQuery('#advancedPopup').toggleClass("done");
+            popup_id = "advancedPopup";
         }
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "select-btn",
+            "filter_value": popup_id
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', 'a.btn-product-link', function(event) {
@@ -1113,7 +1296,6 @@ jQuery(document).ready(function(){
         };
         
         send_POST_to_API(wbld.api1, 'product_click/', data);
-        
     });
 
     //open product change popup on product image click
@@ -1175,7 +1357,6 @@ jQuery(document).ready(function(){
         };
         
         send_POST_to_API(wbld.api2, 'product_change_click/', data);
-
     });
 
     // Close the popup when clicking outside the content
@@ -1271,33 +1452,14 @@ jQuery(document).ready(function(){
         if (userInput == '') {
             return;
         }
-        
-        if (wbld.visitor_id != "no_data") {
-            const data = {
-                "widget_name": wbld.widget_name,
-                "visitor_id": wbld.visitor_id,
-                "user_input": userInput,
-            };
 
-            send_POST_to_API(wbld.api1, 'user_search/', data);
-        } else {
-            const fpPromise = import('https://openfpcdn.io/fingerprintjs/v3/esm.min.js')
-                .then(FingerprintJS => FingerprintJS.load());
-            fpPromise
-                .then(fp => fp.get())
-                .then(result => {
-                    wbld.visitor_id = result.visitorId;
-                    //console.log("visitor_id:", wbld.visitor_id);
+        const data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "user_input": userInput,
+        };
 
-                    const data = {
-                        "widget_name": wbld.widget_name,
-                        "visitor_id": wbld.visitor_id,
-                        "user_input": userInput,
-                    };
-                    send_POST_to_API(wbld.api1, 'user_search/', data);
-                });
-        }
-    
+        send_POST_to_API(wbld.api1, 'user_search/', data);
     });
 
     // Clear input address search after clear button click
@@ -1329,6 +1491,15 @@ jQuery(document).ready(function(){
         if (layout_id_selected) {
             update_price_budget_range(layout_id_selected);
         }
+
+        // send filter button click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "filter_name": "style image",
+            "filter_value": jQuery(this).attr('id')
+        };
+        send_POST_to_API(wbld.api2, "user_filter_click/", data);
     });
     
 });
