@@ -181,15 +181,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
 
     // get country_name from wbld.widget_domain
     // change countries_list.selected if needed
-    if (wbld.widget_domain.split('-')[0] in ["UAE", "KSA"]) {
-        countries_list.forEach(function(item) {
-            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
-                item.selected = 'selected';
-            } else {
-                item.selected = '';
-            }
-        });
-    } else if (wbld.widget_domain.split('.')[1] === 'biglayoutdata.com') {
+    if (countries_list.length > 1) {
         fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
             .then((response) => response.json())
             .then(
@@ -202,6 +194,14 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
                     }
                 })
             )
+    } else if (wbld.widget_domain.split('-')[0] in ["uae", "ksa"] && countries_list.length > 1) {
+        countries_list.forEach(function(item) {
+            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
+                item.selected = 'selected';
+            } else {
+                item.selected = '';
+            }
+        });
     }
 
     // widget shops
