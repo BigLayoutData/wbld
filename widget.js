@@ -5,6 +5,8 @@ var wbld = {
     partner_id: 'no_data',
     progressBarIntervalId: 0,
     waitBarIntervalId: 0,
+    onboardingClickOn: true,
+    onboardingScrollXOn: true,
     // some const for img urls
     pics: 'https://space.biglayoutdata.com/pics/',
     mood_board_img: 'https://space.biglayoutdata.com/mood-boards/',
@@ -753,8 +755,31 @@ function update_output(click_n, address_id, layout_id) {
                             grayPoint.dataset.product_price = product.product_price;
                             grayPoint.dataset.product_currency = product.product_currency;
                             grayPoint.dataset.products_list_total = JSON.stringify(filteredList);
-
                             productDiv.appendChild(grayPoint);
+
+                            if (i == room.products_list.length - 1 && wbld.onboardingClickOn) {
+                                const fingerClick = document.createElement('div');
+                                fingerClick.className = 'finger-click';
+                                const fingerClickImg = document.createElement('img');
+                                fingerClickImg.src = wbld.pics + 'hand-cursor-icon-clip-art-free-png.webp';
+                                fingerClickImg.width = 89;
+                                fingerClickImg.height = 100;
+                                fingerClickImg.alt = 'Click to change image';
+
+                                fingerClickImg.dataset.product = JSON.stringify(product);
+                                fingerClickImg.dataset.product_id = product.product_id;
+                                fingerClickImg.dataset.room_id = room.room_id;
+                                fingerClickImg.dataset.product_price = product.product_price;
+                                fingerClickImg.dataset.product_currency = product.product_currency;
+                                fingerClickImg.dataset.products_list_total = JSON.stringify(filteredList);
+
+                                fingerClick.appendChild(fingerClickImg);
+                                productDiv.appendChild(fingerClick);
+
+                                // Add load event listener to fingerClickImg
+                                items_n += 1;
+                            }
+                            
                             productDiv.appendChild(img);
 
                             pmbDiv.appendChild(productDiv);
@@ -1337,11 +1362,29 @@ jQuery(document).ready(function(){
             jQuery('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
         });
 
+        if (productsListTotal.length > 2 && wbld.onboardingScrollXOn) {
+            const fingerScrollX = document.createElement('div');
+            fingerScrollX.className = 'finger-scroll-x';
+            const fingerScrollXImg = document.createElement('img');
+            fingerScrollXImg.src = wbld.pics + 'hand-cursor-icon-clip-art-free-png.webp';
+            fingerScrollXImg.width = 89;
+            fingerScrollXImg.height = 100;
+            fingerScrollXImg.alt = 'Click to change image';
+            fingerScrollX.appendChild(fingerScrollXImg);
+            // add fingerScrollX to product-popup-list like first child
+            const productPopupList = document.getElementById('product-popup-list');
+            productPopupList.insertBefore(fingerScrollX, productPopupList.firstChild);
+        }
+
         // Show the popup
         jQuery('#product-popup').fadeIn();
 
         // Add the 'no-scroll' class to the body to prevent scrolling on the background content
         jQuery('body').addClass('no-scroll');
+
+        // Close finger point
+        wbld.onboardingClickOn = false;
+        jQuery('.finger-click').hide();
 
         // Send product change event
         const data = {
@@ -1410,6 +1453,10 @@ jQuery(document).ready(function(){
         jQuery('#product-popup').fadeOut();
         // Remove the 'no-scroll' class from the body to allow scrolling on the background content
         jQuery('body').removeClass('no-scroll');
+
+        // Close finger scroll
+        wbld.onboardingScrollXOn = false;
+        jQuery('.finger-scroll-x').hide();
 
         // Send product change event
         const data = {

@@ -282,6 +282,7 @@
     overflow-x: scroll;
     scrollbar-width: thin;
     border-top: #DDDDDD 1px solid;
+    position: relative;
 }
 #product-popup-list-title {
     box-sizing: border-box;
@@ -310,7 +311,7 @@
     width: 190px;
     height: 170px;
     margin-left: 0px;
-    margin-right: 30px;
+    margin-right: 20px;
     color: #000000;
 }
 #product-popup-list-item img {
@@ -740,12 +741,12 @@ body.no-scroll {
 }  
 .gray-point {
     position: absolute;
-    top: 10px; /* Adjust the top position as needed */
-    left: 10px; /* Adjust the left position as needed */
-    width: 12px; /* Adjust the width as needed */
-    height: 12px; /* Adjust the height as needed */
-    background: #333; /* Makes a black border */
-    border-radius: 50%; /* Makes it a circle */
+    top: 10px;
+    left: 10px;
+    width: 12px;
+    height: 12px;
+    background: #333;
+    border-radius: 50%;
     border: solid 2px white;
     cursor: pointer;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
@@ -755,6 +756,44 @@ body.no-scroll {
     .gray-point:hover {
         width: 14px;
         height: 14px;
+    }
+}
+.finger-click {
+    position: absolute;
+    left: 30%;
+    top: 30%;
+    width: 35px;
+    animation: zoomInOut 1s infinite alternate;
+}
+.finger-scroll-x {
+    position: absolute;
+    left: 250px;
+    top: 15%;
+    width: 35px;
+    animation: moveLeftRight 3.5s infinite linear;
+}
+.finger-click img, .finger-scroll-x img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+@keyframes zoomInOut {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}
+@keyframes moveLeftRight {
+    0% {
+        left: 250px;
+    }
+    75% {
+        left: 100px;
+    }
+    100% {
+        left: 250px;
     }
 }
 .product-div img {
