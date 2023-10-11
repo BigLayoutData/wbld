@@ -10,8 +10,8 @@
     <link rel="canonical" href="https://widget.biglayoutdata.com" />
 
     <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript">
-    <link rel="preload" as="script" href="widget.js?v=1.0" type="text/javascript">
-    <link rel="preload" as="style" href="widget.css?v=1.0" type="text/css">
+    <link rel="preload" as="script" href="widget.js?v=1.0.1" type="text/javascript">
+    <link rel="preload" as="style" href="widget.css?v=1.0.1" type="text/css">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/neoclassic.webp" type="image/webp">
@@ -28,7 +28,7 @@
     <script type="text/javascript">
         jQuery(document).ready(function($) {
             var scriptElement = document.createElement('script');
-            scriptElement.src = 'widget.js?v=1.0';
+            scriptElement.src = 'widget.js?v=1.0.1';
             scriptElement.type = 'text/javascript';
             scriptElement.async = true;
             scriptElement.onload = function() {
@@ -38,7 +38,7 @@
             document.body.appendChild(scriptElement);
         });
     </script>
-    <link rel="stylesheet" href="widget.css?v=1.0" type="text/css" />
+    <link rel="stylesheet" href="widget.css?v=1.0.1" type="text/css" />
     <!-- BigLayoutData widget (widget.js) -->
 
     <!-- Google tag (gtag.js) -->
