@@ -1,10 +1,13 @@
 var wbld = { 
+    id: 'wbld',
     widget_name: 'no_data',
     widget_domain: 'no_data',
+    widget_url: 'no_data',
     visitor_id: 'no_data',
     partner_id: 'no_data',
-    progressBarIntervalId: 0,
-    waitBarIntervalId: 0,
+    filters_json: 'no_data',
+    project_id: 'no_data',
+    project_json: 'no_data',
     onboardingClickOn: true,
     onboardingScrollXOn: true,
     // some const for img urls
@@ -37,30 +40,23 @@ var wbld = {
             return;
         }
 
-        // add loading bar
-        jQuery('#' + id).append(`
-            <div class="widget-container" id="loading-bar">
-                <div class="loading-bar-text-editor">
-                    <p class="p-box">We are downloading your widget!</p>
-                    <div class="progress">
-                        <div class="bar"></div>
-                        <div class="label">0%</div>
-                    </div>
-                </div>
-            </div>
-        `);
-
-        // start progress bar
-        startLoadingProgressBar(200);
+        // start loading progress bar
+        wbld.loadingBar = new loadingBar('loading-bar', this.id, 'We are downloading your widget!');
+        wbld.loadingBar.start(speed=200);
 
         // set widget name
         this.widget_name = widget_name;
 
-        // get domain name
+        // get domain name and url
         this.widget_domain = location.hostname;
+        this.widget_url = location.href;
 
         // get url params
         url_search_params = new URLSearchParams(window.location.search);
+        if (url_search_params.get('project_id')) {
+            this.project_id = url_search_params.get('project_id');
+        }
+
         if (url_search_params.get('partner_id')) {
             this.partner_id = url_search_params.get('partner_id');
         }
@@ -77,6 +73,7 @@ var wbld = {
             "property_size": url_params.get('property_size'),
             "bedrooms": url_params.get('bedrooms'),
             "search": url_params.get('search'),
+            "project_id": this.project_id,
         };
         //console.log("data:", data);
         jQuery.ajax({
@@ -86,22 +83,28 @@ var wbld = {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response) {
-                if (response.data.widget_status == 'active') {
-                    // start widget draw
-                    start(
-                        response.data.widget_addresses,
-                        response.data.widget_address_address,
-                        response.data.widget_address_id,
-                        response.data.widget_layout_id,
-                        response.data.widget_n_bedrooms,
-                        response.data.widget_budgets,
-                        response.data.widget_styles,
-                        response.data.widget_shops,
-                        response.data.widget_parameters,
-                    );
-                } else {
+                if (response.data.widget_status != 'active') {
                     console.log(`Widget widget_name="${widget_name}" status is not active`);
+                    return;
                 }
+
+                // get project_json and parse it
+                if (response.data.widget_project_json != "no_data") {
+                    wbld.project_json = JSON.parse(response.data.widget_project_json);
+                }
+
+                // start widget draw
+                start(
+                    response.data.widget_addresses,
+                    response.data.widget_address_address,
+                    response.data.widget_address_id,
+                    response.data.widget_layout_id,
+                    response.data.widget_n_bedrooms,
+                    response.data.widget_budgets,
+                    response.data.widget_styles,
+                    response.data.widget_shops,
+                    response.data.widget_parameters,
+                );
             },
             error: function(error) {
                 if (error.status === 404) {
@@ -122,6 +125,83 @@ var wbld = {
     }
 };
 
+class loadingBar {
+    constructor(id, parent_id, text) {
+        this.id = id;
+        this.parent_id = parent_id;
+        this.text = text;
+        this.intervalId = 0;
+        this.progress = 0;
+        this.div = this.createDiv();
+        this.appendToParent();
+    }
+
+    createDiv() {
+        const div = document.createElement('div');
+        div.id = this.id;
+        div.className = 'widget-container';
+        div.innerHTML = `
+            <div class="text-editor">
+                <p class="p-box">${this.text}</p>
+                <div class="progress">
+                    <div class="bar"></div>
+                    <div class="label">0%</div>
+                </div>
+            </div>
+        `;
+        return div;
+    }
+
+    appendToParent() {
+        const parent = document.getElementById(this.parent_id);
+        parent.appendChild(this.div);
+    }
+
+    start(speed) {
+        this.div.style.display = 'block';
+        clearInterval(this.intervalId);
+        this.intervalId = setInterval(() => {
+            this.progress += 1;
+            this.update();
+            if (this.progress === 100) { 
+                clearInterval(this.intervalId);
+                this.div.style.display = 'none';
+                this.progress = 0;
+                this.update();
+            }
+        }, speed);
+    }
+
+    update() {
+        this.div.querySelector('.bar').style.maxWidth = `${this.progress}%`;
+        this.div.querySelector('.label').innerHTML = `${this.progress}%`;
+    }
+}
+
+class progressBar extends loadingBar {
+    constructor(id, parent_id, text) {
+        super(id, parent_id, text);
+    }
+
+    start(speed) {
+        this.div.style.display = 'block';
+        const generateBtnBlock = document.getElementById('generate-btn-block');
+        generateBtnBlock.style.display = 'none';
+        clearInterval(this.intervalId);
+        this.intervalId = setInterval(() => {
+            this.progress += 1;
+            this.update();
+            if (this.progress === 100) { 
+                clearInterval(this.intervalId);
+                this.div.style.display = 'none';
+                generateBtnBlock.style.display = 'block';
+                this.progress = 0;
+                this.update();
+            }
+        }, speed);
+    }
+}
+
 function start(widget_addresses, widget_address_address, widget_address_id, widget_layout_id, widget_n_bedrooms, widget_budgets, widget_styles, widget_shops, widget_parameters) {
 
     // widget parameters
@@ -135,9 +215,6 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     root.style.setProperty('--widget-font', widget_parameters.widget_font);
     root.style.setProperty('--btn-color', widget_parameters.btn_color);
     root.style.setProperty('--btn-font-color', widget_parameters.btn_font_color);
-
-    // set visitor_id
-    //wbld.visitor_id = visitor_id;
     
     jQuery("#wbld").append(jQuery('<div id="mainbar"></div>'));
     
@@ -234,7 +311,15 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     
     generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
 
-    generate_output();
+    if (wbld.project_id === 'no_data') {
+        generate_output();
+    } else {
+        // finish loadingBar
+        wbld.loadingBar.start(speed=1);
+
+        // imitate click on generate-btn
+        jQuery(`.generate-btn`).click();
+    }
 
     generate_product_popup();
     
@@ -297,10 +382,10 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
                     </div>
 
                     <div class="widget-container">
-                        <button class="generate-btn " style="float: right; width: 220px;" data-click_n=${click_n}>Close and Create Project</button>
+                        <button class="generate-btn" style="float: right; width: 220px;" data-click_n=${click_n}>Close and Create Project</button>
                     </div>
 
-                    <div class="widget-container" id="building-scroll" ${countries_list.find(item => item.selected === 'selected').country_name === "UAE" ? "" : "done"}>
+                    <div class="widget-container done" id="building-scroll">
                         <div class="small-text">Search Layout by Building (Optional)</div>
                         <div class="input-container">
                             <input type="text" id="address-search" placeholder="Search building name..." autocomplete="off">
@@ -362,7 +447,14 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
 
             <div class="widget-container">
                 <div class="small-text">&nbsp;</div> 
-                <button class="generate-btn generate-btn-block" data-click_n=${click_n}>Create Project</button>
+                <button class="generate-btn" data-click_n=${click_n}>Create Project</button>
+                <button class="save-share-btn" id="save-share-btn">
+                    <div class="save-share-btn-text">Share Project</div>
+                    <div class="save-share-btn-icon">
+                        <img src="${wbld.pics + 'share-icon.webp'}" width="79" height="104" alt="Share">
+                    </div>
+                    <div id="copyMessage">Link copied to clipboard</div>
+                </button>
             </div>
 
         </div>
@@ -383,7 +475,7 @@ function generate_output() {
     function imageLoaded() {
         imagesLoaded++;
         if (imagesLoaded === 2) {
-            startLoadingProgressBar(1);
+            wbld.loadingBar.start(speed=1);
         }
     }
 
@@ -456,7 +548,7 @@ function layout_change(address_id, n_bedrooms, n_bedrooms_name, layout_id_select
         success: function(response) {
             if (!response.data.length) {
                 jQuery(".layout-change").html(`
-                    <div class="error-text-editor">
+                    <div class="text-editor">
                         <p class="p-box">No layouts for <b>${n_bedrooms_name}</b>.</p>
                     </div>
                 `);
@@ -644,21 +736,9 @@ function update_output(click_n, address_id, layout_id) {
         return;
     }
     
-    // add progress bar
-    jQuery('#output').append(`
-        <div class="widget-container" id="progress-bar">
-            <div class="text-editor">
-                <p class="p-box">We are selecting furniture that fits your layout!</p>
-                <div class="progress">
-                    <div class="bar"></div>
-                    <div class="label">0%</div>
-                </div>
-            </div>
-        </div>
-    `);
-    
-    // start progress bar
-    startProgressBar(200);
+    // start outputBar
+    const outputBar = new progressBar('progress-bar', 'output', 'We are selecting furniture that fits your layout!');
+    outputBar.start(speed=200);
     
     const min_budget = jQuery(".budget-btn.selected").data( "min_budget" );
     const max_budget = jQuery(".budget-btn.selected").data( "max_budget" );
@@ -666,163 +746,184 @@ function update_output(click_n, address_id, layout_id) {
     const country = jQuery(".country-btn.selected").data( "country_name" );
     const shop = jQuery(".shop-btn.selected").data( "shop_name" );
     
-    jQuery.ajax({
-        url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + country + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
-        type: "GET",
-        cache: false,
-        dataType: "json",
-        success: function(response) {
-            if ( !response.data.address_id ) {
-                jQuery('#output').append(`
-                    <div class="widget-container">
-                        <div class="text-editor">
-                            <p class="p-box">No items for <b>address_id=${address_id}</b> and <b>layout_id=${layout_id}</b>.</p>
-                        </div>
-                    </div>
-                `);
-                
-                startProgressBar(1);
-            
-            } else {
-                
-                let items_n = 0;
-
-                all_possible_products_srcs = [];
-
-                //sort rooms_list by room_position_output ASC
-                response.data.rooms_list.sort((a, b) => a.room_position_output - b.room_position_output);
-                
-                response.data.rooms_list.forEach( function(room) {
-                    
-                    if (room.room_has_moodboard == "Y" && room.products_list.length > 0) {
-
-                        items_n += room.products_list.length;
-                    
-                        jQuery('#output').append(`
-                            <div class="widget-container">
-                                <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
-                                <div class="heading-subtitle total-budget-title"></div>
+    if (wbld.project_id === 'no_data') {
+        jQuery.ajax({
+            url: wbld.api2 + "generate/" + wbld.widget_name + "/" + wbld.visitor_id + "/" + wbld.partner_id + "/" + click_n + "/" + address_id + "/" + layout_id + "/" + style + "/" + country + "/" + shop + "/" + min_budget + "/" + max_budget + "/",
+            type: "GET",
+            cache: false,
+            dataType: "json",
+            success: function(response) {
+                if ( !response.data.address_id ) {
+                    jQuery('#output').append(`
+                        <div class="widget-container">
+                            <div class="text-editor">
+                                <p class="p-box">No items for <b>address_id=${address_id}</b> and <b>layout_id=${layout_id}</b>.</p>
                             </div>
-                        `);
-
-                        const wcDiv = document.createElement('div');
-                        wcDiv.className = 'widget-container';
-
-                        const pmbDiv = document.createElement('div');
-                        pmbDiv.className = 'product-mood-board';
-                        
-                        wcDiv.appendChild(pmbDiv);
-                        jQuery('#output').append(wcDiv);
-
-                        roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-                        pmbDiv.style.height = pmbDiv.offsetWidth * roomMoodboardHeight + 'px';
-
-                        // Assuming room.products_list is an array of objects with the parameter item_significance
-                        room.products_list.sort((a, b) => b.item_significance - a.item_significance);
-                        for (let i = 0; i < room.products_list.length; i++) {
-                            const product = room.products_list[i];
-
-                            const productDiv = document.createElement('div');
-                            productDiv.className = 'product-div';
-
-                            const img = document.createElement('img');
-                            img.src = get_bucket(product.product_image, product.product_shop);
-                            
-                            img.dataset.product = JSON.stringify(product);
-                            img.dataset.product_id = product.product_id;
-                            img.dataset.room_id = room.room_id;
-                            img.dataset.product_price = product.product_price;
-                            img.dataset.product_currency = product.product_currency;
-
-                            // Filter the array based on the condition item_id == product.item_id
-                            // const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
-                            // new version product.item_ids.includes(item.item_id)
-                            const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
-
-                            // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
-                            img.dataset.products_list_total = JSON.stringify(filteredList);
-
-                            // Add all room.products_list_total img src to the array of all possible product images
-                            room.products_list_total.forEach( function (item) {
-                                all_possible_products_srcs.push(get_bucket(item.product_image, item.product_shop));
-                            });
-                            
-                            const grayPoint = document.createElement('div');
-                            grayPoint.className = 'gray-point';
-                            grayPoint.dataset.product = JSON.stringify(product);
-                            grayPoint.dataset.product_id = product.product_id;
-                            grayPoint.dataset.room_id = room.room_id;
-                            grayPoint.dataset.product_price = product.product_price;
-                            grayPoint.dataset.product_currency = product.product_currency;
-                            grayPoint.dataset.products_list_total = JSON.stringify(filteredList);
-                            productDiv.appendChild(grayPoint);
-
-                            if (i == room.products_list.length - 1 && wbld.onboardingClickOn) {
-                                const fingerClick = document.createElement('div');
-                                fingerClick.className = 'finger-click';
-                                const fingerClickImg = document.createElement('img');
-                                fingerClickImg.src = wbld.pics + 'hand-cursor-icon-clip-art-free-png.webp';
-                                fingerClickImg.width = 89;
-                                fingerClickImg.height = 100;
-                                fingerClickImg.alt = 'Click to change image';
-
-                                fingerClickImg.dataset.product = JSON.stringify(product);
-                                fingerClickImg.dataset.product_id = product.product_id;
-                                fingerClickImg.dataset.room_id = room.room_id;
-                                fingerClickImg.dataset.product_price = product.product_price;
-                                fingerClickImg.dataset.product_currency = product.product_currency;
-                                fingerClickImg.dataset.products_list_total = JSON.stringify(filteredList);
-
-                                fingerClick.appendChild(fingerClickImg);
-                                productDiv.appendChild(fingerClick);
-
-                                // Add load event listener to fingerClickImg
-                                items_n += 1;
-                            }
-                            
-                            productDiv.appendChild(img);
-
-                            pmbDiv.appendChild(productDiv);
-                            setCoordinates(productDiv, JSON.parse(product.item_ax));
-                        }
-
-                    }
+                        </div>
+                    `);
                     
-                });
+                    //progressBar.start(speed=10);
+                    outputBar.start(speed=10);
+                
+                } else {
 
-                jQuery(".total-budget-title").text(`Total: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
-                jQuery(".total-budget-title").data("budget_total", response.data.budget_total);
-                
-                // next click number
-                click_n += 1;
-                jQuery(".generate-btn").data("click_n", click_n);
-                
-                // Attach load event listener to each item image
-                const itemImage = jQuery('.product-div img').last();
-                // Was problem. On last image click after request this event was triggered
-                let requestNode = true;
-                itemImage.on('load', function () {
-                    // Check if all item images have finished loading
-                    if (jQuery('.product-div img').length === items_n & requestNode) {
-                        startProgressBar(5);
-                        requestNode = false;
-                    }
-                });
-
-                // Attach click event listener to each item image in all_possible_products_srcs
-                // to push them in cache
-                all_possible_products_srcs.forEach( function (item) {
-                    const img = new Image();
-                    img.src = item;
-                });
-                
+                    // save response to wbld.project_json
+                    wbld.project_json = response;
+                    output_content(response, click_n, outputBar);
+                    
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error:", errorThrown);
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("Error:", errorThrown);
+        });
+    } else {
+        const response = wbld.project_json;
+        output_content(response, click_n, outputBar);
+    }
+    
+}
+
+function output_content(response, click_n, outputBar) {
+    let items_n = 0;
+
+    all_possible_products_srcs = [];
+
+    //sort rooms_list by room_position_output ASC
+    response.data.rooms_list.sort((a, b) => a.room_position_output - b.room_position_output);
+    
+    response.data.rooms_list.forEach( function(room) {
+        
+        if (room.room_has_moodboard == "Y" && room.products_list.length > 0) {
+
+            items_n += room.products_list.length;
+        
+            jQuery('#output').append(`
+                <div class="widget-container">
+                    <div class="heading-subtitle room-budget-title" data-room_id="${room.room_id}" data-room_name="${encodeURIComponent(room.room_name)}" data-room_budget="${room.room_budget}">${room.room_name}: ${Number(room.room_budget).toLocaleString()} ${room.room_budget_currency}</div>
+                    <div class="heading-subtitle total-budget-title"></div>
+                </div>
+            `);
+
+            const wcDiv = document.createElement('div');
+            wcDiv.className = 'widget-container';
+
+            const pmbDiv = document.createElement('div');
+            pmbDiv.className = 'product-mood-board';
+            
+            wcDiv.appendChild(pmbDiv);
+            jQuery('#output').append(wcDiv);
+
+            roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
+            pmbDiv.style.height = pmbDiv.offsetWidth * roomMoodboardHeight + 'px';
+
+            // Assuming room.products_list is an array of objects with the parameter item_significance
+            room.products_list.sort((a, b) => b.item_significance - a.item_significance);
+            for (let i = 0; i < room.products_list.length; i++) {
+                const product = room.products_list[i];
+
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-div';
+
+                const img = document.createElement('img');
+                img.src = get_bucket(product.product_image, product.product_shop);
+                
+                img.dataset.product = JSON.stringify(product);
+                img.dataset.product_id = product.product_id;
+                img.dataset.room_id = room.room_id;
+                img.dataset.product_price = product.product_price;
+                img.dataset.product_currency = product.product_currency;
+                img.dataset.item_ax = product.item_ax;
+
+                // Filter the array based on the condition item_id == product.item_id
+                // const filteredList = room.products_list_total.filter(item => item.item_id === product.item_id);
+                // new version product.item_ids.includes(item.item_id)
+                const filteredList = room.products_list_total.filter(item => product.item_ids.includes(item.item_id));
+                // Loop through the filtered list and add item_ids, item_ax to each item
+                filteredList.forEach(item => {
+                    item.item_ids = product.item_ids;
+                    item.item_ax = product.item_ax;
+                });
+
+                // Convert the filtered array to a string and store it in the 'data-products_list_total' attribute
+                img.dataset.products_list_total = JSON.stringify(filteredList);
+
+                // Add all room.products_list_total img src to the array of all possible product images
+                room.products_list_total.forEach( function (item) {
+                    all_possible_products_srcs.push(get_bucket(item.product_image, item.product_shop));
+                });
+                
+                const grayPoint = document.createElement('div');
+                grayPoint.className = 'gray-point';
+                grayPoint.dataset.product = JSON.stringify(product);
+                grayPoint.dataset.product_id = product.product_id;
+                grayPoint.dataset.room_id = room.room_id;
+                grayPoint.dataset.product_price = product.product_price;
+                grayPoint.dataset.product_currency = product.product_currency;
+                grayPoint.dataset.item_ax = product.item_ax;
+                grayPoint.dataset.products_list_total = JSON.stringify(filteredList);
+                productDiv.appendChild(grayPoint);
+
+                if (i == room.products_list.length - 1 && wbld.onboardingClickOn) {
+                    const fingerClick = document.createElement('div');
+                    fingerClick.className = 'finger-click';
+                    const fingerClickImg = document.createElement('img');
+                    fingerClickImg.src = wbld.pics + 'hand-cursor-icon-clip-art-free-png.webp';
+                    fingerClickImg.width = 89;
+                    fingerClickImg.height = 100;
+                    fingerClickImg.alt = 'Click to change image';
+
+                    fingerClickImg.dataset.product = JSON.stringify(product);
+                    fingerClickImg.dataset.product_id = product.product_id;
+                    fingerClickImg.dataset.room_id = room.room_id;
+                    fingerClickImg.dataset.product_price = product.product_price;
+                    fingerClickImg.dataset.product_currency = product.product_currency;
+                    fingerClickImg.dataset.item_ax = product.item_ax;
+                    fingerClickImg.dataset.products_list_total = JSON.stringify(filteredList);
+
+                    fingerClick.appendChild(fingerClickImg);
+                    productDiv.appendChild(fingerClick);
+
+                    // Add load event listener to fingerClickImg
+                    items_n += 1;
+                }
+                
+                productDiv.appendChild(img);
+
+                pmbDiv.appendChild(productDiv);
+                setCoordinates(productDiv, JSON.parse(product.item_ax));
+            }
+
+        }
+        
+    });
+
+    jQuery(".total-budget-title").text(`Total: ${Number(response.data.budget_total).toLocaleString()} ${response.data.budget_total_currency}`);
+    jQuery(".total-budget-title").data("budget_total", response.data.budget_total);
+    
+    // next click number
+    click_n += 1;
+    jQuery(".generate-btn").data("click_n", click_n);
+    
+    // Attach load event listener to each item image
+    const itemImage = jQuery('.product-div img').last();
+    // Was problem. On last image click after request this event was triggered
+    let requestNode = true;
+    itemImage.on('load', function () {
+        // Check if all item images have finished loading
+        if (jQuery('.product-div img').length === items_n & requestNode) {
+            //progressBar.start(speed=10);
+            outputBar.start(speed=10);
+            requestNode = false;
         }
     });
-    
+
+    // Attach click event listener to each item image in all_possible_products_srcs
+    // to push them in cache
+    all_possible_products_srcs.forEach( function (item) {
+        const img = new Image();
+        img.src = item;
+    });
 }
 
 function send_ajax_request(api, method, data) {
@@ -915,57 +1016,6 @@ function get_url(product_url) {
     return product_url;
 }
 
-function startLoadingProgressBar(speedProgressBar) {
-    let progress = 0;
-    jQuery("#loading-bar").css('display', 'block');
-    clearInterval(wbld.progressBarIntervalId);
-    wbld.progressBarIntervalId = setInterval(() => {
-        progress += 1;
-        updateProgressBar("#loading-bar", progress);
-        if (progress === 100) { 
-            clearInterval(wbld.progressBarIntervalId);
-            jQuery("#loading-bar").css('display', 'none');
-            progress = 0;
-            updateProgressBar("#loading-bar", progress);
-            speedProgressBar = 200;
-        }
-    }, speedProgressBar);
-}
-
-function startProgressBar(speedProgressBar) {
-    let progress = 0;
-    jQuery("#progress-bar").css('display', 'block');
-    jQuery('#generate-btn-block').css('display', 'none');
-    clearInterval(wbld.progressBarIntervalId);
-    wbld.progressBarIntervalId = setInterval(() => {
-        progress += 1;
-        updateProgressBar("#progress-bar", progress);
-        if (progress === 100) { 
-            clearInterval(wbld.progressBarIntervalId);
-            jQuery("#progress-bar").css('display', 'none');
-            jQuery('#generate-btn-block').css('display', 'block');
-            progress = 0;
-            updateProgressBar("#progress-bar", progress);
-            speedProgressBar = 200;
-        }
-    }, speedProgressBar);
-}
-
-function updateProgressBar(id, progress) {
-    const bar = jQuery(id + ' .bar');
-    const label = jQuery(id + ' .label');
-
-    //bar.css('width', `${progress}%`);
-    //bar.css('width', '');
-    bar.css('max-width', `${progress}%`);
-    label.html(`${progress}%`);
-
-    if (progress === 100) {
-        bar.addClass('complete');
-        label.html('Complete!');
-    }
-}
-
 function startWaitBar(wait_bar_id) {
     jQuery('#' + wait_bar_id).css('display', 'block');
     let bar = jQuery(".wait-bar-bar");
@@ -1013,6 +1063,12 @@ jQuery(document).ready(function(){
                     update_output(click_n, address_id, layout_id);
                 });
         }
+
+        // hide generate-btn
+        // show save-share-btn
+        jQuery('#generate-btn-block').css('display', 'none');
+        jQuery('.generate-btn').css('display', 'none');
+        jQuery('#save-share-btn').css('display', 'block');
     });
     
     jQuery(document).on('click', '.filter-btn', function(event) {
@@ -1020,6 +1076,13 @@ jQuery(document).ready(function(){
         
         // change click_n to 0 after each change of filter
         set_zero_click_n();
+
+        // show generate-btn
+        // hide save-share-btn
+        // rest wbld.project_id
+        wbld.project_id = 'no_data';
+        jQuery('.generate-btn').css('display', 'block');
+        jQuery('#save-share-btn').css('display', 'none');
     });
     
     jQuery(document).on('click', '.address-btn', function(event) {
@@ -1214,11 +1277,11 @@ jQuery(document).ready(function(){
         }
 
         // add class done to #building-scroll if counrty_name not UAE
-        if (country_name != "UAE") {
+        /*if (country_name != "UAE") {
             jQuery('#building-scroll').addClass("done");
         } else {
             jQuery('#building-scroll').removeClass("done");
-        }
+        }*/
 
         // send filter button click to API
         data = {
@@ -1331,6 +1394,7 @@ jQuery(document).ready(function(){
         const product_id = product.product_id;
         const productsListTotal = JSON.parse(jQuery(this).attr('data-products_list_total'));
         const room_id = jQuery(this).attr('data-room_id');
+        const item_ax = jQuery(this).attr('data-item_ax');
         
         // Clear the previous content
         jQuery('#product-popup-content').empty();
@@ -1359,7 +1423,7 @@ jQuery(document).ready(function(){
         productsListTotal.forEach(function(product) {
             const dataProduct = JSON.stringify(product);
             const encodedDataProduct = encodeURIComponent(dataProduct);
-            jQuery('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
+            jQuery('#product-popup-list-items').append(`<div id="product-popup-list-item"><img data-product_id_for_change="${product_id}" data-product=${encodedDataProduct} data-room_id=${room_id} data-item_ax_for_change="${item_ax}" src="${get_bucket(product.product_image, product.product_shop)}"/><p>${Number(product.product_price).toLocaleString()} ${product.product_currency}</p></div>`);
         });
 
         if (productsListTotal.length > 2 && wbld.onboardingScrollXOn) {
@@ -1419,26 +1483,31 @@ jQuery(document).ready(function(){
         const decodedDataProduct = decodeURIComponent(jQuery(this).attr('data-product'));
         const product = JSON.parse(decodedDataProduct);
         const product_id_for_change = jQuery(this).attr('data-product_id_for_change');
+        const item_ax_for_change = jQuery(this).attr('data-item_ax_for_change');
         const room_id = jQuery(this).attr('data-room_id');
 
-        const mbProduct = jQuery(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        const mbProduct = jQuery(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
         const ProductPriceOld = mbProduct.attr('data-product_price');
         mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
         mbProduct.attr('data-product', JSON.stringify(product));
         mbProduct.attr('data-product_id', product.product_id);
         mbProduct.attr('data-product_price', product.product_price);
-        mbProduct.attr('data-product_currency', product.product_currency);
+        //mbProduct.attr('data-product_currency', product.product_currency);
+        //mbProduct.attr('data-item_ax', product.item_ax);
 
-        const mbGrayPoint = jQuery(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"]`);
+        const mbGrayPoint = jQuery(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
         mbGrayPoint.attr('data-product', JSON.stringify(product));
         mbGrayPoint.attr('data-product_id', product.product_id);
         mbGrayPoint.attr('data-product_price', product.product_price);
-        mbGrayPoint.attr('data-product_currency', product.product_currency);
+        //mbGrayPoint.attr('data-product_currency', product.product_currency);
+        //mbGrayPoint.attr('data-item_ax', product.item_ax);
 
+        let projectTotalBudget = 0;
         jQuery(".total-budget-title").each(function(index, element) {
             const mbTotalBudget = jQuery(element);
             const mbTotalBudgetValue = mbTotalBudget.data("budget_total");
             const mbTotalBudgetValueNew = mbTotalBudgetValue + (product.product_price - ProductPriceOld) * product.item_amount;
+            projectTotalBudget = mbTotalBudgetValueNew;
             mbTotalBudget.text(`Total: ${Number(mbTotalBudgetValueNew).toLocaleString()} ${product.product_currency}`);
             mbTotalBudget.data("budget_total", mbTotalBudgetValueNew);
         });
@@ -1457,6 +1526,22 @@ jQuery(document).ready(function(){
         // Close finger scroll
         wbld.onboardingScrollXOn = false;
         jQuery('.finger-scroll-x').hide();
+
+        // Change in wbld.project_json
+        // firstly change product in product_list
+        const roomIndex = wbld.project_json.data.rooms_list.findIndex(room => room.room_id === parseInt(room_id));
+        //const productIndex = wbld.project_json.data.rooms_list[roomIndex].products_list.findIndex(product => product.product_id === parseInt(product_id_for_change));
+        const productIndex = wbld.project_json.data.rooms_list[roomIndex].products_list.findIndex(product => {
+            return product.product_id === parseInt(product_id_for_change) && product.item_ax === item_ax_for_change;
+        });
+
+        if (roomIndex !== -1 && productIndex !== -1) {
+            wbld.project_json.data.rooms_list[roomIndex].products_list[productIndex] = product;
+        }
+        // second change room budget
+        wbld.project_json.data.rooms_list[roomIndex].room_budget = roomBudgetValueNew;
+        // third change total budget
+        wbld.project_json.data.budget_total = projectTotalBudget;
 
         // Send product change event
         const data = {
@@ -1549,6 +1634,76 @@ jQuery(document).ready(function(){
             "filter_value": jQuery(this).attr('id')
         };
         send_POST_to_API(wbld.api2, "user_filter_click/", data);
+    });
+
+    // Open Web Share API on save-share-btn click
+    jQuery(document).on('click', '#save-share-btn', function(event) {
+        const visitor_id = wbld.visitor_id;
+        const timestamp = Date.now();
+
+        // Combine visitor ID and timestamp into a single string
+        const hash = `${visitor_id}${timestamp}`;
+        //console.log(`Unique URL hash ${hash}, length ${hash.length}`);
+
+        // get selected shop_name
+        const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
+        let url = wbld.widget_url;
+        if (url.includes("project_id=")) {
+            url = url.replace(/project_id=\w+/, "project_id=" + hash);
+        } else if (url.includes("?")) {
+            url += "&project_id=" + hash;
+        } else {
+            url += "?project_id=" + hash;
+        }
+        const title = 'AI furniture mood boards from ' + shop_name;
+        const text = 'AI furniture mood boards from ' + shop_name;
+
+        const shareData = {
+            title: title,
+            text: text,
+            url: url,
+            //files: [new File(['Furnish-Your-Rooms.webp'], 'https://space.biglayoutdata.com/pics/Furnish-Your-Rooms.webp', { type: 'image/webp' })]
+        }
+        if (navigator.share) {
+            navigator.share(shareData)
+                //.then(() => console.log('Share was successful.'))
+                .catch((error) => console.log('Sharing failed', error));
+        } else {
+            //console.log('Your browser does not support Web Share API');
+
+            // Copy link in clipboard and show copyMessage
+            navigator.clipboard.writeText(url)
+                //.then(() => console.log('Link copied to clipboard'))
+                .catch((error) => console.log('Copy failed', error));
+            
+            jQuery('#copyMessage').css('display', 'block');
+            setTimeout(() => {
+                jQuery('#copyMessage').css('display', 'none');
+            }, 2000);
+
+        }
+
+        // get all filters buttons selected
+        wbld.filters_json = {}
+        wbld.filters_json.country_id = jQuery(".country-btn.selected").data( "country_id" );
+        wbld.filters_json.shop_id = jQuery(".shop-btn.selected").data( "shop_id" );
+        wbld.filters_json.style_id = jQuery(".style-btn.selected").data( "style_id" );
+        wbld.filters_json.budget_id = jQuery(".budget-btn.selected").data( "budget_id" );
+        wbld.filters_json.n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
+        wbld.filters_json.layout_size_layout_id = jQuery(".layout_size-btn.selected").data( "layout_id" );
+        wbld.filters_json.address_id = jQuery(".address-btn.selected").data( "address_id" );
+        wbld.filters_json.layout_id = jQuery("#layout-change").data( "layout_id" );
+
+        // send save-share-btn click to API
+        data = {
+            "widget_name": wbld.widget_name,
+            "visitor_id": wbld.visitor_id,
+            "partner_id": wbld.partner_id,
+            "filters_json": JSON.stringify(wbld.filters_json),
+            "project_id": hash,
+            "project_json": JSON.stringify(wbld.project_json),
+        };
+        send_POST_to_API(wbld.api2, "user_project/", data);
     });
     
 });

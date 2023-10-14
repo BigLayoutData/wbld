@@ -1,3 +1,6 @@
+<?php
+$version = "1.1.0";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +10,21 @@
     <title>Furnish Your Rooms from Store Next Door Using AI</title>
     <meta name="description" content="Furnish Rooms Using AI from IKEA, Home Centre, Home Box, West Elm, Pottery Barn, Danube Home, OC Home.">
     <meta name="keywords" content="furniture, select furniture, ai interior design, ai interior, ai design, ai tool for furnishing, Home Centre, IKEA, Home Box, Danube Home, OC Home, West Elm, Pottery Barn">
+    <meta property="og:title" content="Furnish Your Rooms from Store Next Door Using AI">
+    <meta property="og:description" content="Furnish Rooms Using AI from IKEA, Home Centre, Home Box, West Elm, Pottery Barn, Danube Home, OC Home.">
+    <meta property="og:url" content="https://widget.biglayoutdata.com">
+    <meta property="og:image" content="https://space.biglayoutdata.com/pics/Furnish-Your-Rooms.webp">
     <link rel="canonical" href="https://widget.biglayoutdata.com" />
 
     <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript">
-    <link rel="preload" as="script" href="widget.js?v=1.0.1" type="text/javascript">
-    <link rel="preload" as="style" href="widget.css?v=1.0.1" type="text/css">
+    <link rel="preload" as="script" href="widget.js?v=<?php echo $version; ?>" type="text/javascript">
+    <link rel="preload" as="style" href="widget.css?v=<?php echo $version; ?>" type="text/css">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
+
+    <?php if (!isset($_GET['project_id'])) { ?>
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">
     <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/neoclassic.webp" type="image/webp">
+    <?php } ?>
 </head>
 <body>
     <div id="logo" style="max-width: 165px; margin-left: calc(50% - 173px);">
@@ -28,7 +38,7 @@
     <script type="text/javascript">
         jQuery(document).ready(function($) {
             var scriptElement = document.createElement('script');
-            scriptElement.src = 'widget.js?v=1.0.1';
+            scriptElement.src = 'widget.js?v=<?php echo $version; ?>';
             scriptElement.type = 'text/javascript';
             scriptElement.async = true;
             scriptElement.onload = function() {
@@ -38,7 +48,7 @@
             document.body.appendChild(scriptElement);
         });
     </script>
-    <link rel="stylesheet" href="widget.css?v=1.0.1" type="text/css" />
+    <link href="widget.css?v=<?php echo $version; ?>" rel="stylesheet" type="text/css">
     <!-- BigLayoutData widget (widget.js) -->
 
     <!-- Google tag (gtag.js) -->

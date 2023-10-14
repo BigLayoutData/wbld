@@ -71,7 +71,7 @@
 }
 
 /* --> Onboarding and text editor styles */
-.text-editor, .loading-bar-text-editor, .error-text-editor {
+.text-editor {
     float: left;
     box-sizing: border-box;
     width: 100%;
@@ -515,7 +515,7 @@ body.no-scroll {
     text-overflow: ellipsis;
 }
 
-.generate-btn {
+.generate-btn, .save-share-btn {
     width: 165px;
     font-size: var(--normal-text-size);
     font-weight: var(--normal-text-weight-bold);
@@ -529,8 +529,40 @@ body.no-scroll {
     text-align: center;
     cursor: pointer;
 }
+.save-share-btn {
+    display: none;
+    position: relative;
+}
+.save-share-btn-text {
+    float: left;
+    width: calc(100% - 13px - 10px);
+}
+.save-share-btn-icon {
+    float: left;
+    width: 13px;
+    height: 16px;
+}
+.save-share-btn-icon img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+#copyMessage {
+    display: none;
+    position: absolute;
+    top: -35px; /* Position above the button */
+    left: 0%;
+    background-color: #f0f0f0; /* Slightly gray background */
+    font-size: var(--small-text-size);
+    font-weight: var(--small-text-weight);
+    padding: 5px 10px; /* Adjust padding as needed */
+    border: 1px solid #ccc; /* Small border */
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Small shadow */
+    border-radius: 5px; /* Rounded corners */
+    white-space: nowrap; /* Prevent line breaks */
+}
 @media (hover: hover) {
-.generate-btn:hover {
+.generate-btn:hover, .save-share-btn:hover {
     border-color: var(--btn-color);
 }
 }
@@ -681,7 +713,7 @@ body.no-scroll {
     display: none;
 
     position: absolute;
-    top: 170px;
+    top: 155px;
     left: 0;
     z-index: 999;
     background-color: #FFFFFF;
