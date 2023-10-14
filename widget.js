@@ -1668,20 +1668,19 @@ jQuery(document).ready(function(){
             navigator.share(shareData)
                 //.then(() => console.log('Share was successful.'))
                 .catch((error) => console.log('Sharing failed', error));
-        } else {
-            //console.log('Your browser does not support Web Share API');
-
-            // Copy link in clipboard and show copyMessage
-            navigator.clipboard.writeText(url)
-                //.then(() => console.log('Link copied to clipboard'))
-                .catch((error) => console.log('Copy failed', error));
-            
-            jQuery('#copyMessage').css('display', 'block');
-            setTimeout(() => {
-                jQuery('#copyMessage').css('display', 'none');
-            }, 2000);
-
         }
+
+        //console.log('Your browser does not support Web Share API');
+
+        // Copy link in clipboard and show copyMessage
+        navigator.clipboard.writeText(url)
+            //.then(() => console.log('Link copied to clipboard'))
+            .catch((error) => console.log('Copy failed', error));
+        
+        jQuery('#copyMessage').css('display', 'block');
+        setTimeout(() => {
+            jQuery('#copyMessage').css('display', 'none');
+        }, 2000);
 
         // get all filters buttons selected
         wbld.filters_json = {}
