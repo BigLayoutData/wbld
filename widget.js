@@ -217,7 +217,6 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     root.style.setProperty('--btn-font-color', widget_parameters.btn_font_color);
     
     jQuery("#wbld").append(jQuery('<div id="mainbar"></div>'));
-    
     jQuery("#mainbar").append(jQuery('<div id="input"></div>'));
     jQuery("#input").append(jQuery('<div id="input-line-1"></div>'));
     jQuery("#input").append(jQuery('<div id="input-line-2"></div>'));
@@ -254,40 +253,6 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     widget_styles = decodeURIComponent(widget_styles);
     const styles_list = JSON.parse(widget_styles);
 
-    // widget countries
-    widget_shops = decodeURIComponent(widget_shops);
-    const countries_list = JSON.parse(widget_shops);
-
-    // get country_name from wbld.widget_domain
-    // change countries_list.selected if needed
-    if (["uae", "ksa"].includes(wbld.widget_domain.split('-')[0])) {
-        countries_list.forEach(function(item) {
-            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
-                item.selected = 'selected';
-            } else {
-                item.selected = '';
-            }
-        });
-    } else {
-        if (countries_list.length > 1) {
-            fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
-                .then((response) => response.json())
-                .then(
-                    (jsonResponse) =>
-                    countries_list.forEach(function(item) {
-                        if (item.country_code === jsonResponse.country) {
-                            item.selected = 'selected';
-                        } else {
-                            item.selected = '';
-                        }
-                    })
-                )
-        }
-    }
-
-    // widget shops
-    const shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
-
     // sort addresses_list by address_address ASC
     addresses_list.sort((a, b) => {
         // Assuming `address_address` is a string, for alphanumeric sorting
@@ -308,22 +273,54 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
             item.address_done = 'done';
         }   
     });
-    
-    generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
 
-    if (wbld.project_id === 'no_data') {
-        generate_output();
-    } else {
-        // finish loadingBar
-        wbld.loadingBar.start(speed=1);
+    // widget countries
+    widget_shops = decodeURIComponent(widget_shops);
+    const countries_list = JSON.parse(widget_shops);
+    let shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
 
-        // imitate click on generate-btn
-        jQuery(`.generate-btn`).click();
+    // get country_name from wbld.widget_domain
+    // change countries_list.selected if needed
+    // if share loading - not needed to change countries_list.selected
+    if (wbld.project_id !== 'no_data') {
+        generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
+        return;
     }
 
-    generate_product_popup();
-    
-    generate_poweredby();
+    // if standart loading
+    if (["uae", "ksa", "usa"].includes(wbld.widget_domain.split('-')[0])) {
+        countries_list.forEach(function(item) {
+            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
+                item.selected = 'selected';
+            } else {
+                item.selected = '';
+            }
+        });
+
+        shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
+        generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
+    } else {
+        if (countries_list.length > 1) {
+            fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
+                .then((response) => response.json())
+                .then((jsonResponse) => {
+                    if (["AE", "SA", "US"].includes(jsonResponse.country)) {
+                        countries_list.forEach(function(item) {
+                            if (item.country_code === jsonResponse.country) {
+                                item.selected = 'selected';
+                            } else {
+                                item.selected = '';
+                            }
+                        });
+                    }
+                    shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
+                    generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
+                })
+                .catch((error) => {
+                  console.error('Error fetching IP information:', error);
+                });
+        }
+    }
 }
 
 function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n) {
@@ -459,6 +456,21 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
 
         </div>
     `);
+
+    // Start generate_output if project_id is no_data
+    if (wbld.project_id === 'no_data') {
+        generate_output();
+    } else {
+        // finish loadingBar
+        wbld.loadingBar.start(speed=1);
+
+        // imitate click on generate-btn
+        jQuery(`.generate-btn`).click();
+    }
+
+    generate_product_popup();
+    
+    generate_poweredby();
     
     // Update layout based on address and number of bedrooms
     layout_change(
@@ -467,6 +479,7 @@ function generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, 
         n_bedrooms_list.find(item => item.selected === 'selected').n_bedrooms_name, 
         layout_id
     );
+
 }
 
 function generate_output() {
@@ -474,7 +487,7 @@ function generate_output() {
     let imagesLoaded = 0;
     function imageLoaded() {
         imagesLoaded++;
-        if (imagesLoaded === 2) {
+        if (imagesLoaded === 3) {
             wbld.loadingBar.start(speed=1);
         }
     }
@@ -504,6 +517,8 @@ function generate_output() {
 
     // Attach load event listener to each image
     jQuery(".onboarding-images img").on("load", imageLoaded);
+    // Attach load event listener to save-share-btn-icon image
+    jQuery(".save-share-btn-icon img").on("load", imageLoaded);
 }
 
 function generate_product_popup() {
