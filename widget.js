@@ -1409,7 +1409,7 @@ jQuery(document).ready(function(){
             <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
             <div class="product-popup-info-product-link-btn">
                 <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
-                    <button class="link-btn">Product Details</button>
+                    <button class="link-btn">Link to Store</button>
                 </a>
             </div>
         </div>
@@ -1681,6 +1681,8 @@ jQuery(document).ready(function(){
         setTimeout(() => {
             jQuery('#copyMessage').css('display', 'none');
         }, 2000);
+
+
 
         // get all filters buttons selected
         wbld.filters_json = {}
