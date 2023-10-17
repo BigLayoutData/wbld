@@ -826,6 +826,7 @@ function output_content(response, click_n, outputBar) {
                 productDiv.className = 'product-div';
 
                 const img = document.createElement('img');
+                img.className = 'product-div-img';
                 img.src = get_bucket(product.product_image, product.product_shop);
                 
                 img.dataset.product = JSON.stringify(product);
@@ -853,7 +854,7 @@ function output_content(response, click_n, outputBar) {
                     all_possible_products_srcs.push(get_bucket(item.product_image, item.product_shop));
                 });
                 
-                const grayPoint = document.createElement('div');
+                /*const grayPoint = document.createElement('div');
                 grayPoint.className = 'gray-point';
                 grayPoint.dataset.product = JSON.stringify(product);
                 grayPoint.dataset.product_id = product.product_id;
@@ -862,7 +863,34 @@ function output_content(response, click_n, outputBar) {
                 grayPoint.dataset.product_currency = product.product_currency;
                 grayPoint.dataset.item_ax = product.item_ax;
                 grayPoint.dataset.products_list_total = JSON.stringify(filteredList);
-                productDiv.appendChild(grayPoint);
+                productDiv.appendChild(grayPoint);*/
+
+                const cartIcon = document.createElement('div');
+                cartIcon.className = 'cart-icon';
+                const cartIconImg = document.createElement('img');
+                cartIconImg.className = 'cart-icon-img';
+                cartIconImg.src = wbld.pics + 'cart-icon.webp';
+                cartIconImg.width = 32;
+                cartIconImg.height = 32;
+                cartIconImg.alt = 'Link to Store';
+                
+                const cartIconA = document.createElement('a');
+                cartIconA.href = get_url(product.product_url);
+                cartIconA.target = '_blank';
+                cartIconA.rel = 'noopener';
+                cartIconA.className = 'btn-product-link';
+                cartIconA.dataset.product_id = product.product_id;
+                cartIconA.dataset.product_sku = product.product_sku;
+                cartIconA.dataset.product_name = product.product_name;
+                cartIconA.dataset.product_price = product.product_price;
+                cartIconA.dataset.product_currency = product.product_currency;
+                cartIconA.dataset.item_name = product.item_name;
+                cartIconA.dataset.item_amount = product.item_amount;
+                cartIconA.dataset.item_ax = product.item_ax;
+                cartIconA.dataset.room_id = room.room_id;
+                cartIconA.appendChild(cartIconImg);
+                cartIcon.appendChild(cartIconA);
+                productDiv.appendChild(cartIcon);
 
                 if (i == room.products_list.length - 1 && wbld.onboardingClickOn) {
                     const fingerClick = document.createElement('div');
@@ -885,7 +913,7 @@ function output_content(response, click_n, outputBar) {
                     productDiv.appendChild(fingerClick);
 
                     // Add load event listener to fingerClickImg
-                    items_n += 1;
+                    //items_n += 1;
                 }
                 
                 productDiv.appendChild(img);
@@ -906,12 +934,12 @@ function output_content(response, click_n, outputBar) {
     jQuery(".generate-btn").data("click_n", click_n);
     
     // Attach load event listener to each item image
-    const itemImage = jQuery('.product-div img').last();
+    const itemImage = jQuery('img.product-div-img').last();
     // Was problem. On last image click after request this event was triggered
     let requestNode = true;
     itemImage.on('load', function () {
         // Check if all item images have finished loading
-        if (jQuery('.product-div img').length === items_n & requestNode) {
+        if (jQuery('img.product-div-img').length === items_n & requestNode) {
             //progressBar.start(speed=10);
             outputBar.start(speed=10);
             requestNode = false;
@@ -1361,7 +1389,6 @@ jQuery(document).ready(function(){
     });
     
     jQuery(document).on('click', 'a.btn-product-link', function(event) {
-        
         const product_url = jQuery(this).attr('href');
         const product_id = jQuery(this).attr('data-product_id');
         const product_sku = jQuery(this).attr('data-product_sku');
@@ -1389,7 +1416,7 @@ jQuery(document).ready(function(){
     });
 
     //open product change popup on product image click
-    jQuery(document).on('click', '.product-div img, .gray-point', function(event) {
+    jQuery(document).on('click', '.product-div-img, .gray-point', function(event) {
         const product = JSON.parse(jQuery(this).attr('data-product'));
         const product_id = product.product_id;
         const productsListTotal = JSON.parse(jQuery(this).attr('data-products_list_total'));
@@ -1486,7 +1513,7 @@ jQuery(document).ready(function(){
         const item_ax_for_change = jQuery(this).attr('data-item_ax_for_change');
         const room_id = jQuery(this).attr('data-room_id');
 
-        const mbProduct = jQuery(`.product-div img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
+        const mbProduct = jQuery(`.product-div-img[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
         const ProductPriceOld = mbProduct.attr('data-product_price');
         mbProduct.attr('src', get_bucket(product.product_image, product.product_shop));
         mbProduct.attr('data-product', JSON.stringify(product));
@@ -1495,12 +1522,21 @@ jQuery(document).ready(function(){
         //mbProduct.attr('data-product_currency', product.product_currency);
         //mbProduct.attr('data-item_ax', product.item_ax);
 
-        const mbGrayPoint = jQuery(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
+        /*const mbGrayPoint = jQuery(`.gray-point[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
         mbGrayPoint.attr('data-product', JSON.stringify(product));
         mbGrayPoint.attr('data-product_id', product.product_id);
         mbGrayPoint.attr('data-product_price', product.product_price);
         //mbGrayPoint.attr('data-product_currency', product.product_currency);
-        //mbGrayPoint.attr('data-item_ax', product.item_ax);
+        //mbGrayPoint.attr('data-item_ax', product.item_ax);*/
+        const mbCartIcon = jQuery(`.cart-icon a[data-product_id="${product_id_for_change}"][data-room_id="${room_id}"][data-item_ax="${item_ax_for_change}"]`);
+        mbCartIcon.attr('href', get_url(product.product_url));
+        mbCartIcon.attr('data-product_id', product.product_id);
+        mbCartIcon.attr('data-product_sku', product.product_sku);
+        mbCartIcon.attr('data-product_name', product.product_name);
+        mbCartIcon.attr('data-product_price', product.product_price);
+        //mbCartIcon.attr('data-product_currency', product.product_currency);
+        mbCartIcon.attr('data-item_name', product.item_name);
+        mbCartIcon.attr('data-item_amount', product.item_amount);
 
         let projectTotalBudget = 0;
         jQuery(".total-budget-title").each(function(index, element) {

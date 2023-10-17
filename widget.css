@@ -791,6 +791,23 @@ body.no-scroll {
         height: 14px;
     }
 }
+.cart-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px;
+    cursor: pointer;
+}
+@media (hover: hover) {
+    .cart-icon:hover {
+        width: 24px;
+        height: 24px;
+    }
+}
 .finger-click {
     position: absolute;
     left: 30%;
