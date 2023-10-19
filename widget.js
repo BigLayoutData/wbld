@@ -288,7 +288,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     }
 
     // if standart loading
-    if (["uae", "ksa", "usa"].includes(wbld.widget_domain.split('-')[0])) {
+    if (["uae", "ksa", "usa", "ind"].includes(wbld.widget_domain.split('-')[0])) {
         countries_list.forEach(function(item) {
             if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
                 item.selected = 'selected';
@@ -304,7 +304,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
             fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
                 .then((response) => response.json())
                 .then((jsonResponse) => {
-                    if (["AE", "SA", "US"].includes(jsonResponse.country)) {
+                    if (["AE", "SA", "US", "IN"].includes(jsonResponse.country)) {
                         countries_list.forEach(function(item) {
                             if (item.country_code === jsonResponse.country) {
                                 item.selected = 'selected';
