@@ -282,7 +282,7 @@ function start(widget_addresses, widget_address_address, widget_address_id, widg
     // get country_name from wbld.widget_domain
     // change countries_list.selected if needed
     // if share loading - not needed to change countries_list.selected
-    if (wbld.project_id !== 'no_data') {
+    if (wbld.project_id !== 'no_data' || countries_list.length === 1) {
         generate_input(addresses_list, address_id, layout_id, n_bedrooms_list, countries_list, shops_list, styles_list, budgets_list, click_n);
         return;
     }
