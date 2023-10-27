@@ -1,5 +1,5 @@
 <?php
-$version = "1.3.1";
+$version = "1.4.0";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,8 +22,12 @@ $version = "1.3.1";
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
 
     <?php if (!isset($_GET['project_id'])) { ?>
-    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/contemporary.webp" type="image/webp">
-    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/neoclassic.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-1.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-2.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-3.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-4.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-5.webp" type="image/webp">
+    <link rel="preload" as="image" href="https://space.biglayoutdata.com/pics/bld-inspiring-pic-6.webp" type="image/webp">
     <?php } ?>
 </head>
 <body>
