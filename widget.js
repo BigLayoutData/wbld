@@ -697,7 +697,12 @@ function output_content(response, outputBar) {
             jQuery('#output').append(wcDiv);
 
             const roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-            pmbDiv.style.height = pmbDiv.offsetWidth * roomMoodboardHeight + 'px';
+            let roomMoodboardWidth = pmbDiv.offsetWidth;
+            if (roomMoodboardWidth == 0) {
+                const output = document.getElementById('output');
+                roomMoodboardWidth = output.offsetWidth;
+            }
+            pmbDiv.style.height = roomMoodboardWidth * roomMoodboardHeight + 'px';
 
             // Assuming room.products_list is an array of objects with the parameter item_significance
             room.products_list.sort((a, b) => b.item_significance - a.item_significance);
