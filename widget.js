@@ -692,7 +692,13 @@ function output_content(response, outputBar) {
 
             const pmbDiv = document.createElement('div');
             pmbDiv.className = 'product-mood-board';
+
+            const tempDiv = document.createElement('div');
+            tempDiv.id = 'tempDiv';
+            tempDiv.style.height = '100px';
+            tempDiv.style.width = '100%';
             
+            pmbDiv.appendChild(tempDiv);
             wcDiv.appendChild(pmbDiv);
             jQuery('#output').append(wcDiv);
 
@@ -791,6 +797,9 @@ function output_content(response, outputBar) {
                 pmbDiv.appendChild(productDiv);
                 setCoordinates(productDiv, JSON.parse(product.item_ax));
             }
+
+            // Remove tempDiv
+            tempDiv.remove();
 
         }
         
