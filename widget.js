@@ -566,10 +566,8 @@ function generate_poweredby() {
 }
 
 function setCoordinates(element, coords) {
-    // const parentWidth = element.parentNode.offsetWidth;
-    // const parentHeight = element.parentNode.offsetHeight;
-    const parentWidth = element.parentNode.getBoundingClientRect().width;
-    const parentHeight = element.parentNode.getBoundingClientRect().height;
+    const parentWidth = element.parentNode.offsetWidth;
+    const parentHeight = element.parentNode.offsetHeight;
   
     const x = coords[0] * parentWidth;
     const y =  ( 1 - coords[1] - coords[3] ) * parentHeight;
@@ -699,7 +697,10 @@ function output_content(response, outputBar) {
             jQuery('#output').append(wcDiv);
 
             const roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-            let roomMoodboardWidth = pmbDiv.getBoundingClientRect().width;
+            let roomMoodboardWidth = pmbDiv.offsetWidth;
+            if (roomMoodboardWidth == 0) {
+                roomMoodboardWidth = 346;
+            }
             pmbDiv.style.height = roomMoodboardWidth * roomMoodboardHeight + 'px';
 
             // Assuming room.products_list is an array of objects with the parameter item_significance
