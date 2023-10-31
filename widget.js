@@ -697,6 +697,7 @@ function output_content(response, outputBar) {
             tempDiv.id = 'tempDiv';
             tempDiv.style.height = '100px';
             tempDiv.style.width = '100%';
+            tempDiv.innerHTML = '&nbsp;';
             
             pmbDiv.appendChild(tempDiv);
             wcDiv.appendChild(pmbDiv);
