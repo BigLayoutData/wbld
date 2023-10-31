@@ -697,7 +697,9 @@ function output_content(response, outputBar) {
             jQuery('#output').append(wcDiv);
 
             const roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-            const roomMoodboardWidth = pmbDiv.clientWidth;
+            // const roomMoodboardWidth = pmbDiv.clientWidth;
+            const pmbDivComputedStyle = window.getComputedStyle(pmbDiv);
+            const roomMoodboardWidth = parseInt(pmbDivComputedStyle.getPropertyValue('width'));
             pmbDiv.style.height = roomMoodboardWidth * roomMoodboardHeight + 'px';
 
             // Assuming room.products_list is an array of objects with the parameter item_significance
