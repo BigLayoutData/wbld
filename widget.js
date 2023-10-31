@@ -697,9 +697,10 @@ function output_content(response, outputBar) {
             jQuery('#output').append(wcDiv);
 
             const roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-            // const roomMoodboardWidth = pmbDiv.clientWidth;
-            const pmbDivComputedStyle = window.getComputedStyle(pmbDiv);
-            const roomMoodboardWidth = parseInt(pmbDivComputedStyle.getPropertyValue('width'));
+            const outputDivComputedStyle = window.getComputedStyle(document.getElementById('output'));
+            const roomMoodboardWidth = parseInt(outputDivComputedStyle.getPropertyValue('width'));
+            console.log("roomMoodboardWidth:", roomMoodboardWidth);
+            console.log("roomMoodboardOffsetWidth:", pmbDiv.offsetWidth);
             pmbDiv.style.height = roomMoodboardWidth * roomMoodboardHeight + 'px';
 
             // Assuming room.products_list is an array of objects with the parameter item_significance
