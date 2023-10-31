@@ -22,6 +22,7 @@
     display: table;
     width: 100%;
     max-width: 650px;
+    min-height: 1000px;
     font-family: var(--widget-font);
     line-height: 1.25;
     margin: 0 auto;
