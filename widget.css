@@ -64,11 +64,18 @@
     width: 173px;
     padding-left: 8px;
 }
-#before_output, #output {
+#before_output{
+    float: left;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 1230px;
+}
+#output {
     float: left;
     box-sizing: border-box;
     width: 100%;
 }
+
 
 /* --> Onboarding and text editor styles */
 .text-editor {

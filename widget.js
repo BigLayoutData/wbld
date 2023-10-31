@@ -18,8 +18,8 @@ var wbld = {
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     products_bucket: 'https://space.biglayoutdata.com/products_',
     // some const for api urls
-    api1: 'https://api1.biglayoutdata.com/',
-    api2: 'https://api.biglayoutdata.com/',
+    api1: 'https://api.biglayoutdata.com/',
+    api2: 'https://api1.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
@@ -188,10 +188,7 @@ class loadingBar {
             this.progress += 1;
             this.update();
             if (this.progress === 100) { 
-                clearInterval(this.intervalId);
-                this.div.style.display = 'none';
-                this.progress = 0;
-                this.update();
+                this.finish();
             }
         }, speed);
     }
@@ -199,6 +196,13 @@ class loadingBar {
     update() {
         this.div.querySelector('.bar').style.maxWidth = `${this.progress}%`;
         this.div.querySelector('.label').innerHTML = `${this.progress}%`;
+    }
+
+    finish() {
+        clearInterval(this.intervalId);
+        this.div.style.display = 'none';
+        this.progress = 0;
+        this.update();
     }
 }
 
@@ -214,15 +218,21 @@ class progressBar extends loadingBar {
         clearInterval(this.intervalId);
         this.intervalId = setInterval(() => {
             this.progress += 1;
+            speed += 10;
             this.update();
             if (this.progress === 100) { 
-                clearInterval(this.intervalId);
-                this.div.style.display = 'none';
-                generateBtnBlock.style.display = 'block';
-                this.progress = 0;
-                this.update();
+                this.finish();
             }
         }, speed);
+    }
+
+    finish() {
+        clearInterval(this.intervalId);
+        this.div.style.display = 'none';
+        const generateBtnBlock = document.getElementById('generate-btn-block');
+        generateBtnBlock.style.display = 'block';
+        this.progress = 0;
+        this.update();
     }
 }
 
@@ -429,7 +439,7 @@ function generate_input(n_bedrooms_list, countries_list, shops_list, budgets_lis
     } else {
         generate_before_output(display='none');
         // finish loadingBar
-        wbld.loadingBar.start(speed=1);
+        wbld.loadingBar.finish();
 
         // imitate click on generate-btn
         jQuery(`.generate-btn`).click();
@@ -448,7 +458,7 @@ function generate_before_output() {
     function imageLoaded() {
         imagesLoaded++;
         if (imagesLoaded === 7) {
-            wbld.loadingBar.start(speed=1);
+            wbld.loadingBar.finish();
         }
     }
 
@@ -619,7 +629,7 @@ function update_output() {
         }
 
         jQuery.ajax({
-            url: `${wbld.api2}generate/`,
+            url: `${wbld.api1}generate/`,
             type: "POST", // Use POST method to send data
             data: formData, // Send the FormData object
             cache: false,
@@ -636,7 +646,8 @@ function update_output() {
                         </div>
                     `);
 
-                    outputBar.start(speed = 10);
+                    // outputBar.start(speed = 10);
+                    outputBar.finish();
                 } else {
                     // save response to wbld.project_json
                     wbld.project_json = response;
@@ -793,7 +804,7 @@ function output_content(response, outputBar) {
         <div class="widget-container">
             <div class="output-btns">
                 <button class="output-btn-left" id="back-to-before-output-btn">Upload new image</button>
-                <!--<button class="output-btn-right" id="download-pdf-btn">List of products in PDF</button>-->
+                <button class="output-btn-right" id="download-pdf-btn">List of products in PDF</button>
             </div>
         </div>
     `);
@@ -806,7 +817,8 @@ function output_content(response, outputBar) {
     itemImage.on('load', function () {
         // Check if all item images have finished loading
         if (jQuery('img.product-div-img').length === items_n & requestNode) {
-            outputBar.start(speed=10);
+            // outputBar.start(speed=10);
+            outputBar.finish();
             requestNode = false;
         }
     });
@@ -1186,6 +1198,11 @@ jQuery(document).ready(function(){
         // Add the 'no-scroll' class to the body to prevent scrolling on the background content
         jQuery('body').addClass('no-scroll');
 
+        // Close finger point and send product change event
+        if (!wbld.onboardingClickOn) {
+            return;
+        }
+
         // Close finger point
         wbld.onboardingClickOn = false;
         jQuery('.finger-click').hide();
@@ -1266,10 +1283,6 @@ jQuery(document).ready(function(){
         // Remove the 'no-scroll' class from the body to allow scrolling on the background content
         jQuery('body').removeClass('no-scroll');
 
-        // Close finger scroll
-        wbld.onboardingScrollXOn = false;
-        jQuery('.finger-scroll-x').hide();
-
         // Change in wbld.project_json
         // firstly change product in product_list
         const roomIndex = wbld.project_json.data.rooms_list.findIndex(room => room.room_id === parseInt(room_id));
@@ -1285,6 +1298,15 @@ jQuery(document).ready(function(){
         wbld.project_json.data.rooms_list[roomIndex].room_budget = roomBudgetValueNew;
         // third change total budget
         wbld.project_json.data.budget_total = projectTotalBudget;
+
+        // Close finger scroll and send product change event
+        if (!wbld.onboardingScrollXOn) {
+            return;
+        }
+
+        // Close finger scroll
+        wbld.onboardingScrollXOn = false;
+        jQuery('.finger-scroll-x').hide();
 
         // Send product change event
         const data = {
@@ -1421,7 +1443,7 @@ jQuery(document).ready(function(){
             "project_id": hash,
             "project_json": JSON.stringify(wbld.project_json),
         };
-        send_POST_to_API(wbld.api2, "user_project/", data);
+        send_POST_to_API(wbld.api1, "user_project/", data);
     });
 
     // back-to-before-output-btn click
@@ -1516,6 +1538,9 @@ jQuery(document).ready(function(){
 
         // get selected shop_name
         const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
+        const n_bedrooms_name = decodeURIComponent(jQuery(".bedroom-btn.selected").data( "n_bedrooms_name" ));
+        const n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
+        const layout_name = jQuery(".layout_size-btn.selected").text();
         let url = wbld.widget_url;
         if (url.includes("project_id=")) {
             url = url.replace(/project_id=\w+/, "project_id=" + hash);
@@ -1524,8 +1549,8 @@ jQuery(document).ready(function(){
         } else {
             url += "?project_id=" + hash;
         }
-        const title = 'AI furniture mood boards from ' + shop_name;
-        const text = 'AI furniture mood boards from ' + shop_name;
+        const title = 'Your design is ready, ' + n_bedrooms_name + ' ' + shop_name;
+        const text = n_bedrooms_name + ' ' + shop_name;
 
         // get all filters buttons selected
         wbld.filters_json = {}
@@ -1548,9 +1573,13 @@ jQuery(document).ready(function(){
             text: text,
             url: url,
             email: email,
+            bedroom_name: n_bedrooms_name,
+            n_bedrooms: n_bedrooms,
+            layout_name: layout_name,
+            shop_name: shop_name,
         };
         //console.log(sharedData);
-        send_POST_to_API(wbld.api2, "send_email/", data);
+        send_POST_to_API(wbld.api1, "send_email/", data);
 
 
         // close product-popup
