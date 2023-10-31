@@ -872,6 +872,7 @@ body.no-scroll {
     width: 100%;
     padding-left: 0%;
     padding-right: 0%;
+    min-width: 346px;
     max-width: 650px;
     height: 325px;
     display: flex;
