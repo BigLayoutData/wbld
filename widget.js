@@ -811,7 +811,7 @@ function output_content(response, outputBar) {
         <div class="widget-container">
             <div class="output-btns">
                 <button class="output-btn-left" id="back-to-before-output-btn">Upload new image</button>
-                <button class="output-btn-right" id="download-pdf-btn">List of products in PDF</button>
+                <button class="output-btn-right" id="download-pdf-btn">Products list in PDF</button>
             </div>
         </div>
     `);
