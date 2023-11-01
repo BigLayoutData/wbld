@@ -565,10 +565,7 @@ function generate_poweredby() {
     `);
 }
 
-function setCoordinates(element, coords) {
-    const parentWidth = element.parentNode.offsetWidth;
-    const parentHeight = element.parentNode.offsetHeight;
-  
+function setCoordinates(parentWidth, parentHeight, element, coords) {
     const x = coords[0] * parentWidth;
     const y =  ( 1 - coords[1] - coords[3] ) * parentHeight;
     const width = coords[2] * parentWidth;
@@ -692,20 +689,19 @@ function output_content(response, outputBar) {
 
             const pmbDiv = document.createElement('div');
             pmbDiv.className = 'product-mood-board';
-
-            const tempDiv = document.createElement('div');
-            tempDiv.id = 'tempDiv';
-            tempDiv.style.height = '100px';
-            tempDiv.style.width = '100%';
-            tempDiv.innerHTML = '&nbsp;';
             
-            pmbDiv.appendChild(tempDiv);
+            //pmbDiv.appendChild(tempDiv);
             wcDiv.appendChild(pmbDiv);
             jQuery('#output').append(wcDiv);
 
-            const roomMoodboardHeight = parseInt(room.room_moodboard_height) / 10;
-            const roomMoodboardWidth = pmbDiv.offsetWidth;
-            pmbDiv.style.height = roomMoodboardWidth * roomMoodboardHeight + 'px';
+            // get pmbDiv css width with jQuery
+            var getWidth;
+            getWidth = function($el){
+                return $el.offsetWidth || getWidth($el.parentElement);
+            }
+            const roomMoodboardWidth = getWidth(pmbDiv);
+            const roomMoodboardHeight = roomMoodboardWidth * parseInt(room.room_moodboard_height) / 10;
+            pmbDiv.style.height = roomMoodboardHeight + 'px';
 
             // Assuming room.products_list is an array of objects with the parameter item_significance
             room.products_list.sort((a, b) => b.item_significance - a.item_significance);
@@ -796,11 +792,8 @@ function output_content(response, outputBar) {
                 productDiv.appendChild(img);
 
                 pmbDiv.appendChild(productDiv);
-                setCoordinates(productDiv, JSON.parse(product.item_ax));
+                setCoordinates(roomMoodboardWidth, roomMoodboardHeight, productDiv, JSON.parse(product.item_ax));
             }
-
-            // Remove tempDiv
-            tempDiv.remove();
 
         }
         

@@ -875,7 +875,6 @@ body.no-scroll {
     min-width: 346px;
     max-width: 650px;
     height: 325px;
-    display: flex;
     justify-content: center;
     align-items: center;
     margin: auto;
