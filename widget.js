@@ -699,7 +699,10 @@ function output_content(response, outputBar) {
             getWidth = function($el){
                 return $el.offsetWidth || getWidth($el.parentElement);
             }
-            const roomMoodboardWidth = getWidth(pmbDiv);
+            let roomMoodboardWidth = getWidth(pmbDiv);
+            if (roomMoodboardWidth > 650) {
+                roomMoodboardWidth = 650;
+            }
             const roomMoodboardHeight = roomMoodboardWidth * parseInt(room.room_moodboard_height) / 10;
             pmbDiv.style.height = roomMoodboardHeight + 'px';
 
