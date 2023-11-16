@@ -1,3 +1,21 @@
+let wbld_widget;
+let url_params = new Map();
+
+class WBLD {
+    constructor(id, widget_name, url_params) {
+        this.id = id;
+        this.widget_name = widget_name;
+        this.url_params = url_params;
+        
+        // Start widget manager
+        this.manager();
+    }
+
+    manager() {
+        wbld.init(this.id, this.widget_name, this.url_params);
+    }
+}
+
 var wbld = { 
     id: 'wbld',
     widget_name: 'no_data',
@@ -18,8 +36,7 @@ var wbld = {
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     products_bucket: 'https://space.biglayoutdata.com/products_',
     // some const for api urls
-    api1: 'https://api.biglayoutdata.com/',
-    api2: 'https://api1.biglayoutdata.com/',
+    api: 'https://api1.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
@@ -65,6 +82,9 @@ var wbld = {
             url_params = url_search_params;
         }
 
+        /*TEMP
+        {"shop_name": "Home Box", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "selected", "shop_id": 3}*/
+
         // start wo check_widget for basic widget
         const is_basic_widget = (this.widget_name === 'wbld_widget_test_server' || this.widget_name === 'wbld_widget') && this.project_id === 'no_data';
         if (is_basic_widget) {
@@ -75,7 +95,7 @@ var wbld = {
             widget_budgets = JSON.stringify(widget_budgets);
             widget_styles = [{"style_name": "Contemporary", "selected": "selected", "style_id": 1}, {"style_name": "Neoclassic", "selected": "", "style_id": 2}];
             widget_styles = JSON.stringify(widget_styles);
-            widget_shops = [{"country_name": "UAE", "country_code": "AE", "country_id": 1, "country_flag": "&#127462;&#127466;", "country_currency": "AED", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "", "shop_id": 3}, {"shop_name": "West Elm", "selected": "", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "", "shop_id": 5}]}, {"country_name": "KSA", "country_code": "SA", "country_id": 2, "country_flag": "&#127480;&#127462;", "country_currency": "SAR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "", "shop_id": 3}, {"shop_name": "West Elm", "selected": "", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "", "shop_id": 5}]}, {"country_name": "USA", "country_code": "US", "country_id": 3, "country_flag": "&#127482;&#127480;", "country_currency": "USD", "selected": "selected", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}]}, {"country_name": "IND", "country_code": "IN", "country_id": 4, "country_flag": "&#127470;&#127475;", "country_currency": "INR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}]}];
+            widget_shops = [{"country_name": "USA", "country_code": "US", "country_id": 1, "country_flag": "&#127482;&#127480;", "country_currency": "USD", "selected": "selected", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Ashley", "selected": "selected", "shop_id": 2}]}, {"country_name": "IND", "country_code": "IN", "country_id": 2, "country_flag": "&#127470;&#127475;", "country_currency": "INR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}]}, {"country_name": "UAE", "country_code": "AE", "country_id": 3, "country_flag": "&#127462;&#127466;", "country_currency": "AED", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}, {"country_name": "KSA", "country_code": "SA", "country_id": 4, "country_flag": "&#127480;&#127462;", "country_currency": "SAR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}];
             widget_shops = JSON.stringify(widget_shops);
             widget_parameters = {"widget_font": "'Raleway', sans-serif", "widget_font_link": "https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap", "btn_color": "#E4B944", "btn_font_color": "#000000"};
             widget_parameters = JSON.stringify(widget_parameters);
@@ -102,7 +122,7 @@ var wbld = {
         };
         //console.log("data:", data);
         jQuery.ajax({
-            url: this.api1 + 'check_widget/',
+            url: this.api + 'check_widget/',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
@@ -282,48 +302,8 @@ function start(widget_layout_id, widget_n_bedrooms, widget_budgets, widget_style
     const countries_list = JSON.parse(widget_shops);
     let shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
 
-    // get country_name from wbld.widget_domain
-    // change countries_list.selected if needed
-    // if share loading - not needed to change countries_list.selected
-    if (wbld.project_id !== 'no_data' || countries_list.length === 1) {
-        generate_input(n_bedrooms_list, countries_list, shops_list, budgets_list);
-        return;
-    }
-
-    // if standart loading
-    if (["uae", "ksa", "usa", "ind"].includes(wbld.widget_domain.split('-')[0])) {
-        countries_list.forEach(function(item) {
-            if (item.country_name === wbld.widget_domain.split('-')[0].toUpperCase()) {
-                item.selected = 'selected';
-            } else {
-                item.selected = '';
-            }
-        });
-
-        shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
-        generate_input(n_bedrooms_list, countries_list, shops_list, budgets_list);
-        return;
-    }
-
-    // if countries_list.length > 1
-    fetch("https://ipinfo.io/json?token=20e5b2bc3a74f5")
-        .then((response) => response.json())
-        .then((jsonResponse) => {
-            if (["AE", "SA", "US", "IN"].includes(jsonResponse.country)) {
-                countries_list.forEach(function(item) {
-                    if (item.country_code === jsonResponse.country) {
-                        item.selected = 'selected';
-                    } else {
-                        item.selected = '';
-                    }
-                });
-            }
-            shops_list = countries_list.find(item => item.selected === 'selected').shops_list;
-            generate_input(n_bedrooms_list, countries_list, shops_list, budgets_list);
-        })
-        .catch((error) => {
-            console.error('Error fetching IP information:', error);
-        });
+    
+    generate_input(n_bedrooms_list, countries_list, shops_list, budgets_list);
 }
 
 function generate_input(n_bedrooms_list, countries_list, shops_list, budgets_list) {
@@ -468,7 +448,7 @@ function generate_before_output() {
                 Furnish Your <span class='word-room'>Rooms</span> from Store Next Door Using <span class='word-room'>AI</span>
             </div>
             <div class="main-description">
-                Start by uploading an inspiring image, and we'll match you with similar furniture nearby. Then, tap 'Create Project'
+                Start by choosing an inspiring image, and we'll match you with similar furniture nearby. Then, tap 'Create Project'
             </div>
         </div>
 
@@ -483,18 +463,6 @@ function generate_before_output() {
                 <div id="file-preview">
                     ${wbld.project_id !== 'no_data' ? `<img class="inspiring-image img-selected" alt="Inspiring Image" data-inspiring_image_id=${wbld.project_json.data.inspiring_image_id} data-inspiring_image_name=${wbld.project_json.data.inspiring_image_name} />` : ''}
                 </div>
-            </div>
-        </div>
-
-        <div class="widget-container">
-            <div class="main-description">
-                <button class="generate-btn">Create Project</button>
-            </div>
-        </div>
-
-        <div class="widget-container">
-            <div class="main-description">
-                Or choose one of our inspiring images
             </div>
         </div>
 
@@ -596,7 +564,7 @@ function update_output() {
     
     // start outputBar
     const outputBar = new progressBar('progress-bar', 'output', 'We are selecting furniture that fits your layout!');
-    outputBar.start(speed=200);
+    outputBar.start(speed=300);
     
     if (wbld.project_id === 'no_data') {
         // get style, country, shop, budget_id
@@ -604,7 +572,12 @@ function update_output() {
         const inspiring_image_id = jQuery(".inspiring-image.img-selected").data( "inspiring_image_id" );
         const inspiring_image_name = jQuery(".inspiring-image.img-selected").data( "inspiring_image_name" );
         const country = jQuery(".country-btn.selected").data( "country_name" );
-        const shop = jQuery(".shop-btn.selected").data( "shop_name" );
+        // get all selected shops in string by , separator
+        let shops = '';
+        jQuery(".shop-btn.selected").each(function() {
+            shops += jQuery(this).data( "shop_name" ) + ', ';
+        });
+        //const shop = jQuery(".shop-btn.selected").data( "shop_name" );
         const budget_id = jQuery(".budget-btn.selected").data( "budget_id" );
 
         // Create a FormData object to send the file and other data
@@ -616,7 +589,8 @@ function update_output() {
         formData.append("inspiring_image_id", inspiring_image_id);
         formData.append("inspiring_image_name", inspiring_image_name);
         formData.append("country", country);
-        formData.append("shop", shop);
+        //formData.append("shop", shop);
+        formData.append("shops", shops);
         formData.append("budget_id", budget_id);
 
         if (inspiring_image_id === 0) {
@@ -626,7 +600,7 @@ function update_output() {
         }
 
         jQuery.ajax({
-            url: `${wbld.api1}generate/`,
+            url: `${wbld.api}generate/`,
             type: "POST", // Use POST method to send data
             data: formData, // Send the FormData object
             cache: false,
@@ -874,7 +848,7 @@ function send_POST_to_API(api, method, data) {
     
 }
 
-function get_bucket(product_image, product_shop) {    
+function get_bucket(product_image, product_shop) {
     let bucket_name = wbld.products_bucket + product_shop.replace(" ", "_") + "/";
     return bucket_name + product_image;
 }
@@ -942,10 +916,11 @@ jQuery(document).ready(function(){
         // hide before-output
         jQuery('#before-output').css('display', 'none');
         jQuery('#output').css('display', 'block');
+        jQuery('#wbld').scrollTop(0);
     });
     
     jQuery(document).on('click', '.filter-btn', function(event) {
-        jQuery(this).toggleClass("selected");
+        //jQuery(this).toggleClass("selected");
 
         // show generate-btn
         // hide save-share-btn
@@ -975,7 +950,7 @@ jQuery(document).ready(function(){
             "filter_name": "bedroom-btn",
             "filter_value": `n_bedrooms_name: ${n_bedrooms_name}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.layout_size-btn', function(event) {
@@ -991,7 +966,7 @@ jQuery(document).ready(function(){
             "filter_name": "layout_size-btn",
             "filter_value": `layout_id: ${layout_id}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.budget-btn', function(event) {
@@ -1010,7 +985,7 @@ jQuery(document).ready(function(){
             "filter_name": "budget-btn",
             "filter_value": `budget_name: ${budget_name}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.style-btn', function(event) {
@@ -1028,7 +1003,7 @@ jQuery(document).ready(function(){
             "filter_name": "style-btn",
             "filter_value": `style_name: ${style_name}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
 
     jQuery(document).on('click', '.country-btn', function(event) {
@@ -1057,16 +1032,29 @@ jQuery(document).ready(function(){
             "filter_name": "country-btn",
             "filter_value": `country_name: ${country_name}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', '.shop-btn', function(event) {
-        jQuery(".shop-btn").removeClass("selected");
-        jQuery(this).addClass("selected");
+        //jQuery(".shop-btn").removeClass("selected");
+        //jQuery(this).addClass("selected");
+        
+        // removeClass selected only if this not last selected shop
+        if (jQuery(".shop-btn.selected").length > 1) {
+            jQuery(this).toggleClass("selected");
+        } else {
+            if (jQuery(this).hasClass("selected")) {
+                // Last shop selected
+            } else {
+                jQuery(this).addClass("selected");
+            }
+        }
+
         jQuery('#shopsPopup').scrollTop(0);
         jQuery('#shopsPopup').toggleClass("done");
         
-        const shop_name = decodeURIComponent(jQuery(this).data( "shop_name" ));
+        //const shop_name = decodeURIComponent(jQuery(this).data( "shop_name" ));
+        const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
         const country_flag = decodeURIComponent(jQuery(".country-btn.selected").data( "country_flag" ));
         
         jQuery("#shops-select").html(`${shop_name} ${country_flag}`);
@@ -1078,7 +1066,7 @@ jQuery(document).ready(function(){
             "filter_name": "shop-btn",
             "filter_value": `shop_name: ${shop_name}`
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', function(event) {
@@ -1117,7 +1105,7 @@ jQuery(document).ready(function(){
             "filter_name": "select-btn",
             "filter_value": popup_id
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
     
     jQuery(document).on('click', 'a.btn-product-link', function(event) {
@@ -1144,7 +1132,7 @@ jQuery(document).ready(function(){
         "item_amount": item_amount
         };
         
-        send_POST_to_API(wbld.api1, 'product_click/', data);
+        send_POST_to_API(wbld.api, 'product_click/', data);
     });
 
     //open product change popup on product image click
@@ -1154,6 +1142,9 @@ jQuery(document).ready(function(){
         const productsListTotal = JSON.parse(jQuery(this).attr('data-products_list_total'));
         const room_id = jQuery(this).attr('data-room_id');
         const item_ax = jQuery(this).attr('data-item_ax');
+
+        // TEMP check product_color, product_color_small, product_color_big, product_color_general
+        console.log("product_color", product.product_color, "product_color_small", product.product_color_small, "product_color_big", product.product_color_big, "product_color_general", product.product_color_general)
         
         // Clear the previous content
         jQuery('#product-popup-content').empty();
@@ -1229,7 +1220,7 @@ jQuery(document).ready(function(){
         "out_product_id": 0
         };
         
-        send_POST_to_API(wbld.api2, 'product_change_click/', data);
+        send_POST_to_API(wbld.api, 'product_change_click/', data);
     });
 
     // Close the popup when clicking outside the content
@@ -1330,7 +1321,7 @@ jQuery(document).ready(function(){
             "out_product_id": product_id_for_change
         };
         
-        send_POST_to_API(wbld.api2, 'product_change_click/', data);
+        send_POST_to_API(wbld.api, 'product_change_click/', data);
     }); 
 
     // Inspiring Image File Upload
@@ -1367,7 +1358,7 @@ jQuery(document).ready(function(){
             "filter_name": "input file",
             "filter_value": selectedFile.name
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
 
     // Inspiring Image img-selected click
@@ -1384,7 +1375,7 @@ jQuery(document).ready(function(){
             "filter_name": "inspiring-image",
             "filter_value": inspiring_image_id
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
 
     // Open Web Share API on save-share-btn click
@@ -1396,8 +1387,10 @@ jQuery(document).ready(function(){
         const hash = `${visitor_id}${timestamp}`;
         //console.log(`Unique URL hash ${hash}, length ${hash.length}`);
 
-        // get selected shop_name
-        const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
+        // get selected shop_names string by comma
+        const shop_names = jQuery(".shop-btn.selected").map(function() {
+            return decodeURIComponent(jQuery(this).data( "shop_name" ));
+        }).get().join(", ");
         let url = wbld.widget_url;
         if (url.includes("project_id=")) {
             url = url.replace(/project_id=\w+/, "project_id=" + hash);
@@ -1406,8 +1399,8 @@ jQuery(document).ready(function(){
         } else {
             url += "?project_id=" + hash;
         }
-        const title = 'AI furniture mood boards from ' + shop_name;
-        const text = 'AI furniture mood boards from ' + shop_name;
+        const title = 'AI furniture mood boards from ' + shop_names;
+        const text = 'AI furniture mood boards from ' + shop_names;
 
         const shareData = {
             title: title,
@@ -1435,7 +1428,11 @@ jQuery(document).ready(function(){
         // get all filters buttons selected
         wbld.filters_json = {}
         wbld.filters_json.country_id = jQuery(".country-btn.selected").data( "country_id" );
-        wbld.filters_json.shop_id = jQuery(".shop-btn.selected").data( "shop_id" );
+        // get selected shop_names string by comma
+        wbld.filters_json.shop_ids = jQuery(".shop-btn.selected").map(function() {
+            return jQuery(this).data( "shop_id" );
+        }).get().join(",");
+        //wbld.filters_json.shop_id = jQuery(".shop-btn.selected").data( "shop_id" );
         wbld.filters_json.style_id = jQuery(".style-btn.selected").data( "style_id" );
         wbld.filters_json.budget_id = jQuery(".budget-btn.selected").data( "budget_id" );
         wbld.filters_json.n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
@@ -1450,7 +1447,7 @@ jQuery(document).ready(function(){
             "project_id": hash,
             "project_json": JSON.stringify(wbld.project_json),
         };
-        send_POST_to_API(wbld.api1, "user_project/", data);
+        send_POST_to_API(wbld.api, "user_project/", data);
     });
 
     // back-to-before-output-btn click
@@ -1484,7 +1481,7 @@ jQuery(document).ready(function(){
             "filter_name": "back-to-before-output-btn",
             "filter_value": "click"
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
 
     // download-btn click
@@ -1518,7 +1515,7 @@ jQuery(document).ready(function(){
             "filter_name": "download-pdf-btn",
             "filter_value": "click"
         };
-        send_POST_to_API(wbld.api2, "user_filter_click/", data);
+        send_POST_to_API(wbld.api, "user_filter_click/", data);
     });
 
     // send-email-btn click
@@ -1543,8 +1540,11 @@ jQuery(document).ready(function(){
         const hash = `${visitor_id}${timestamp}`;
         //console.log(`Unique URL hash ${hash}, length ${hash.length}`);
 
-        // get selected shop_name
-        const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
+        // get selected shop_names string by comma
+        const shop_names = jQuery(".shop-btn.selected").map(function() {
+            return decodeURIComponent(jQuery(this).data( "shop_name" ));
+        }).get().join(", ");
+        //const shop_name = decodeURIComponent(jQuery(".shop-btn.selected").data( "shop_name" ));
         const n_bedrooms_name = decodeURIComponent(jQuery(".bedroom-btn.selected").data( "n_bedrooms_name" ));
         const n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
         const layout_name = jQuery(".layout_size-btn.selected").text();
@@ -1556,13 +1556,17 @@ jQuery(document).ready(function(){
         } else {
             url += "?project_id=" + hash;
         }
-        const title = 'Your design is ready, ' + n_bedrooms_name + ' ' + shop_name;
-        const text = n_bedrooms_name + ' ' + shop_name;
+        const title = 'Your design is ready, ' + n_bedrooms_name + ' ' + shop_names;
+        const text = n_bedrooms_name + ' ' + shop_names;
 
         // get all filters buttons selected
         wbld.filters_json = {}
         wbld.filters_json.country_id = jQuery(".country-btn.selected").data( "country_id" );
-        wbld.filters_json.shop_id = jQuery(".shop-btn.selected").data( "shop_id" );
+        // get selected shop_names string by comma
+        wbld.filters_json.shop_ids = jQuery(".shop-btn.selected").map(function() {
+            return jQuery(this).data( "shop_id" );
+        }).get().join(",");
+        //wbld.filters_json.shop_id = jQuery(".shop-btn.selected").data( "shop_id" );
         wbld.filters_json.style_id = jQuery(".style-btn.selected").data( "style_id" );
         wbld.filters_json.budget_id = jQuery(".budget-btn.selected").data( "budget_id" );
         wbld.filters_json.n_bedrooms = jQuery(".bedroom-btn.selected").data( "n_bedrooms" );
@@ -1583,10 +1587,10 @@ jQuery(document).ready(function(){
             bedroom_name: n_bedrooms_name,
             n_bedrooms: n_bedrooms,
             layout_name: layout_name,
-            shop_name: shop_name,
+            shop_names: shop_names,
         };
         //console.log(sharedData);
-        send_POST_to_API(wbld.api1, "send_email/", data);
+        send_POST_to_API(wbld.api, "send_email/", data);
 
 
         // close product-popup

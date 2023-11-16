@@ -134,6 +134,7 @@
     color: #000000;
 }
 .user-inspiring-image {
+    display: none;
     width: 100%;
     margin: 10px 0px 10px 0px;
 }

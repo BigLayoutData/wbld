@@ -1,5 +1,5 @@
 <?php
-$version = "1.6.3";
+$version = "1.7.0";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,17 +39,12 @@ $version = "1.6.3";
     <!-- BigLayoutData widget (widget.js) -->
     <div id="wbld"></div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="widget.js?v=<?php echo $version; ?>" type="text/javascript"></script>
     <script type="text/javascript">
-        jQuery(document).ready(function($) {
-            var scriptElement = document.createElement('script');
-            scriptElement.src = 'widget.js?v=<?php echo $version; ?>';
-            scriptElement.type = 'text/javascript';
-            scriptElement.async = true;
-            scriptElement.onload = function() {
-                var url_params = new Map();
-                wbld.init(id='wbld', widget_name='wbld_widget', url_params=url_params);
-            };
-            document.body.appendChild(scriptElement);
+        jQuery(document).ready(function() {
+            window.addEventListener('load', function() {
+                wbld_widget = new WBLD(id='wbld', widget_name='wbld_widget', url_params=url_params);
+            });
         });
     </script>
     <link href="widget.css?v=<?php echo $version; ?>" rel="stylesheet" type="text/css">
