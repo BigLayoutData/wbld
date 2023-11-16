@@ -784,7 +784,7 @@ function output_content(response, outputBar) {
     jQuery('#output').append(`
         <div class="widget-container">
             <div class="output-btns">
-                <button class="output-btn-left" id="back-to-before-output-btn">Upload new image</button>
+                <button class="output-btn-left" id="back-to-before-output-btn">Select new image</button>
                 <button class="output-btn-right" id="download-pdf-btn">Products list in PDF</button>
             </div>
         </div>
@@ -1144,7 +1144,7 @@ jQuery(document).ready(function(){
         const item_ax = jQuery(this).attr('data-item_ax');
 
         // TEMP check product_color, product_color_small, product_color_big, product_color_general
-        console.log("product_color", product.product_color, "product_color_small", product.product_color_small, "product_color_big", product.product_color_big, "product_color_general", product.product_color_general)
+        //console.log("product_color", product.product_color, "product_color_small", product.product_color_small, "product_color_big", product.product_color_big, "product_color_general", product.product_color_general)
         
         // Clear the previous content
         jQuery('#product-popup-content').empty();
