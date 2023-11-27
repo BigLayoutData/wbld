@@ -1,5 +1,5 @@
 <?php
-$version = "1.7.2";
+$version = "1.7.4";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,10 +7,10 @@ $version = "1.7.2";
     <meta charset="UTF-8">
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Furnish Your Rooms from Store Next Door Using AI</title>
+    <title>AI Furniture Planner</title>
     <meta name="description" content="Furnish Rooms Using AI from IKEA, Home Centre, Home Box, West Elm, Pottery Barn, Danube Home, OC Home.">
     <meta name="keywords" content="furniture, select furniture, ai interior design, ai interior, ai design, ai tool for furnishing, Home Centre, IKEA, Home Box, Danube Home, OC Home, West Elm, Pottery Barn">
-    <meta property="og:title" content="Furnish Your Rooms from Store Next Door Using AI">
+    <meta property="og:title" content="AI Furniture Planner">
     <meta property="og:description" content="Furnish Rooms Using AI from IKEA, Home Centre, Home Box, West Elm, Pottery Barn, Danube Home, OC Home.">
     <meta property="og:url" content="https://widget.biglayoutdata.com">
     <meta property="og:image" content="https://space.biglayoutdata.com/pics/Furnish-Your-Rooms.webp">
