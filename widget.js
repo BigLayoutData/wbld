@@ -36,7 +36,7 @@ var wbld = {
     room_in_layout_img: 'https://space.biglayoutdata.com/room-in-layout-img/',
     products_bucket: 'https://space.biglayoutdata.com/products_',
     // some const for api urls
-    api: 'https://api1.biglayoutdata.com/',
+    api: 'https://api.biglayoutdata.com/',
     // widget initialization method 
     init: function(id, widget_name, url_params) {
         // check if the HTML element with the specified id exists on the page
