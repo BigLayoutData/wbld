@@ -92,7 +92,7 @@ var wbld = {
             widget_budgets = JSON.stringify(widget_budgets);
             widget_styles = [{"style_name": "Contemporary", "selected": "selected", "style_id": 1}, {"style_name": "Neoclassic", "selected": "", "style_id": 2}];
             widget_styles = JSON.stringify(widget_styles);
-            widget_shops = [{"country_name": "UAE", "country_code": "AE", "country_id": 1, "country_flag": "&#127462;&#127466;", "country_currency": "AED", "selected": "selected", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "selected", "shop_id": 3}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}, {"country_name": "KSA", "country_code": "SA", "country_id": 2, "country_flag": "&#127480;&#127462;", "country_currency": "SAR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "selected", "shop_id": 3}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}, {"country_name": "IND", "country_code": "IN", "country_id": 3, "country_flag": "&#127470;&#127475;", "country_currency": "INR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}]}, {"country_name": "USA", "country_code": "US", "country_id": 4, "country_flag": "&#127482;&#127480;", "country_currency": "USD", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Ashley", "selected": "selected", "shop_id": 2}]}];
+            widget_shops = [{"country_name": "USA", "country_code": "US", "country_id": 1, "country_flag": "&#127482;&#127480;", "country_currency": "USD", "selected": "selected", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Ashley", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Depot", "selected": "selected", "shop_id": 3}]}, {"country_name": "UAE", "country_code": "AE", "country_id": 2, "country_flag": "&#127462;&#127466;", "country_currency": "AED", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "selected", "shop_id": 3}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}, {"country_name": "KSA", "country_code": "SA", "country_id": 3, "country_flag": "&#127480;&#127462;", "country_currency": "SAR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}, {"shop_name": "Home Box", "selected": "selected", "shop_id": 2}, {"shop_name": "Home Centre", "selected": "selected", "shop_id": 3}, {"shop_name": "West Elm", "selected": "selected", "shop_id": 4}, {"shop_name": "Pottery Barn", "selected": "selected", "shop_id": 5}]}, {"country_name": "IND", "country_code": "IN", "country_id": 4, "country_flag": "&#127470;&#127475;", "country_currency": "INR", "selected": "", "shops_list": [{"shop_name": "IKEA", "selected": "selected", "shop_id": 1}]}];
             widget_shops = JSON.stringify(widget_shops);
             widget_parameters = {"widget_font": "'Raleway', sans-serif", "widget_font_link": "https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap", "btn_color": "#E4B944", "btn_font_color": "#000000"};
             widget_parameters = JSON.stringify(widget_parameters);
@@ -851,18 +851,39 @@ function get_bucket(product_image, product_shop) {
 
 function get_url(product_url) {
 
-    if (product_url.includes("https://www.westelm.ae")) {
+    if (product_url.includes("westelm")) {
         admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
         product_url = admitad_url + encodeURIComponent(product_url);
         product_url += "&subid=" + wbld.widget_name;
         product_url += "&subid1=" + wbld.partner_id;
     }
 
-    if (product_url.includes("https://www.potterybarn.ae")) {
+    if (product_url.includes("potterybarn")) {
         admitad_url = "https://ad.admitad.com/g/hak848wxff21d78ab6e73929b57187/?ulp=";
         product_url = admitad_url + encodeURIComponent(product_url);
         product_url += "&subid=" + wbld.widget_name;
         product_url += "&subid1=" + wbld.partner_id;
+    }
+
+    if (product_url.includes("ashleyfurniture")) {
+        viglink_url = "http://redirect.viglink.com?u=";
+        product_url = viglink_url + encodeURIComponent(product_url);
+        product_url += "&key=d3cc955495d4bde4695df9e4130c02da";
+        product_url += "&utm_source=" + wbld.widget_name;
+    }
+
+    if (product_url.includes("ikea")) {
+        viglink_url = "http://redirect.viglink.com?u=";
+        product_url = viglink_url + encodeURIComponent(product_url);
+        product_url += "&key=d3cc955495d4bde4695df9e4130c02da";
+        product_url += "&utm_source=" + wbld.widget_name;
+    }
+
+    if (product_url.includes("homedepot")) {
+        viglink_url = "http://redirect.viglink.com?u=";
+        product_url = viglink_url + encodeURIComponent(product_url);
+        product_url += "&key=d3cc955495d4bde4695df9e4130c02da";
+        product_url += "&utm_source=" + wbld.widget_name;
     }
 
     // if product_url contains ? then add & otherwise add ?
@@ -1150,14 +1171,15 @@ jQuery(document).ready(function(){
         jQuery('#product-popup-content').append(`
         <div id="product-popup-info">
             <div id="product-popup-info-title">${product.product_name}</div>
+            <div id="product-popup-info-shop">Shop: <span style="font-weight: 700;">${product.product_shop}</span></div>
             <div id="product-popup-info-amount">Quantity: <span style="font-weight: 700;">${product.item_amount}</span></div>
             <div id="product-popup-info-price">Price: <span style="font-weight: 700;">${Number(product.product_price).toLocaleString()} ${product.product_currency}</span></div>
-            <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
             <div class="product-popup-info-product-link-btn">
                 <a href="${get_url(product.product_url)}" target="_blank" rel="noopener" class="btn-product-link" data-product_id="${product.product_id}" data-product_sku="${product.product_sku}" data-product_name="${product.product_name}" data-product_price="${product.product_price}" data-product_currency="${product.product_currency}" data-item_name="${product.item_name}" data-item_amount="${product.item_amount}">
                     <button class="link-btn">Link to Store</button>
                 </a>
             </div>
+            <div class="product-popup-info-product-comment-btn">${product.product_comment}</div>
         </div>
         `);
 

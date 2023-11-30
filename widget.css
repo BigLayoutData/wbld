@@ -290,6 +290,14 @@
     font-size: 13px;
     color: #000000;
 }
+#product-popup-info-shop {
+    box-sizing: border-box;
+    float: left;
+    width: 100%;
+    padding-bottom: 10px;
+    font-size: 13px;
+    color: #000000;
+}
 .product-popup-info-product-link-btn {
     box-sizing: border-box;
     float: left;
@@ -1050,6 +1058,9 @@ body.no-scroll {
     width: 50%;
 }
 #product-popup-info-amount {
+    width: 50%;
+}
+#product-popup-info-shop {
     width: 50%;
 }
 .product-popup-info-product-comment-btn {
