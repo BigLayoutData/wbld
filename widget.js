@@ -851,19 +851,19 @@ function get_bucket(product_image, product_shop) {
 
 function get_url(product_url) {
 
-    if (product_url.includes("westelm")) {
-        admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
-        product_url = admitad_url + encodeURIComponent(product_url);
-        product_url += "&subid=" + wbld.widget_name;
-        product_url += "&subid1=" + wbld.partner_id;
-    }
+    // if (product_url.includes("westelm")) {
+    //     admitad_url = "https://ad.admitad.com/g/03mwou5x7x21d78ab6e7cf8e2e3afe/?ulp=";
+    //     product_url = admitad_url + encodeURIComponent(product_url);
+    //     product_url += "&subid=" + wbld.widget_name;
+    //     product_url += "&subid1=" + wbld.partner_id;
+    // }
 
-    if (product_url.includes("potterybarn")) {
-        admitad_url = "https://ad.admitad.com/g/hak848wxff21d78ab6e73929b57187/?ulp=";
-        product_url = admitad_url + encodeURIComponent(product_url);
-        product_url += "&subid=" + wbld.widget_name;
-        product_url += "&subid1=" + wbld.partner_id;
-    }
+    // if (product_url.includes("potterybarn")) {
+    //     admitad_url = "https://ad.admitad.com/g/hak848wxff21d78ab6e73929b57187/?ulp=";
+    //     product_url = admitad_url + encodeURIComponent(product_url);
+    //     product_url += "&subid=" + wbld.widget_name;
+    //     product_url += "&subid1=" + wbld.partner_id;
+    // }
 
     if (product_url.includes("ashleyfurniture")) {
         viglink_url = "http://redirect.viglink.com?u=";
