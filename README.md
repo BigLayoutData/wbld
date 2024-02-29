@@ -12,36 +12,21 @@ We leverage AI and a database of floor plans to curate furniture sets from local
 <!-- BigLayoutData widget (widget.js) -->
 <div id="wbld"></div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<link href="https://widget.biglayoutdata.com/widget.css" rel="stylesheet" type="text/css" />
+<script src="widget.js" type="text/javascript"></script>
 <script type="text/javascript">
-    jQuery(document).ready(function($) {
-        var scriptElement = document.createElement('script');
-        scriptElement.src = 'https://widget.biglayoutdata.com/widget.js';
-        scriptElement.type = 'text/javascript';
-        scriptElement.onload = function() {
-            var url_params = new Map();
-            wbld.init(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
-        };
-        document.body.appendChild(scriptElement);
+    jQuery(document).ready(function() {
+        window.addEventListener('load', function() {
+            wbld_widget = new WBLD(id='wbld', widget_name='YOUR_WIDGET_NAME', url_params=url_params);
+        });
     });
 </script>
+<link href="widget.css" rel="stylesheet" type="text/css">
+<!-- BigLayoutData widget (widget.js) -->
 ```
 
 Replace ```YOUR_WIDGET_NAME``` with the widget name you received in step 1.
 
 The widget should now be installed and activated!
-
-## partner_id in URL
-
-To open a URL with partner_id parameter, you can use the following format:
-
-```https://widget.biglayoutdata.com/?partner_id=[partner_id]```
-
-Replace ```[partner_id]``` with your partner name.
-
-For example, to open a URL with partner name ```partner_test```:
-
-https://widget.biglayoutdata.com/?partner_id=partner_test
 
 ## Getting help
 
