@@ -1,6 +1,6 @@
 # Widget BigLayoutData Quickstart
 
-User-friendly furnishing widget for your apartment layout.
+User-friendly furnishing widget for your apartment layout in USA.
 We leverage AI and a database of floor plans to curate furniture sets from local stores that align with users&#039; layout, budget, and style preferences.
 
 ## Setup
