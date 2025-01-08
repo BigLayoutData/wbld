@@ -1,12 +1,12 @@
 # Widget BigLayoutData Quickstart
 
-User-friendly furnishing widget for your apartment layout in Dubai.
+User-friendly furnishing widget for your apartment layout.
 We leverage AI and a database of floor plans to curate furniture sets from local stores that align with users&#039; layout, budget, and style preferences.
 
 ## Setup
 
-1. To start the setup process, you will need to obtain your ```YOUR_WIDGET_NAME```. Please email us at contact@biglayoutdata.com to receive this.
-2. Once you have your widget name, insert the following code within the ```<body>``` tag on your website:
+1. To start the setup process, you will need to obtain your `YOUR_WIDGET_NAME`. Please email us at contact@biglayoutdata.com to receive this.
+2. Once you have your widget name, insert the following code within the `<body>` tag on your website:
 
 ```
 <!-- BigLayoutData widget (widget.js) -->
@@ -24,7 +24,7 @@ We leverage AI and a database of floor plans to curate furniture sets from local
 <!-- BigLayoutData widget (widget.js) -->
 ```
 
-Replace ```YOUR_WIDGET_NAME``` with the widget name you received in step 1.
+Replace `YOUR_WIDGET_NAME` with the widget name you received in step 1.
 
 The widget should now be installed and activated!
 
